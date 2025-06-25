@@ -178,22 +178,21 @@ preinstall/fast:
 
 # clear depends
 depend:
-	$(CMAKE_COMMAND) -P /Users/htanphuc/Documents/GitHub/CS202_Mario_Game/CMakeFiles/VerifyGlobs.cmake
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named CS202
+# Target rules for targets named Mario
 
 # Build rule for target.
-CS202: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CS202
-.PHONY : CS202
+Mario: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 Mario
+.PHONY : Mario
 
 # fast build rule for target.
-CS202/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CS202.dir/build.make CMakeFiles/CS202.dir/build
-.PHONY : CS202/fast
+Mario/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Mario.dir/build.make CMakeFiles/Mario.dir/build
+.PHONY : Mario/fast
 
 #=============================================================================
 # Target rules for targets named raylib
@@ -205,7 +204,7 @@ raylib: cmake_check_build_system
 
 # fast build rule for target.
 raylib/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/CMakeFiles/raylib.dir/build.make _deps/raylib-build/raylib/CMakeFiles/raylib.dir/build
+	$(MAKE) $(MAKESILENT) -f lib/raylib/build/raylib/CMakeFiles/raylib.dir/build.make lib/raylib/build/raylib/CMakeFiles/raylib.dir/build
 .PHONY : raylib/fast
 
 #=============================================================================
@@ -218,7 +217,7 @@ glfw: cmake_check_build_system
 
 # fast build rule for target.
 glfw/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build
+	$(MAKE) $(MAKESILENT) -f lib/raylib/build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build.make lib/raylib/build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build
 .PHONY : glfw/fast
 
 #=============================================================================
@@ -231,7 +230,7 @@ update_mappings: cmake_check_build_system
 
 # fast build rule for target.
 update_mappings/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
+	$(MAKE) $(MAKESILENT) -f lib/raylib/build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build.make lib/raylib/build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
 .PHONY : update_mappings/fast
 
 #=============================================================================
@@ -244,7 +243,7 @@ box2d: cmake_check_build_system
 
 # fast build rule for target.
 box2d/fast:
-	$(MAKE) $(MAKESILENT) -f _deps/box2d-build/src/CMakeFiles/box2d.dir/build.make _deps/box2d-build/src/CMakeFiles/box2d.dir/build
+	$(MAKE) $(MAKESILENT) -f lib/box2d/build/src/CMakeFiles/box2d.dir/build.make lib/box2d/build/src/CMakeFiles/box2d.dir/build
 .PHONY : box2d/fast
 
 src/main.o: src/main.cpp.o
@@ -252,7 +251,7 @@ src/main.o: src/main.cpp.o
 
 # target to build an object file
 src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CS202.dir/build.make CMakeFiles/CS202.dir/src/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Mario.dir/build.make CMakeFiles/Mario.dir/src/main.cpp.o
 .PHONY : src/main.cpp.o
 
 src/main.i: src/main.cpp.i
@@ -260,7 +259,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CS202.dir/build.make CMakeFiles/CS202.dir/src/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Mario.dir/build.make CMakeFiles/Mario.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -268,8 +267,32 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/CS202.dir/build.make CMakeFiles/CS202.dir/src/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Mario.dir/build.make CMakeFiles/Mario.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
+
+src/temp.o: src/temp.cpp.o
+.PHONY : src/temp.o
+
+# target to build an object file
+src/temp.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Mario.dir/build.make CMakeFiles/Mario.dir/src/temp.cpp.o
+.PHONY : src/temp.cpp.o
+
+src/temp.i: src/temp.cpp.i
+.PHONY : src/temp.i
+
+# target to preprocess a source file
+src/temp.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Mario.dir/build.make CMakeFiles/Mario.dir/src/temp.cpp.i
+.PHONY : src/temp.cpp.i
+
+src/temp.s: src/temp.cpp.s
+.PHONY : src/temp.s
+
+# target to generate assembly for a file
+src/temp.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Mario.dir/build.make CMakeFiles/Mario.dir/src/temp.cpp.s
+.PHONY : src/temp.cpp.s
 
 # Help Target
 help:
@@ -286,13 +309,16 @@ help:
 	@echo "... package_source"
 	@echo "... rebuild_cache"
 	@echo "... update_mappings"
-	@echo "... CS202"
+	@echo "... Mario"
 	@echo "... box2d"
 	@echo "... glfw"
 	@echo "... raylib"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/temp.o"
+	@echo "... src/temp.i"
+	@echo "... src/temp.s"
 .PHONY : help
 
 
@@ -304,7 +330,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -P /Users/htanphuc/Documents/GitHub/CS202_Mario_Game/CMakeFiles/VerifyGlobs.cmake
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

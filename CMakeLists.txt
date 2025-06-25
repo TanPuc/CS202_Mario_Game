@@ -1,70 +1,91 @@
-cmake_minimum_required(VERSION 3.30)
-project(CS202 LANGUAGES C CXX)
+cmake_minimum_required(VERSION 3.16)
+project(Mario)
 
-# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(FetchContent)
-set(FETCHCONTENT_QUIET FALSE)
+# Set download and extraction directories
+set(DOWNLOAD_DIR "${CMAKE_SOURCE_DIR}/zip_files")
+set(EXTRACT_DIR "${CMAKE_SOURCE_DIR}/lib")
 
-# Disable examples for Raylib
-set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
+# URLs for dependencies
+set(RAYLIB_URL "https://github.com/raysan5/raylib/archive/refs/heads/master.zip")
+set(BOX2D_URL "https://github.com/erincatto/box2d/archive/refs/heads/main.zip")
 
-# Raylib
-FetchContent_Declare(
-    raylib
-    GIT_REPOSITORY "https://github.com/raysan5/raylib.git"
-    GIT_TAG "master"
-    GIT_PROGRESS TRUE
-)
-FetchContent_MakeAvailable(raylib)
+# Download paths
+set(RAYLIB_ZIP "${DOWNLOAD_DIR}/raylib.zip")
+set(BOX2D_ZIP "${DOWNLOAD_DIR}/box2d.zip")
 
-# RayGUI
-FetchContent_Declare(
-  raygui
-  GIT_REPOSITORY https://github.com/raysan5/raygui.git
-  GIT_TAG master
-  GIT_PROGRESS TRUE
-)
-FetchContent_MakeAvailable(raygui)
+# Extraction paths
+set(RAYLIB_SRC "${EXTRACT_DIR}/raylib")
+set(BOX2D_SRC "${EXTRACT_DIR}/box2d")
 
-# Box2D
-FetchContent_Declare(
-    box2d
-    GIT_REPOSITORY https://github.com/erincatto/box2d.git
-    GIT_TAG main
-    GIT_PROGRESS TRUE
-)
-set(BOX2D_BUILD_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(box2d)
+# Ensure directories exist
+file(MAKE_DIRECTORY ${DOWNLOAD_DIR})
+file(MAKE_DIRECTORY ${EXTRACT_DIR})
 
-# Source files
-file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/src/*.cpp" "${CMAKE_CURRENT_LIST_DIR}/src/*.c")
-set(PROJECT_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/include/")
-
-# Declaring our executable
-add_executable(${PROJECT_NAME} src/main.cpp)
-target_sources(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_INCLUDE})
-
-# Linking Raylib
-target_include_directories(${PROJECT_NAME} PRIVATE ${raylib_SOURCE_DIR}/src)
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
-
-# Linking RayGUI
-target_include_directories(${PROJECT_NAME} PRIVATE ${raygui_SOURCE_DIR}/src)
-target_compile_definitions(${PROJECT_NAME} PRIVATE RAYGUI_IMPLEMENTATION)
-
-# Linking Box2D
-target_include_directories(${PROJECT_NAME} PRIVATE ${box2d_SOURCE_DIR}/include)
-target_link_libraries(${PROJECT_NAME} PRIVATE box2d)
-
-# Linking OS-specific libraries
-if (WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE comdlg32)
+# Download raylib if not already present
+if(NOT EXISTS ${RAYLIB_ZIP})
+    message(STATUS "Downloading raylib...")
+    file(DOWNLOAD ${RAYLIB_URL} ${RAYLIB_ZIP} SHOW_PROGRESS STATUS download_status)
+    list(GET download_status 0 status_code)
+    if(NOT status_code EQUAL 0)
+        message(FATAL_ERROR "Failed to download raylib")
+    endif()
 endif()
 
-# Setting ASSETS_PATH
-target_compile_definitions(${PROJECT_NAME} PUBLIC ASSETS_PATH="${CMAKE_CURRENT_SOURCE_DIR}/assets/")
+# Extract raylib if not already extracted
+if(NOT EXISTS ${RAYLIB_SRC})
+    message(STATUS "Extracting raylib...")
+    file(ARCHIVE_EXTRACT INPUT ${RAYLIB_ZIP} DESTINATION ${EXTRACT_DIR})
+    # Rename extracted folder if necessary
+    file(GLOB raylib_folder "${EXTRACT_DIR}/raylib-*")
+    file(RENAME ${raylib_folder} ${RAYLIB_SRC})
+endif()
+
+# Download box2d if not already present
+if(NOT EXISTS ${BOX2D_ZIP})
+    message(STATUS "Downloading box2d...")
+    file(DOWNLOAD ${BOX2D_URL} ${BOX2D_ZIP} SHOW_PROGRESS STATUS download_status)
+    list(GET download_status 0 status_code)
+    if(NOT status_code EQUAL 0)
+        message(FATAL_ERROR "Failed to download box2d")
+    endif()
+endif()
+
+# Extract box2d if not already extracted
+if(NOT EXISTS ${BOX2D_SRC})
+    message(STATUS "Extracting box2d...")
+    file(ARCHIVE_EXTRACT INPUT ${BOX2D_ZIP} DESTINATION ${EXTRACT_DIR})
+    file(GLOB box2d_folder "${EXTRACT_DIR}/box2d-*")
+    file(RENAME ${box2d_folder} ${BOX2D_SRC})
+endif()
+
+# Add raylib and box2d as subdirectories
+add_subdirectory(${RAYLIB_SRC} ${RAYLIB_SRC}/build)
+add_subdirectory(${BOX2D_SRC} ${BOX2D_SRC}/build)
+
+# Gather sources
+file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/include/*.h" "${CMAKE_SOURCE_DIR}/include/*.hpp")
+
+if(NOT SOURCES)
+    message(FATAL_ERROR "No source files found in src/ directory.")
+endif()
+
+add_executable(Mario ${SOURCES} ${HEADERS})
+
+target_include_directories(Mario PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${RAYLIB_SRC}/src
+    ${BOX2D_SRC}/include
+)
+
+target_link_libraries(Mario PRIVATE raylib box2d)
+
+# Optionally copy assets to build directory
+add_custom_command(TARGET Mario POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets
+    $<TARGET_FILE_DIR:Mario>/assets
+    COMMENT "Copying assets to output directory"
+)

@@ -14,8 +14,6 @@
 # EXTERNAL cache entries
 ########################
 
-BOX2D_BUILD_UNIT_TESTS:BOOL=OFF
-
 //Compile warnings as errors
 BOX2D_COMPILE_WARNING_AS_ERROR:BOOL=OFF
 
@@ -27,8 +25,6 @@ BOX2D_SANITIZE:BOOL=OFF
 
 //Build the examples.
 BUILD_EXAMPLES:BOOL=OFF
-
-BUILD_GAMES:BOOL=OFF
 
 //Build shared libraries
 BUILD_SHARED_LIBS:BOOL=OFF
@@ -46,7 +42,7 @@ CMAKE_BUILD_TYPE:STRING=
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
 //CXX compiler
-CMAKE_CXX_COMPILER:FILEPATH=/Library/Developer/CommandLineTools/usr/bin/c++
+CMAKE_CXX_COMPILER:STRING=/Library/Developer/CommandLineTools/usr/bin/c++
 
 //Flags used by the CXX compiler during all build types.
 CMAKE_CXX_FLAGS:STRING=
@@ -64,7 +60,7 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //C compiler
-CMAKE_C_COMPILER:FILEPATH=/Library/Developer/CommandLineTools/usr/bin/cc
+CMAKE_C_COMPILER:STRING=/Library/Developer/CommandLineTools/usr/bin/cc
 
 //Flags used by the C compiler during all build types.
 CMAKE_C_FLAGS:STRING=
@@ -212,19 +208,19 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=CS202
+CMAKE_PROJECT_NAME:STATIC=Mario
 
 //Value Computed by CMake
-CMAKE_PROJECT_VERSION:STATIC=3.4.0
+CMAKE_PROJECT_VERSION:STATIC=3.1.1
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION_MAJOR:STATIC=3
 
 //Value Computed by CMake
-CMAKE_PROJECT_VERSION_MINOR:STATIC=4
+CMAKE_PROJECT_VERSION_MINOR:STATIC=1
 
 //Value Computed by CMake
-CMAKE_PROJECT_VERSION_PATCH:STATIC=0
+CMAKE_PROJECT_VERSION_PATCH:STATIC=1
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION_TWEAK:STATIC=
@@ -312,15 +308,6 @@ CPACK_SOURCE_TZ:BOOL=ON
 //Enable to build ZIP source packages
 CPACK_SOURCE_ZIP:BOOL=OFF
 
-//Value Computed by CMake
-CS202_BINARY_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game
-
-//Value Computed by CMake
-CS202_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-CS202_SOURCE_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game
-
 //Show options for customizing your Raylib library build.
 CUSTOMIZE_BUILD:BOOL=OFF
 
@@ -344,35 +331,11 @@ FETCHCONTENT_FULLY_DISCONNECTED:BOOL=OFF
 //Enables QUIET option for all content population
 FETCHCONTENT_QUIET:BOOL=ON
 
-//When not empty, overrides where to find pre-populated content
-// for box2d
-FETCHCONTENT_SOURCE_DIR_BOX2D:PATH=
-
-//When not empty, overrides where to find pre-populated content
-// for raygui
-FETCHCONTENT_SOURCE_DIR_RAYGUI:PATH=
-
-//When not empty, overrides where to find pre-populated content
-// for raylib
-FETCHCONTENT_SOURCE_DIR_RAYLIB:PATH=
-
 //Enables UPDATE_DISCONNECTED behavior for all content population
 FETCHCONTENT_UPDATES_DISCONNECTED:BOOL=OFF
 
-//Enables UPDATE_DISCONNECTED behavior just for population of box2d
-FETCHCONTENT_UPDATES_DISCONNECTED_BOX2D:BOOL=OFF
-
-//Enables UPDATE_DISCONNECTED behavior just for population of raygui
-FETCHCONTENT_UPDATES_DISCONNECTED_RAYGUI:BOOL=OFF
-
-//Enables UPDATE_DISCONNECTED behavior just for population of raylib
-FETCHCONTENT_UPDATES_DISCONNECTED_RAYLIB:BOOL=OFF
-
-//Git command line client
-GIT_EXECUTABLE:FILEPATH=/usr/bin/git
-
 //Value Computed by CMake
-GLFW_BINARY_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/_deps/raylib-build/raylib/external/glfw
+GLFW_BINARY_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/lib/raylib/build/raylib/external/glfw
 
 //Build support for Cocoa
 GLFW_BUILD_COCOA:BOOL=ON
@@ -395,10 +358,19 @@ GLFW_IS_TOP_LEVEL:STATIC=OFF
 GLFW_LIBRARY_TYPE:STRING=OBJECT
 
 //Value Computed by CMake
-GLFW_SOURCE_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/_deps/raylib-src/src/external/glfw
+GLFW_SOURCE_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/lib/raylib/src/external/glfw
 
 //Include everything disabled by default (for CI usage)
 INCLUDE_EVERYTHING:BOOL=OFF
+
+//Value Computed by CMake
+Mario_BINARY_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game
+
+//Value Computed by CMake
+Mario_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+Mario_SOURCE_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game
 
 //Path to a library.
 OPENGL_LIBRARY:FILEPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk/System/Library/Frameworks/OpenGL.framework
@@ -416,22 +388,22 @@ USE_EXTERNAL_GLFW:STRING=OFF
 WITH_PIC:BOOL=OFF
 
 //Value Computed by CMake
-box2d_BINARY_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/_deps/box2d-build
+box2d_BINARY_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/lib/box2d/build
 
 //Value Computed by CMake
 box2d_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-box2d_SOURCE_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/_deps/box2d-src
+box2d_SOURCE_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/lib/box2d
 
 //Value Computed by CMake
-raylib_BINARY_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/_deps/raylib-build/raylib
+raylib_BINARY_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/lib/raylib/build/raylib
 
 //Value Computed by CMake
 raylib_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-raylib_SOURCE_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/_deps/raylib-src/src
+raylib_SOURCE_DIR:STATIC=/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/lib/raylib/src
 
 
 ########################
@@ -629,8 +601,6 @@ CPACK_SOURCE_TZ-ADVANCED:INTERNAL=1
 CPACK_SOURCE_ZIP-ADVANCED:INTERNAL=1
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
-//ADVANCED property for variable: GIT_EXECUTABLE
-GIT_EXECUTABLE-ADVANCED:INTERNAL=1
 //Build support for Wayland
 GLFW_BUILD_WAYLAND:INTERNAL=OFF
 //Build support for X11

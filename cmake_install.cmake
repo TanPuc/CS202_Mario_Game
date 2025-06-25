@@ -39,12 +39,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/_deps/raylib-build/cmake_install.cmake")
+  include("/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/lib/raylib/build/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/_deps/box2d-build/cmake_install.cmake")
+  include("/Users/htanphuc/Documents/GitHub/CS202_Mario_Game/lib/box2d/build/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)

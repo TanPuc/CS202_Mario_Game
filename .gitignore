@@ -30,3 +30,31 @@
 *.exe
 *.out
 *.app
+*.cmake
+
+# Build directories
+/build/
+/bin/
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+Makefile
+compile_commands.json
+*.cmake
+
+# Library archives
+zip_files/
+
+# Decompressed headers
+lib/
+  
+# IDE files
+*.user
+*.suo
+*.vcxproj*
+*.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
