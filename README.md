@@ -1,6 +1,8 @@
 # CS202_Mario_Game
 
 ```
-Initialize: cmake .
-Run code: make
+# All commands must be called within the root directory
+Initialize project: cmake .
+Compile project: cmake --build .
+Run game: ./Mario
 ```
