@@ -55,6 +55,7 @@ lib/
 *.suo
 *.vcxproj*
 *.idea/
+.vs/
 
 # OS files
 .DS_Store

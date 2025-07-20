@@ -17,7 +17,7 @@ void DrawEntity(const Entity* entity)
 {
 	// The boxes were created centered on the bodies, but raylib draws textures starting at the top left corner.
 	// b2Body_GetWorldPoint gets the top left corner of the box accounting for rotation.
-	b2Vec2 p = b2Body_GetWorldPoint(entity->bodyId, (b2Vec2) { -entity->extent.x, -entity->extent.y });
+	b2Vec2 p = b2Body_GetWorldPoint(entity->bodyId, b2Vec2 { -entity->extent.x, -entity->extent.y });
 	b2Rot rotation = b2Body_GetRotation(entity->bodyId);
 	float radians = b2Rot_GetAngle(rotation);
 
@@ -70,7 +70,7 @@ int main(void)
 	{
 		Entity* entity = groundEntities + i;
 		b2BodyDef bodyDef = b2DefaultBodyDef();
-		bodyDef.position = (b2Vec2){ (2.0f * i + 2.0f) * groundExtent.x, height - groundExtent.y - 100.0f};
+		bodyDef.position = b2Vec2{ (2.0f * i + 2.0f) * groundExtent.x, height - groundExtent.y - 100.0f};
 
 		// I used this rotation to test the world to screen transformation
 		//bodyDef.rotation = b2MakeRot(0.25f * b2_pi * i);
@@ -96,7 +96,7 @@ int main(void)
 			Entity* entity = boxEntities + boxIndex;
 			b2BodyDef bodyDef = b2DefaultBodyDef();
 			bodyDef.type = b2_dynamicBody;
-			bodyDef.position = (b2Vec2){ x, y };
+			bodyDef.position = b2Vec2{ x, y };
 			entity->bodyId = b2CreateBody(worldId, &bodyDef);
 			entity->texture = boxTexture;
 			entity->extent = boxExtent;
