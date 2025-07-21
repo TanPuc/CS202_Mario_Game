@@ -60,7 +60,7 @@ class EnemyState;
 //
 //};
 //
-//class MoveStrategyWander : public IMoveStrategy
+//class MoveStrategyBasic : public IMoveStrategy
 //{
 //public:
 //	void move(Enemy& e) override;
@@ -125,6 +125,7 @@ private:
 	
 	IMoveStrategy*		m_MoveStrategy		= nullptr;
 	IAttackStrategy*	m_AttackStrategy	= nullptr;
+	ICollisionStrategy* m_CollideStrategy	= nullptr;
 };
 
 

@@ -16,10 +16,10 @@ private:
 
 };
 
-class MoveStrategyWander : public IMoveStrategy
+class MoveStrategyBasic : public IMoveStrategy
 {
 public:
-	MoveStrategyWander(int,Enemy&);
+	MoveStrategyBasic(int,Enemy&);
 	void move(Enemy& e) override;
 
 private:
@@ -76,14 +76,14 @@ private:
 	Vector2* mark;
 	Vector2 randomTarget;
 };
-class MoveStrategyJump : public IMoveStrategy
-{
-public:
-	MoveStrategyJump(int);
-	void move(Enemy&) override;
-private:
-	int magnitude;
-};
+//class MoveStrategyJump : public IMoveStrategy
+//{
+//public:
+//	MoveStrategyJump(int);
+//	void move(Enemy&) override;
+//private:
+//	int magnitude;
+//};
 
 class MoveStrategyCombined :public IMoveStrategy
 {

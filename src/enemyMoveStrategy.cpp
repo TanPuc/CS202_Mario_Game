@@ -31,14 +31,14 @@ void MoveStrategyKeepDistance::move(Enemy& e)
 	e.setVelocity(Vector2Normalize(direction * speed));
 }
 
-MoveStrategyWander::MoveStrategyWander(int value,Enemy& e):
+MoveStrategyBasic::MoveStrategyBasic(int value,Enemy& e):
 	speed(value)
 {
 	Vector2 temp = e.getVelocity();
 	temp.x = speed;
 	e.setVelocity(temp);	//so it is 20 instead of 20+x...
 }
-void MoveStrategyWander::move(Enemy& e)
+void MoveStrategyBasic::move(Enemy& e)
 {
 	if (collisionWall)
 	{
@@ -76,18 +76,18 @@ void MoveStrategyRandom::move(Enemy& e)
 	}
 }
 
-MoveStrategyJump::MoveStrategyJump(int m) :
-	magnitude(m)
-{}
-void MoveStrategyJump::move(Enemy& e)
-{
-	if (collisonFloor)
-	{
-		Vector2 temp = e.getVelocity();
-		temp.x = magnitude;
-		e.setVelocity(temp);
-	}
-}
+//MoveStrategyJump::MoveStrategyJump(int m) :
+//	magnitude(m)
+//{}
+//void MoveStrategyJump::move(Enemy& e)
+//{
+//	if (collisonFloor)
+//	{
+//		Vector2 temp = e.getVelocity();
+//		temp.x = magnitude;
+//		e.setVelocity(temp);
+//	}
+//}
 
 void MoveStrategyCombined::move(Enemy& e)
 {

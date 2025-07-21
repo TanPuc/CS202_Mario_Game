@@ -23,6 +23,8 @@ public:
 private:
 	EnemyManager* m_manager;
 	const int m_type = EnemyType::hammer;
+	float timeTotal = 0;
+	float cooldown = 4;
 };
 
 class AttackFireBall : public IAttackStrategy
@@ -33,6 +35,8 @@ public:
 private:
 	EnemyManager* m_manager;
 	const int m_type = EnemyType::fireball;
+	float timeTotal = 0;
+	float cooldown = 4;
 };
 
 class AttackNothing :public IAttackStrategy

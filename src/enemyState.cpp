@@ -11,7 +11,7 @@ void AliveState::handleInput(Enemy& e, int input)
 }
 void AliveState::enter(Enemy& e)
 {
-	e.setStrategy(new MoveStrategyWander(,e));
+	e.setStrategy(new MoveStrategyBasic(,e));
 }
 
 void DeadState::handleInput(Enemy& e, int input)

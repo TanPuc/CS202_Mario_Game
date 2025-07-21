@@ -2,9 +2,10 @@
 #include "enemyState.h"
 #include "enemyMoveStrategy.h"
 #include "enemyAttackStrategy.h"
+#include "enemyCollisionStrategy.h"
 
 Enemy::Enemy(int type, Vector2 position, EnemyState* state):
-	m_Type(type), m_position(position), m_State(state),
+	m_Type(type), m_position(position), m_State(state)
 {}
 Enemy::~Enemy()
 {
