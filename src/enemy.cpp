@@ -1,30 +1,11 @@
 #include "enemy.h"
 #include "enemyState.h"
 #include "enemyMoveStrategy.h"
+#include "enemyAttackStrategy.h"
 
-Enemy::Enemy(int type):
-	m_MoveStrategy(nullptr),m_State(nullptr),m_Type(0)
-{
-	switch (type)
-	{
-	case EnemyType::goopa:
-	{
-		m_MoveStrategy = new MoveStrategyWander();
-		m_State = new AliveState();
-
-		break;
-	}
-	case EnemyType::koopa:
-	{
-		m_MoveStrategy = new MoveStrategyWander();
-		m_State = new AliveState();
-
-		break;
-	}
-	default:
-		break;
-	}
-}
+Enemy::Enemy(int type, Vector2 position, EnemyState* state):
+	m_Type(type), m_position(position), m_State(state),
+{}
 Enemy::~Enemy()
 {
 	destroy();

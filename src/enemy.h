@@ -3,8 +3,15 @@
 #include "raylib.h"
 
 enum EnemyType {
+	nothing = 0,
+
 	goopa = 1,
 	koopa = 2,
+
+	hammer = 10,
+	fireball = 11,
+	spiny = 12,
+
 
 };
 
@@ -83,12 +90,13 @@ class EnemyState;
 //	void move(Enemy& e) override;
 //};
 class IMoveStrategy;
+class IAttackStrategy;
 
 //context
 class Enemy
 {
 public:
-	Enemy(int type);
+	Enemy(int type, Vector2 position, EnemyState* state);
 	~Enemy();
 
 	void setStrategy(IMoveStrategy*);
@@ -106,15 +114,19 @@ public:
 	Vector2 getPositon() const;
 
 private:
-	int				m_Type			= 0;
+	int					m_Type				= 0;
 
-	Vector2			m_position		= { 0,0 };
-	Vector2			m_velocity		= { 0,0 };
+	Vector2				m_position			= { 0,0 };
+	Vector2				m_velocity			= { 0,0 };
 
-	EnemyState*		m_State			= nullptr;
+	Rectangle			m_hitbox			= {};
+
+	EnemyState*			m_State				= nullptr;
 	
-	IMoveStrategy*	m_MoveStrategy	= nullptr;
+	IMoveStrategy*		m_MoveStrategy		= nullptr;
+	IAttackStrategy*	m_AttackStrategy	= nullptr;
 };
+
 
 
 
