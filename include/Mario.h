@@ -3,89 +3,88 @@
 
 #include <raylib.h>
 #include "Entity.h"
+#include "Physics.h"
 #include <iostream>
 
-class Mario
+enum State
+{
+    IDLE,
+    RUNNING,
+    JUMPING,
+    FALLING
+};
+
+class Mario : public Entity
 {
 public:
-    Texture2D texture;
-    Rectangle rect;
-    Vector2 position;
-    Vector2 velocity;
     bool moveLeft;
     bool moveRight;
+    float speed;
+    float jumpForce;
+    State state;
 
-    Mario()
-    {
-        texture = LoadTexture("./assets/mario.png");
-        position = {500.0f, 400.0f}; // Initial position
-        rect = {position.x, position.y, static_cast<float>(texture.width), static_cast<float>(texture.height)};
-        moveLeft = false;
-        moveRight = false;
-        velocity = {0.0f, 0.0f}; // Initial velocity
-    }
+    Mario(Texture texture, Vector2 position) : Entity(texture, position), state(IDLE), speed(200.0f), jumpForce(300.0f), moveLeft(false), moveRight(false) {}
 
     void HandleInput()
     {
-        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
-        {
-            moveLeft = true;
-
-            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
-            {
-                moveLeft = false;
-                moveRight = true;
-            }
-        }
-        else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
-        {
-            moveRight = true;
-
-            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
-            {
-                moveRight = false;
-                moveLeft = true;
-            }
-        }
+        if (IsKeyDown(KEY_LEFT))
+            velocity.x = -speed;
+        else if (IsKeyDown(KEY_RIGHT))
+            velocity.x = speed;
         else
+            velocity.x = 0;
+
+        if (IsKeyPressed(KEY_SPACE) && state != JUMPING && state != FALLING)
         {
-            moveLeft = false;
-            moveRight = false;
+            velocity.y = -jumpForce;
+            state = JUMPING;
         }
     }
 
-    void Update()
+    void Update() override
     {
-        float gravity = 98.1f; // Gravity effect
-        float speed = 200.0f; // Speed of Mario
-        float deltaTime = GetFrameTime();
-
-        velocity.x += speed * deltaTime; 
-        velocity.y += gravity * deltaTime; // Update velocity with gravity
-
-        if(moveLeft)
-        {
-            position.x -= speed * deltaTime; // Move left
-        }
-        else if(moveRight)
-        {
-            position.x += speed * deltaTime; // Move right
-        }
-        position.y += velocity.y * deltaTime; // Apply gravity to Mario's position
-
-        if (position.y > 720 - rect.height) // Prevent going below the ground
-        {
-            position.y = 720 - rect.height;
-        }
-
+        // float gravity = 98.1f; // Gravity effect
+        float dt = GetFrameTime();
+        HandleInput();
+        ApplyGravity(velocity, 800.0f); // Gravity
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
         rect.x = position.x;
         rect.y = position.y;
+
+        // Update state
+        if (velocity.y > 0)
+            state = FALLING;
+        else if (velocity.y < 0)
+            state = JUMPING;
+        else if (velocity.x != 0)
+            state = RUNNING;
+        else
+            state = IDLE;
     }
 
-    void Draw()
+    void CheckCollision(Level &level)
     {
-        std::cout << "Drawing Mario at position: (" << position.x << ", " << position.y << ")\n";
-        DrawTextureEx(texture, position, 0.0f, 1.0f, WHITE);
+        Rectangle playerRect = rect;
+
+        // Check ground/platform collision
+        if (level.CheckCollision(playerRect))
+        {
+            position.y = (int)(position.y / 32) * 32; // Snap to tile grid
+            velocity.y = 0;
+            if (state == FALLING || state == JUMPING)
+                state = IDLE;
+        }
+    };
+
+    void Animate()
+    {
+        // Choose frame based on state
+    }
+
+    void OnCollision(Entity &other) override
+    {
+        // Example: stomp enemy or collect coin
     }
 };
 

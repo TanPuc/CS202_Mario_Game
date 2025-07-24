@@ -10,20 +10,28 @@ public:
     Texture2D texture;
     Rectangle rect;
     Vector2 position;
+    Vector2 velocity;
 
-    Entity(char const *filePath, Vector2 position, Vector2 size)
+    Entity(Texture texture, Vector2 position)
+        : texture(texture), position(position), velocity({0.0f, 0.0f})
     {
-        this->texture = LoadTexture(filePath);
-        this->position = position;
-        rect = {position.x, position.y, size.x, size.y};
+        rect = {position.x, position.y, (float)texture.width, (float)texture.height};
+    }
+    virtual ~Entity()
+    {
+        UnloadTexture(texture);
     }
 
     virtual void Update() = 0;
-    virtual void Draw() = 0;
-
-    ~Entity()
+    virtual void Draw() const
     {
-        UnloadTexture(texture);
+        DrawTexturePro(texture, {0, 0, (float)texture.width, (float)texture.height}, rect, {0, 0}, 0.0f, WHITE);
+    }
+
+    virtual void OnCollision(Entity &other) = 0;
+
+    Rectangle GetBounds() const {
+        return rect;
     }
 };
 
