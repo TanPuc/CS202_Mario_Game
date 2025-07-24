@@ -11,13 +11,7 @@ AttackThrowHammer::AttackThrowHammer(EnemyManager* manager) :
 {}
 void AttackThrowHammer::attack(Enemy& e) const
 {
-	if (timeTotal >= cooldown)
-	{
-		m_manager->spawnEnemyAt(m_type, e.getPositon());
-		timeTotal = 0;
-	}
-
-	timeTotal += GetFrameTime();
+	m_manager->spawnEnemyAt(m_type, e.getPositon());
 }
 
 AttackFireBall::AttackFireBall(EnemyManager* manager):
@@ -25,20 +19,21 @@ AttackFireBall::AttackFireBall(EnemyManager* manager):
 {}
 void AttackFireBall::attack(Enemy& e) const
 {
-	if (timeTotal >= cooldown)
-	{
-		m_manager->spawnEnemyAt(m_type, e.getPositon());
-		timeTotal = 0;
-	}
-
-	timeTotal += GetFrameTime();
+	m_manager->spawnEnemyAt(m_type, e.getPositon());
 }
 
-AttackCombined::attack(Enemy& e) const
+AttackSpiny::AttackSpiny(EnemyManager* manager) :
+	m_manager(manager) {}
+void AttackSpiny::attack(Enemy& e) const
+{
+	m_manager->spawnEnemyAt(m_type, e.getPositon());
+}
+
+void AttackCombined::attack(Enemy& e) const
 {
 	for (auto m : m_Strategies)
 	{
-		e->attack(m);
+		m->attack(e);
 	}
 }
 void AttackCombined::addStrategy(IAttackStrategy* s)

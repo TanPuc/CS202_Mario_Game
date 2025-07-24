@@ -34,8 +34,6 @@ public:
 private:
 	float magnitude;
 	float frequency;
-	Vector2 oldVelo = { 0,0 };
-	Vector2 velo = { 0,magnitude };
 };
 class MoveStrategyKeepDistance : public IMoveStrategy
 {

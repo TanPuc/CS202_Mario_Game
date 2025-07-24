@@ -24,10 +24,22 @@ void Enemy::setState(EnemyState* state)
 	delete m_State;
 	m_State = state;
 }
-void Enemy::setStrategy(IMoveStrategy* strategy)
+void Enemy::setMoveStrategy(IMoveStrategy* strategy)
 {
 	delete m_MoveStrategy;
 	m_MoveStrategy = strategy;
+}
+void Enemy::setAttackStrategy(IAttackStrategy* strategy)
+{
+	setVelocityX(0);
+	setVelocityY(0);
+	delete m_AttackStrategy;
+	m_AttackStrategy = strategy;
+}
+void Enemy::setCollisionStrategy(ICollisionStrategy* strategy)
+{
+	delete m_CollideStrategy;
+	m_CollideStrategy = strategy;
 }
 
 void Enemy::destroy()
@@ -40,18 +52,17 @@ void Enemy::destroy()
 }
 
 
-Vector2 Enemy::getVelocity() const
+void Enemy::setVelocityX(float X)
 {
-	return m_velocity;
+	m_velocity.x = X;
 }
-void Enemy::setVelocity(const Vector2& velo)
+void Enemy::setVelocityY(float Y)
 {
-	m_velocity = velo;
+	m_velocity.y = Y;
 }
-void Enemy::addVelocity(const Vector2& velo)
+void Enemy::addVelocityY(float Y)
 {
-	m_velocity.x += velo.x;
-	m_velocity.y += velo.y;
+	m_velocity.y += Y;
 }
 
 Vector2 Enemy::getPositon() const

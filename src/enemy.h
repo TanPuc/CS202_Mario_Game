@@ -7,10 +7,20 @@ enum EnemyType {
 
 	goopa = 1,
 	koopa = 2,
-
-	hammer = 10,
-	fireball = 11,
-	spiny = 12,
+	paratroopa = 3,
+	beezybettle = 4,
+	lakitu = 5,
+	spiny = 6,
+	piranhaplant = 7,
+	cheepcheep = 8,
+	blooper = 9,
+	hammerbro = 10,
+	bowser = 11,
+	
+	hammer = 15,
+	fireball = 16,
+	lavabubble = 17,
+	bulletbill= 18,
 
 
 };
@@ -23,7 +33,7 @@ class Enemy;
 //public:
 //
 //	virtual void enter(Enemy& enemy) = 0;
-//	virtual void handleInput(Enemy& enemy, int input) = 0;
+//	virtual void exit(Enemy& enemy) = 0;
 //	virtual void update(Enemy& enemy) = 0;
 //private:
 //
@@ -34,7 +44,7 @@ class Enemy;
 //public:
 //
 //	void enter(Enemy& e) override;
-//	void handleInput(Enemy& enemy, int input) override;
+//	void exit(Enemy& enemy) override;
 //	void update(Enemy& enemy) override;
 //private:
 //};
@@ -44,7 +54,7 @@ class Enemy;
 //public:
 //
 //	void enter(Enemy& e) override;
-//	void handleInput(Enemy& enemy, int input) override;
+//	void exit(Enemy& enemy) override;
 //	void update(Enemy& enemy) override;
 //private:
 //};
@@ -91,6 +101,7 @@ class EnemyState;
 //};
 class IMoveStrategy;
 class IAttackStrategy;
+class ICollisionStrategy;
 
 //context
 class Enemy
@@ -99,7 +110,9 @@ public:
 	Enemy(int type, Vector2 position, EnemyState* state);
 	~Enemy();
 
-	void setStrategy(IMoveStrategy*);
+	void setMoveStrategy(IMoveStrategy*);
+	void setAttackStrategy(IAttackStrategy*);
+	void setCollisionStrategy(ICollisionStrategy*);
 	void setState(EnemyState*);
 
 	void handleInput(int input);
@@ -107,9 +120,9 @@ public:
 
 	void destroy();
 
-	Vector2 getVelocity() const;
-	void setVelocity(const Vector2&);
-	void addVelocity(const Vector2&);
+	void setVelocityX(float X);
+	void setVelocityY(float Y);
+	void addVelocityY(float Y);
 
 	Vector2 getPositon() const;
 

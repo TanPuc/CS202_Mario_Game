@@ -9,7 +9,9 @@ MoveStrategyChase::MoveStrategyChase(int value, const Player* p):
 void MoveStrategyChase::move(Enemy& e)
 {
 	Vector2 direction = play.direction - e.getPositon();
-	e.setVelocity(Vector2Scale(direction,speed));
+	Vector2 result = Vector2Scale(direction, speed);
+	e.setVelocityX(result.x);
+	e.setVelocityY(result.y);
 }
 
 MoveStrategyFall::MoveStrategyFall(int value) :
@@ -17,8 +19,7 @@ MoveStrategyFall::MoveStrategyFall(int value) :
 {}
 void MoveStrategyFall::move(Enemy& e)
 {
-	Vector2 temp = { 0, gravity * GetFrameTime()};
-	e.addVelocity(temp);
+	e.addVelocityY(gravity * GetFrameTime());
 }
 
 MoveStrategyKeepDistance::MoveStrategyKeepDistance(int s, Vector2 off, const Player* p) :
@@ -28,22 +29,19 @@ void MoveStrategyKeepDistance::move(Enemy& e)
 {
 	Vector2 lakituTarget = play.position + offset;
 	Vector2 direction = lakituTarget - e.getPositon();
-	e.setVelocity(Vector2Normalize(direction * speed));
+	Vector2 temp = Vector2Scale(Vector2Normalize(direction) , speed);
+	e.setVelocityX(temp.x);
+	e.setVelocityY(temp.y);
 }
 
 MoveStrategyBasic::MoveStrategyBasic(int value,Enemy& e):
 	speed(value)
 {
-	Vector2 temp = e.getVelocity();
-	temp.x = speed;
-	e.setVelocity(temp);	//so it is 20 instead of 20+x...
+	e.setVelocityX(speed);	//so it is 20 instead of 20+x...
 }
 void MoveStrategyBasic::move(Enemy& e)
 {
-	if (collisionWall)
-	{
-		e.addVelocity(Vector2Scale(velocity,-2));
-	}
+
 }
 
 MoveStrategySwayUpDown::MoveStrategySwayUpDown(float vel,float fre):
@@ -51,9 +49,7 @@ MoveStrategySwayUpDown::MoveStrategySwayUpDown(float vel,float fre):
 {}
 void MoveStrategySwayUpDown::move(Enemy& e)
 {
-	e.addVelocity(Vector2Scale(oldVelo, -1));
-	oldVelo = Vector2Scale(velo, sinf(GetTime() * frequency));
-	e.addVelocity(oldVelo);
+	e.setVelocityY(magnitude * sinf(GetTime() * frequency));
 }
 
 MoveStrategyRandom::MoveStrategyRandom(int b, int s, Vector2* m):
@@ -63,14 +59,17 @@ void MoveStrategyRandom::move(Enemy& e)
 {
 	Vector2 direction = Vector2Subtract(randomTarget, e.getPositon());
 	float distance = Vector2Length(direction);
+	
+	Vector2 temp;
 
 	if (distance < 1.0f || distance > boundary)
 	{
-		e.setVelocity(Vector2Normalize(direction) * speed);
+		temp = Vector2Normalize(direction) * speed;
+		e.setVelocityX(temp.x);
 	}
 	else
 	{
-		Vector2 temp = *mark;
+		temp = *mark;
 		temp.x = (float)GetRandomValue(temp.x - boundary,temp.x);
 		randomTarget = temp;
 	}
