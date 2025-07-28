@@ -4,88 +4,97 @@
 #include <raylib.h>
 #include "Entity.h"
 #include "Physics.h"
+#include "Level.h"
+#include "State.h"
 #include <iostream>
-
-enum State
-{
-    IDLE,
-    RUNNING,
-    JUMPING,
-    FALLING
-};
+#include "Sprite.h"
 
 class Mario : public Entity
 {
 public:
-    bool moveLeft;
-    bool moveRight;
-    float speed;
-    float jumpForce;
-    State state;
+    std::unique_ptr<State> currentState = std::make_unique<IdleState>();
+    Sprite MarioSprite;
 
-    Mario(Texture texture, Vector2 position) : Entity(texture, position), state(IDLE), speed(200.0f), jumpForce(300.0f), moveLeft(false), moveRight(false) {}
+    Mario(Texture texture, Vector2 position) : Entity(texture, position) {}
 
     void HandleInput()
     {
-        if (IsKeyDown(KEY_LEFT))
-            velocity.x = -speed;
-        else if (IsKeyDown(KEY_RIGHT))
-            velocity.x = speed;
-        else
-            velocity.x = 0;
+    std::unique_ptr<State> newState = currentState->HandleInput(*this);
+        if (newState != nullptr)
+            currentState = std::move(newState);
+    }
 
-        if (IsKeyPressed(KEY_SPACE) && state != JUMPING && state != FALLING)
-        {
-            velocity.y = -jumpForce;
-            state = JUMPING;
-        }
+    void Draw() override
+    {
+        std::unique_ptr<State> newState = currentState->Draw(*this, MarioSprite);
+        if (newState != nullptr)
+            currentState = std::move(newState);
     }
 
     void Update() override
+    {}
+
+    void Update(Level &level)
     {
-        // float gravity = 98.1f; // Gravity effect
         float dt = GetFrameTime();
-        HandleInput();
-        ApplyGravity(velocity, 800.0f); // Gravity
+        float gravity = GRAVITY;
+        ApplyGravity(velocity, gravity);
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
         rect.x = position.x;
         rect.y = position.y;
 
-        // Update state
-        if (velocity.y > 0)
-            state = FALLING;
-        else if (velocity.y < 0)
-            state = JUMPING;
-        else if (velocity.x != 0)
-            state = RUNNING;
-        else
-            state = IDLE;
+        // Check for collisions with the level
+        Vector2 collisionPoint;
+        if (CheckCollision(*this, level, collisionPoint))
+        {
+            OnCollision(level, collisionPoint);
+        }
     }
 
-    void CheckCollision(Level &level)
+    void OnCollision(Level &level, Vector2 collisionPoint)
     {
-        Rectangle playerRect = rect;
+        float overlapX = 0;
+        float overlapY = 0;
+        if (rect.x + rect.width > rect.x && rect.x < rect.x + rect.width)
+            overlapX = std::min(rect.x + rect.width - rect.x, rect.x + rect.width - rect.x);
 
-        // Check ground/platform collision
-        if (level.CheckCollision(playerRect))
+        if (rect.y + rect.height > rect.y && rect.y < rect.y + rect.height)
+            overlapY = std::min(rect.y + rect.height - rect.y, rect.y + rect.height - rect.y);
+
+        std::cout << "Collision detected at tile (" << collisionPoint.x << ", " << collisionPoint.y << ")" << std::endl;
+        std::cout << overlapX << " " << overlapY << std::endl;
+
+        if (overlapX <= overlapY)
         {
-            position.y = (int)(position.y / 32) * 32; // Snap to tile grid
+            if (rect.x < rect.x)
+            {
+                position.x -= overlapX;
+                velocity.x = 0;
+            }
+            else
+            {
+                position.x += overlapX;
+                velocity.x = 0;
+            }
+        }
+        else
+        {
             velocity.y = 0;
-            if (state == FALLING || state == JUMPING)
-                state = IDLE;
+            position.y = int((position.y / 32) * 32);
         }
     };
-
-    void Animate()
-    {
-        // Choose frame based on state
-    }
-
     void OnCollision(Entity &other) override
     {
-        // Example: stomp enemy or collect coin
+        // Handle collision with other entities if needed
+        std::cout << "Collision with another entity detected!" << std::endl;
     }
+    void OnCollision(Level &level) override
+    {
+        // Handle collision with the level
+        std::cout << "Collision with level detected!" << std::endl;
+    }
+
 };
 
 #endif

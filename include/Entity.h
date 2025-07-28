@@ -23,12 +23,13 @@ public:
     }
 
     virtual void Update() = 0;
-    virtual void Draw() const
+    virtual void Draw()
     {
-        DrawTexturePro(texture, {0, 0, (float)texture.width, (float)texture.height}, rect, {0, 0}, 0.0f, WHITE);
+        DrawTextureEx(texture, position, 0.0f, 2.0f, WHITE);
     }
 
     virtual void OnCollision(Entity &other) = 0;
+    virtual void OnCollision(Level &level) = 0;
 
     Rectangle GetBounds() const {
         return rect;
