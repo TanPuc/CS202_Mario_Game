@@ -5,54 +5,76 @@
 #include "Entity.h"
 #include "Physics.h"
 #include "Level.h"
-#include "State.h"
+#include "MarioState.h"
 #include <iostream>
 #include "Sprite.h"
 
 class Mario : public Entity
 {
 public:
-    std::unique_ptr<State> currentState = std::make_unique<IdleState>();
+    std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
     Sprite MarioSprite;
 
     Mario(Texture texture, Vector2 position) : Entity(texture, position) {}
 
     void HandleInput()
     {
-    std::unique_ptr<State> newState = currentState->HandleInput(*this);
+        std::unique_ptr<MarioState> newState = currentState->HandleInput(*this);
         if (newState != nullptr)
             currentState = std::move(newState);
     }
 
     void Draw() override
     {
-        std::unique_ptr<State> newState = currentState->Draw(*this, MarioSprite);
+        DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED); // Draw hitbox for debugging
+        std::unique_ptr<MarioState> newState = currentState->Draw(*this, MarioSprite);
         if (newState != nullptr)
             currentState = std::move(newState);
     }
 
     void Update() override
-    {}
+    {
+        std::unique_ptr<MarioState> newState = currentState->Update(*this);
+        if (newState != nullptr)
+            currentState = std::move(newState);
+
+        // Update the entity's position and rectangle
+        float dt = GetFrameTime();
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
+        // Round the position to avoid sub-pixel rendering issues
+        position.x = roundf(position.x);
+        position.y = roundf(position.y);
+        rect.x = position.x;
+        rect.y = position.y;
+    }
 
     void Update(Level &level)
     {
+    //     std::unique_ptr<MarioState> newState = currentState->Update(*this);
+    //     if (newState != nullptr)
+    //         currentState = std::move(newState);
+
+        // Update the entity's position and rectangle
+        float gravity = 800.0f;
         float dt = GetFrameTime();
-        float gravity = GRAVITY;
-        ApplyGravity(velocity, gravity);
+        // ApplyGravity(velocity, gravity);
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
+        // Round the position to avoid sub-pixel rendering issues
+        position.x = roundf(position.x);
+        position.y = roundf(position.y);
+
+        if (CheckCollision(*this, level)) // Resolve collision
+        {
+            OnCollision(level);
+        }
+
         rect.x = position.x;
         rect.y = position.y;
-
-        // Check for collisions with the level
-        Vector2 collisionPoint;
-        if (CheckCollision(*this, level, collisionPoint))
-        {
-            OnCollision(level, collisionPoint);
-        }
     }
 
-    void OnCollision(Level &level, Vector2 collisionPoint)
+    void OnCollision(Level &level) override
     {
         float overlapX = 0;
         float overlapY = 0;
@@ -61,9 +83,6 @@ public:
 
         if (rect.y + rect.height > rect.y && rect.y < rect.y + rect.height)
             overlapY = std::min(rect.y + rect.height - rect.y, rect.y + rect.height - rect.y);
-
-        std::cout << "Collision detected at tile (" << collisionPoint.x << ", " << collisionPoint.y << ")" << std::endl;
-        std::cout << overlapX << " " << overlapY << std::endl;
 
         if (overlapX <= overlapY)
         {
@@ -89,12 +108,11 @@ public:
         // Handle collision with other entities if needed
         std::cout << "Collision with another entity detected!" << std::endl;
     }
-    void OnCollision(Level &level) override
-    {
-        // Handle collision with the level
-        std::cout << "Collision with level detected!" << std::endl;
-    }
-
+    // void OnCollision(Level &level) override
+    // {
+    //     // Handle collision with the level
+    //     std::cout << "Collision with level detected!" << std::endl;
+    // }
 };
 
 #endif

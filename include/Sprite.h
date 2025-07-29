@@ -10,63 +10,68 @@
 class Sprite
 {
 public:
-    Texture2D marioIdleSprite = LoadTexture("assets/Mario/mario_idle_sprite.png");
-    Texture2D marioWalkSprite = LoadTexture("assets/Mario/mario_walk_sprite.png");
-    Texture2D marioJumpSprite = LoadTexture("assets/Mario/mario_jump_sprite.png");
-    Rectangle frameRec;
-    std::vector<Rectangle> idleAnimation = {{0, 0, 32, 32}};
-    std::vector<Rectangle> walkAnimation = {{0, 0, 32, 32}, {32, 0, 32, 32}, {64, 0, 32, 32}};
-    std::vector<Rectangle> jumpAnimation = {{0, 0, 32, 32}};
+    Texture2D marioIdleTexture;
+    Texture2D marioWalkTexture;
+    Texture2D marioJumpTexture;
+    std::unique_ptr<Texture2D> currentTexture;
+    Rectangle frameRec = {0, 0, 32, 32};
+    int frameCounter = 0;
+    int frameSpeed = 8; // 8fps
 
-    int frameCounter;
-    int frameSpeed = 8;
-
-    ~Sprite()
+    Sprite()
     {
-        UnloadTexture(marioIdleSprite);
-        UnloadTexture(marioWalkSprite);
-        UnloadTexture(marioJumpSprite);
+        // Initialize the current animation to idle state
+        marioIdleTexture = LoadTexture("assets/Mario/mario_idle_sprite.png");
+        marioWalkTexture = LoadTexture("assets/Mario/mario_walk_sprite.png");
+        marioJumpTexture = LoadTexture("assets/Mario/mario_jump_sprite.png");
+        currentTexture = std::make_unique<Texture2D>(marioIdleTexture);
     }
 
-    void Update(float deltaTime)
+    void SwitchAnimation(STATE state_)
     {
-    }
-
-    void Draw(Entity &entity, STATE state)
-    {
-
-        switch (state)
+        switch (state_)
         {
         case STATE_IDLE:
-            // DrawTextureRec(marioIdleSprite, idleAnimation[0], entity.position, WHITE);
-            DrawTexture(marioIdleSprite, entity.position.x, entity.position.y, WHITE);
-            std::cout << "Drawing Idle Animation" << std::endl;
+            currentTexture = std::make_unique<Texture2D>(marioIdleTexture);
             break;
         case STATE_WALKING:
-            // DrawTextureRec(marioWalkSprite, walkAnimation[0], entity.position, WHITE);
-            DrawTexture(marioWalkSprite, entity.position.x, entity.position.y, WHITE);
-            std::cout << "Drawing Walking Animation" << std::endl;
+            currentTexture = std::make_unique<Texture2D>(marioWalkTexture);
             break;
         case STATE_JUMPING:
-            // DrawTextureRec(marioJumpSprite, jumpAnimation[0], entity.position, WHITE);
-            DrawTexture(marioJumpSprite, entity.position.x, entity.position.y, WHITE);
-            std::cout << "Drawing Jumping Animation" << std::endl;
+            currentTexture = std::make_unique<Texture2D>(marioJumpTexture);
             break;
         case STATE_FALLING:
-            // DrawTextureRec(characterSprite, fallingAnimation[0], entity.position, WHITE);
-            std::cout << "Drawing Falling Animation" << std::endl;
             break;
         case STATE_DUCKING:
-            // DrawTextureRec(characterSprite, duckingAnimation[0], entity.position, WHITE);
-            std::cout << "Drawing Ducking Animation" << std::endl;
             break;
         case STATE_SWIMMING:
-            // DrawTextureRec(characterSprite, swimmingAnimation[0], entity.position, WHITE);
-            std::cout << "Drawing Swimming Animation" << std::endl;
             break;
         default:
-            DrawTextureRec(marioIdleSprite, idleAnimation[0], entity.position, WHITE);
+            std::cerr << "Unknown state: " << state_ << std::endl;
+            break;
         }
+    }
+
+    void Draw(Entity &entity)
+    {
+        if (!currentTexture)
+        {
+            std::cerr << "Current texture is not set!" << std::endl;
+            return;
+        }
+        // Update frame counter
+        frameCounter++;
+        if (frameCounter >= frameSpeed)
+        {
+            frameCounter = 0;
+            // Update frame rectangle for animation
+            frameRec.x += frameRec.width;
+            if (frameRec.x >= currentTexture->width)
+            {
+                frameRec.x = 0; // Reset to the first frame
+            }
+        }
+        DrawTextureRec(*currentTexture, frameRec, entity.position, WHITE);
     }
 };
 

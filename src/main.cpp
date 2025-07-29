@@ -17,11 +17,11 @@ int main(void)
 
 	while (!WindowShouldClose())
 	{
-		/// UPDATE
+		/// UPDATE GAME
 		player->HandleInput();
 		player->Update(*level); // Handling player collision and movement
 
-		/// RENDER
+		/// RENDER GAME
 		Camera2D camera = {0};
 		camera.target = (Vector2){float(player->position.x + player->rect.width / 2), 0};
 		camera.offset = (Vector2){float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
