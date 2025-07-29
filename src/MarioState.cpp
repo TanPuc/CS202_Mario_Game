@@ -7,7 +7,11 @@ std::unique_ptr<MarioState> IdleState::HandleInput(Entity &entity)
     if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT))
     {
         std::cout << "Switching to Walking MarioState" << std::endl;
-        return std::make_unique<WalkingState>(IsKeyDown(KEY_RIGHT) ? RIGHT : LEFT);
+        entity.velocity.x = (IsKeyDown(KEY_RIGHT) ? SPEED : -SPEED);
+        entity.direction = IsKeyDown(KEY_RIGHT) ? RIGHT : LEFT; // Update direction
+        std::cout << "Current MarioState: Walking to the " << (entity.direction == RIGHT ? "right" : "left") << std::endl;
+        // Switch to WalkingState
+        return std::make_unique<WalkingState>();
     }
     else if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP))
     {
@@ -36,6 +40,8 @@ std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &entity)
     if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT))
     {
         entity.velocity.x = (IsKeyDown(KEY_RIGHT) ? SPEED : -SPEED);
+        entity.direction = IsKeyDown(KEY_RIGHT) ? RIGHT : LEFT; // Update direction
+        std::cout << "Current MarioState: Walking to the " << (entity.direction == RIGHT ? "right" : "left") << std::endl;
         return nullptr; // Keep walking
     }
     else if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP))
@@ -56,7 +62,7 @@ std::unique_ptr<MarioState> WalkingState::Update(Entity &entity)
 
 std::unique_ptr<MarioState> WalkingState::Draw(Entity &entity, Sprite &sprite)
 {
-    sprite.SwitchAnimation(STATE_WALKING);
+    sprite.SwitchAnimation(STATE_WALKING); // Update entity direction
     sprite.Draw(entity);
     return nullptr;
 }
@@ -67,8 +73,10 @@ std::unique_ptr<MarioState> JumpingState::HandleInput(Entity &entity)
     if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT))
     {
         entity.velocity.x = (IsKeyDown(KEY_RIGHT) ? SPEED : -SPEED);
-        std::cout << "Switching to Walking MarioState" << std::endl;
-        return std::make_unique<WalkingState>(IsKeyDown(KEY_RIGHT) ? RIGHT : LEFT);
+        entity.direction = IsKeyDown(KEY_RIGHT) ? RIGHT : LEFT; // Update direction
+        std::cout << "Current MarioState: Jumping while walking to the " << (entity.direction == RIGHT ? "right" : "left") << std::endl;
+
+        return std::make_unique<WalkingState>();
     }
     else if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP))
     {

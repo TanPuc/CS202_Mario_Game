@@ -9,12 +9,6 @@
 #include <iostream>
 #include <memory>
 
-enum Direction
-{
-    LEFT,
-    RIGHT
-};
-
 // Forward declarations
 class WalkingState;
 class JumpingState;
@@ -40,10 +34,7 @@ public:
 // ---------------- Walking MarioState ----------------
 class WalkingState : public MarioState
 {
-private:
-    Direction direction;
 public:
-    WalkingState(Direction dir = RIGHT) : direction(dir) {}
     std::unique_ptr<MarioState> HandleInput(Entity &entity) override;
     std::unique_ptr<MarioState> Update(Entity &entity) override;
     std::unique_ptr<MarioState> Draw(Entity &entity, Sprite &sprite) override;

@@ -67,14 +67,14 @@ public:
 
         if (CheckCollision(*this, level)) // Resolve collision
         {
-            OnCollision(level);
+            ResolveCollision(level);
         }
 
         rect.x = position.x;
         rect.y = position.y;
     }
 
-    void OnCollision(Level &level) override
+    void ResolveCollision(Level &level) override
     {
         float overlapX = 0;
         float overlapY = 0;
@@ -103,16 +103,11 @@ public:
             position.y = int((position.y / 32) * 32);
         }
     };
-    void OnCollision(Entity &other) override
+    void ResolveCollision(Entity &other) override
     {
         // Handle collision with other entities if needed
         std::cout << "Collision with another entity detected!" << std::endl;
     }
-    // void OnCollision(Level &level) override
-    // {
-    //     // Handle collision with the level
-    //     std::cout << "Collision with level detected!" << std::endl;
-    // }
 };
 
 #endif

@@ -71,6 +71,14 @@ public:
                 frameRec.x = 0; // Reset to the first frame
             }
         }
+        if (entity.direction == LEFT)
+        {
+            frameRec.width = -abs(frameRec.width); // Flip the frame for left direction
+        }
+        else
+        {
+            frameRec.width = abs(frameRec.width); // Ensure positive width for right direction
+        }
         DrawTextureRec(*currentTexture, frameRec, entity.position, WHITE);
     }
 };

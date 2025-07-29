@@ -11,4 +11,10 @@ enum STATE
     STATE_SWIMMING
 };
 
+enum DIRECTION
+{
+    LEFT,
+    RIGHT
+};
+
 #endif // GLOBAL_VARIABLES_H
