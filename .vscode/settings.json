@@ -1,7 +1,17 @@
 {
     "files.associations": {
         "*.cpp": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "charconv": "cpp",
+        "format": "cpp",
+        "sstream": "cpp",
+        "xhash": "cpp",
+        "xlocnum": "cpp",
+        "xmemory": "cpp",
+        "*.m": "cpp",
+        "vector": "cpp",
+        "functional": "cpp"
     },
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "C_Cpp.default.compilerPath": "C:/MinGW/bin/g++.exe"
 }

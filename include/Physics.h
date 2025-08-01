@@ -11,12 +11,12 @@
 
 #include <raylib.h>
 
-void ApplyGravity(Vector2 &velocity, float gravity) {
+inline void ApplyGravity(Vector2 &velocity, float gravity) {
     float dt = GetFrameTime();
     velocity.y += gravity * dt;
 }
 
-void ClampVelocity(Vector2 &velocity) { // Clamp the velocity to prevent excessive speed
+inline void ClampVelocity(Vector2 &velocity) { // Clamp the velocity to prevent excessive speed
     if (velocity.x > MAX_VELOCITY) velocity.x = MAX_VELOCITY;
     if (velocity.x < -MAX_VELOCITY) velocity.x = -MAX_VELOCITY;
 }

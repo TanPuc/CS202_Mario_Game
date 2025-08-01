@@ -23,6 +23,10 @@ public:
     float jumpForce;
     State state;
 
+    int lives;
+    int coins;
+    long long score;
+
     Mario(Texture texture, Vector2 position) : Entity(texture, position), state(IDLE), speed(200.0f), jumpForce(300.0f), moveLeft(false), moveRight(false) {}
 
     void HandleInput()

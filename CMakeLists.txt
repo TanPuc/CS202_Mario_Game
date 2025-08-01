@@ -52,8 +52,30 @@ endif()
 
 add_executable(Mario ${SOURCES})
 
+# --- Collect all include/ subdirectories recursively ---
+file(GLOB_RECURSE INCLUDE_DIRS RELATIVE ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/include/*)
+set(ALL_INCLUDE_DIRS "")
+foreach(dir ${INCLUDE_DIRS})
+    if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/include/${dir})
+        list(APPEND ALL_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/include/${dir})
+    endif()
+endforeach()
+
+# --- Collect all src/ subdirectories recursively ---
+file(GLOB_RECURSE SRC_DIRS RELATIVE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/*)
+set(ALL_SRC_DIRS "")
+foreach(dir ${SRC_DIRS})
+    if(IS_DIRECTORY ${CMAKE_SOURCE_DIR}/src/${dir})
+        list(APPEND ALL_SRC_DIRS ${CMAKE_SOURCE_DIR}/src/${dir})
+    endif()
+endforeach()
+
+# --- Add root folders and all subfolders to the target include paths ---
 target_include_directories(Mario PRIVATE
     ${CMAKE_SOURCE_DIR}/include
+    ${ALL_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/src
+    ${ALL_SRC_DIRS}
     ${RAYLIB_SRC}/src
 )
 
