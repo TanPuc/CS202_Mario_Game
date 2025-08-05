@@ -14,6 +14,7 @@ public:
     Texture2D marioWalkTexture;
     Texture2D marioJumpTexture;
     std::unique_ptr<Texture2D> currentTexture;
+    STATE prevState; // Previous state for animation switching
     Rectangle frameRec = {0, 0, 32, 32};
     int frameCounter = 0;
     int frameSpeed = 8; // 8fps
@@ -29,6 +30,8 @@ public:
 
     void SwitchAnimation(STATE state_)
     {
+        if(state_ == prevState)
+            return; // No change in state, skip switching
         switch (state_)
         {
         case STATE_IDLE:
@@ -50,6 +53,8 @@ public:
             std::cerr << "Unknown state: " << state_ << std::endl;
             break;
         }
+        frameCounter = 0;
+        prevState = state_; // Update previous state
     }
 
     void Draw(Entity &entity)

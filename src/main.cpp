@@ -32,7 +32,7 @@ int main(void)
 		ClearBackground(SKYBLUE);
 		BeginMode2D(camera);
 
-		level->Draw(camera);
+		level->Draw();
 		player->Draw();
 
 		EndMode2D();

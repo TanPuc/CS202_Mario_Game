@@ -1,101 +1,184 @@
 #include "MarioState.h"
-#define SPEED 200.0f
 
 // ---------------- IdleState ----------------
-std::unique_ptr<MarioState> IdleState::HandleInput(Entity &entity)
+std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprite)
 {
-    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT))
+    float deltaTime = GetFrameTime();
+    if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
-        std::cout << "Switching to Walking MarioState" << std::endl;
-        entity.velocity.x = (IsKeyDown(KEY_RIGHT) ? SPEED : -SPEED);
-        entity.direction = IsKeyDown(KEY_RIGHT) ? RIGHT : LEFT; // Update direction
-        std::cout << "Current MarioState: Walking to the " << (entity.direction == RIGHT ? "right" : "left") << std::endl;
-        // Switch to WalkingState
+        player.velocity.x += (-MAX_VELOCITY * ACCELERATION * deltaTime);
+        player.direction = LEFT;                           // Set direction to LEFT when moving left
+        ClampVelocity(player.velocity);                    // Ensure velocity is clamped
+        sprite.SwitchAnimation(STATE_WALKING); // Switch to walking state
         return std::make_unique<WalkingState>();
     }
-    else if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP))
+    else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
-        std::cout << "Switching to Jumping MarioState" << std::endl;
+        player.velocity.x += (MAX_VELOCITY * ACCELERATION * deltaTime);
+        player.direction = RIGHT;                          // Set direction to RIGHT when moving right
+        ClampVelocity(player.velocity);                    // Ensure velocity is clamped
+        sprite.SwitchAnimation(STATE_WALKING); // Switch to walking state
+        return std::make_unique<WalkingState>();
+    }
+    else
+    {
+        if (player.velocity.x < 0)
+        {
+            player.velocity.x += (MAX_VELOCITY * DECELERATION * deltaTime);
+            if (player.velocity.x > 0)
+            {
+                player.velocity.x = 0;                          // Stop if deceleration makes velocity negative
+                sprite.SwitchAnimation(STATE_IDLE); // Switch to walking state
+                return std::make_unique<IdleState>();
+            }
+        }
+        else if (player.velocity.x > 0)
+        {
+            player.velocity.x -= (MAX_VELOCITY * DECELERATION * deltaTime);
+            if (player.velocity.x < 0)
+            {
+                player.velocity.x = 0;                          // Stop if deceleration makes velocity negative
+                sprite.SwitchAnimation(STATE_IDLE); // Switch to walking state
+                return std::make_unique<IdleState>();
+            }
+        }
+        ClampVelocity(player.velocity); // Ensure velocity is clamped
+    }
+    if ((IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP)) && player.velocity.y == 0) // Only jump if on the ground
+    {
+        player.velocity.y = -JUMP_FORCE; // Apply jump force
+        sprite.SwitchAnimation(STATE_JUMPING); // Switch to walking state
         return std::make_unique<JumpingState>();
     }
-    return nullptr; // Stay in Idle
+    return nullptr; // Stay in Idle state if no input
 }
 
-std::unique_ptr<MarioState> IdleState::Update(Entity &entity)
+std::unique_ptr<MarioState> IdleState::Update(Entity &player)
 {
     std::cout << "Current MarioState: Idle" << std::endl;
     return nullptr;
 }
 
-std::unique_ptr<MarioState> IdleState::Draw(Entity &entity, Sprite &sprite)
+void IdleState::Draw(Entity &player, Sprite &sprite)
 {
-    sprite.SwitchAnimation(STATE_IDLE);
-    sprite.Draw(entity);
-    return nullptr;
+    sprite.Draw(player);
 }
 
 // ---------------- WalkingState ----------------
-std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &entity)
+std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &player)
 {
-    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT))
+    float deltaTime = GetFrameTime();
+    if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
-        entity.velocity.x = (IsKeyDown(KEY_RIGHT) ? SPEED : -SPEED);
-        entity.direction = IsKeyDown(KEY_RIGHT) ? RIGHT : LEFT; // Update direction
-        std::cout << "Current MarioState: Walking to the " << (entity.direction == RIGHT ? "right" : "left") << std::endl;
-        return nullptr; // Keep walking
+        player.velocity.x += (-MAX_VELOCITY * ACCELERATION * deltaTime);
+        player.direction = LEFT;                           // Set direction to LEFT when moving left
+        ClampVelocity(player.velocity);                    // Ensure velocity is clamped
+        sprite.SwitchAnimation(STATE_WALKING); // Switch to walking state
+        return std::make_unique<WalkingState>();
     }
-    else if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP))
+    else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
-        std::cout << "Switching to Jumping MarioState" << std::endl;
+        player.velocity.x += (MAX_VELOCITY * ACCELERATION * deltaTime);
+        player.direction = RIGHT;       // Set direction to RIGHT when moving right
+        ClampVelocity(player.velocity); // Ensure velocity is clamped
+
+        player.marioSprite.SwitchAnimation(STATE_WALKING); // Switch to walking state
+        return std::make_unique<WalkingState>();
+    }
+    else
+    {
+        if (player.velocity.x < 0)
+        {
+            player.velocity.x += (MAX_VELOCITY * DECELERATION * deltaTime);
+            if (player.velocity.x > 0)
+            {
+                player.velocity.x = 0;                          // Stop if deceleration makes velocity negative
+                player.marioSprite.SwitchAnimation(STATE_IDLE); // Switch to walking state
+                return std::make_unique<IdleState>();
+            }
+        }
+        else if (player.velocity.x > 0)
+        {
+            player.velocity.x -= (MAX_VELOCITY * DECELERATION * deltaTime);
+            if (player.velocity.x < 0)
+            {
+                player.velocity.x = 0;                          // Stop if deceleration makes velocity negative
+                player.marioSprite.SwitchAnimation(STATE_IDLE); // Switch to walking state
+                return std::make_unique<IdleState>();
+            }
+        }
+        ClampVelocity(player.velocity); // Ensure velocity is clamped
+    }
+    if (IsKeyPressed(KEY_SPACE) && player.velocity.y == 0) // Only jump if on the ground
+    {
+        player.velocity.y = -JUMP_FORCE;                   // Apply jump force
+        player.marioSprite.SwitchAnimation(STATE_JUMPING); // Switch to jumping state
         return std::make_unique<JumpingState>();
     }
-    entity.velocity.x = 0;
-    std::cout << "Switching to Idle MarioState" << std::endl;
-    return std::make_unique<IdleState>();
+    return std::make_unique<WalkingState>(); // Stay in Walking state if no input
 }
 
-std::unique_ptr<MarioState> WalkingState::Update(Entity &entity)
+std::unique_ptr<MarioState> WalkingState::Update(Entity &player)
 {
     std::cout << "Current MarioState: Walking" << std::endl;
     return nullptr;
 }
 
-std::unique_ptr<MarioState> WalkingState::Draw(Entity &entity, Sprite &sprite)
+void WalkingState::Draw(Entity &player, Sprite &sprite)
 {
-    sprite.SwitchAnimation(STATE_WALKING); // Update entity direction
-    sprite.Draw(entity);
-    return nullptr;
+    sprite.Draw(player);
 }
 
 // ---------------- JumpingState ----------------
-std::unique_ptr<MarioState> JumpingState::HandleInput(Entity &entity)
+std::unique_ptr<MarioState> JumpingState::HandleInput(Entity &player)
 {
-    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_LEFT))
+    float deltaTime = GetFrameTime();
+    if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
-        entity.velocity.x = (IsKeyDown(KEY_RIGHT) ? SPEED : -SPEED);
-        entity.direction = IsKeyDown(KEY_RIGHT) ? RIGHT : LEFT; // Update direction
-        std::cout << "Current MarioState: Jumping while walking to the " << (entity.direction == RIGHT ? "right" : "left") << std::endl;
-
+        player.velocity.x += (-MAX_VELOCITY * ACCELERATION * deltaTime);
+        player.direction = LEFT;        // Set direction to LEFT when moving left
+        ClampVelocity(player.velocity); // Ensure velocity is clamped
         return std::make_unique<WalkingState>();
     }
-    else if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP))
+    else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
-        // Already jumping, no change
-        return nullptr;
+        player.velocity.x += (MAX_VELOCITY * ACCELERATION * deltaTime);
+        player.direction = RIGHT;       // Set direction to RIGHT when moving right
+        ClampVelocity(player.velocity); // Ensure velocity is clamped
+        return std::make_unique<WalkingState>();
     }
-    // No explicit landing transition (handled elsewhere)
-    return nullptr;
+    else
+    {
+        if (player.velocity.x < 0)
+        {
+            player.velocity.x += (MAX_VELOCITY * DECELERATION * deltaTime);
+            if (player.velocity.x > 0)
+            {
+                player.velocity.x = 0; // Stop if deceleration makes velocity negative
+                return std::make_unique<IdleState>();
+            }
+        }
+        else if (player.velocity.x > 0)
+        {
+            player.velocity.x -= (MAX_VELOCITY * DECELERATION * deltaTime);
+            if (player.velocity.x < 0)
+            {
+                player.velocity.x = 0; // Stop if deceleration makes velocity negative
+                return std::make_unique<IdleState>();
+            }
+        }
+        ClampVelocity(player.velocity); // Ensure velocity is clamped
+    }
+    return nullptr; // Stay in Jumping state if no input
 }
 
-std::unique_ptr<MarioState> JumpingState::Update(Entity &entity)
+std::unique_ptr<MarioState> JumpingState::Update(Entity &player)
 {
     std::cout << "Current MarioState: Jumping" << std::endl;
     return nullptr;
 }
 
-std::unique_ptr<MarioState> JumpingState::Draw(Entity &entity, Sprite &sprite)
+void JumpingState::Draw(Entity &player, Sprite &sprite)
 {
-    sprite.SwitchAnimation(STATE_JUMPING);
-    sprite.Draw(entity);
-    return nullptr;
+    sprite.Draw(player);
 }

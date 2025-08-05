@@ -44,7 +44,7 @@ public:
         }
         return true;
     }
-    void Draw(Camera2D &camera) const
+    void Draw() const
     {
         for (int y = 0; y < tiles.size(); y++)
         {
@@ -53,6 +53,7 @@ public:
                 if (tiles[y][x] > 0)
                 {
                     DrawTextureEx(tileset, Vector2({(float)x * TILE_SIZE, (float)y * TILE_SIZE}), 0.0f, 2.0f, WHITE); // Draw the tile
+                    DrawRectangleLines(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, RED); // Draw hitbox for debugging
                 }
             }
         }

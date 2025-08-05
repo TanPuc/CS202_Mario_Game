@@ -36,6 +36,10 @@ public:
     Rectangle GetBounds() const {
         return rect;
     }
+
+    Vector2 GetPosition() const {
+        return position;
+    }
 };
 
 #endif // ENTITY_H
