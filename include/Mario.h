@@ -21,9 +21,11 @@ public:
 
     void HandleInput()
     {
-        std::unique_ptr<MarioState> newState = currentState->HandleInput(*this);
-        if (newState != nullptr){
+        std::unique_ptr<MarioState> newState = currentState->HandleInput(*this, MarioSprite);
+        if (newState != nullptr)
+        {
             currentState = std::move(newState);
+            MarioSprite.SwitchAnimation(currentState->GetType());
         }
     }
 
@@ -39,12 +41,18 @@ public:
 
     void Update(Level &level)
     {
+        std::unique_ptr<MarioState> newState = currentState->Update(*this, MarioSprite);
+        if (newState != nullptr)
+        {
+            currentState = std::move(newState);
+            MarioSprite.SwitchAnimation(currentState->GetType());
+        }
         float gravity = 800.0f;
         float dt = GetFrameTime();
         ApplyGravity(velocity, gravity);
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
-        
+
         if (CheckCollision(*this, level)) // Resolve collision
         {
             // ResolveCollision(level);
