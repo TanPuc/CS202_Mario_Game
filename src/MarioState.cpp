@@ -54,19 +54,15 @@ std::unique_ptr<MarioState> IdleState::Update(Entity &player, Sprite &sprite)
 {
 
     std::cout << "Current MarioState: Idle" << std::endl;
-    if (player.velocity.y != 0)
+    
+    if (player.velocity.x == 0 && player.velocity.y == 0) // If velocity is zero, stay in Idle state
+    {
+        sprite.SwitchAnimation(STATE_IDLE); // Ensure Idle animation is set
+    }
+    else if (player.velocity.y != 0)
     {
         sprite.SwitchAnimation(STATE_JUMPING);   // Switch to Jumping animation if moving up
         return std::make_unique<JumpingState>(); // Transition to Jumping state if moving up
-    }
-    if (player.velocity.x != 0 || player.velocity.y == 0)
-    {
-        sprite.SwitchAnimation(STATE_WALKING);   // Switch to Idle animation if no horizontal movement
-        return std::make_unique<WalkingState>(); // Transition to Walking state if there's horizontal movement
-    }
-    if (player.velocity.x == 0.0f, player.velocity.y == 0.0f) // If velocity is zero, stay in Idle state
-    {
-        sprite.SwitchAnimation(STATE_IDLE); // Ensure Idle animation is set
     }
     else
     {
@@ -194,7 +190,13 @@ std::unique_ptr<MarioState> JumpingState::HandleInput(Entity &player, Sprite &sp
 std::unique_ptr<MarioState> JumpingState::Update(Entity &player, Sprite &sprite)
 {
     std::cout << "Current MarioState: Jumping" << std::endl;
-    return nullptr;
+    if (player.velocity.y == 0) // If Mario is on the ground
+    {
+        sprite.SwitchAnimation(STATE_IDLE);   // Switch to Idle animation if on the ground
+        return std::make_unique<IdleState>(); // Transition to Idle state
+    }
+    sprite.SwitchAnimation(STATE_JUMPING); // Ensure Jumping animation is set
+    return nullptr; // Stay in Jumping state
 }
 
 void JumpingState::Draw(Entity &player, Sprite &sprite)
