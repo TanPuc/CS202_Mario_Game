@@ -15,7 +15,6 @@ void ResetJumpBuffer()
 
 bool ConsumeJumpBuffer()
 {
-    std::cout << "Active buffer: " << active_buffer << std::endl;
     if (active_buffer > 0)
     {
         active_buffer--;

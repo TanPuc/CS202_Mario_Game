@@ -17,7 +17,7 @@ public:
     STATE prevState; // Previous state for animation switching
     Rectangle frameRec = {0, 0, 32, 32};
     int frameCounter = 0;
-    int frameSpeed = 8; // 8fps
+    int frameSpeed = 6; // 6fps
 
     Sprite()
     {

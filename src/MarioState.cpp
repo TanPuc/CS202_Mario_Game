@@ -4,24 +4,30 @@
 std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprite)
 {
     float deltaTime = GetFrameTime();
-    
+
     /// Jumping
-    // Set jump buffer on input
-    if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+
+    // Count Jump time
+    if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) // Full Jump
     {
-        SetJumpBuffer();
+        jump_time++;
+        // std::cout << "Jump hold time: " << jump_time << std::endl;
+        if (jump_time >= JUMP_TIME_THRESHOLD) // If jump button held for too long,
+        {
+            player.velocity.y = -JUMP_FORCE; // Apply jump force
+            std::cout << "Jump button held too long, staying in Idle state." << std::endl;
+            jump_time = 0; // Reset jump time
+            return std::make_unique<JumpingState>();
+        }
+        else
+            return nullptr;
     }
-    if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
+
+    if (jump_time > 0 && (IsKeyUp(KEY_SPACE) || IsKeyUp(KEY_UP) || IsKeyUp(KEY_W))) // Half Jump
     {
-        player.velocity.y = -JUMP_FORCE; // Apply jump force
-        ResetJumpBuffer();               // Reset jump buffer after jumping
-        return std::make_unique<JumpingState>();
-    }
-    // Consume jump buffer when grounded
-    if (player.velocity.y == 0 && ConsumeJumpBuffer())
-    {
-        player.velocity.y = -JUMP_FORCE;
-        ResetJumpBuffer();
+        // std::cout << "Jump button released, applying jump force. " << jump_time << " Jump power: " << -JUMP_FORCE * (HALF + float(0.03f * jump_time)) << std::endl;
+        player.velocity.y = -JUMP_FORCE * (HALF + float(0.05f * jump_time)); // Apply half jump force
+        jump_time = 0;                                                       // Reset jump time
         return std::make_unique<JumpingState>();
     }
 
@@ -96,24 +102,29 @@ void IdleState::Draw(Entity &player, Sprite &sprite)
 std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &player, Sprite &sprite)
 {
     float deltaTime = GetFrameTime();
-
     /// Jumping
-    // Set jump buffer on input
-    if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+
+    // Count Jump time
+    if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) // Full Jump
     {
-        SetJumpBuffer();
+        jump_time++;
+        // std::cout << "Jump hold time: " << jump_time << std::endl;
+        if (jump_time >= JUMP_TIME_THRESHOLD) // If jump button held for too long,
+        {
+            player.velocity.y = -JUMP_FORCE; // Apply jump force
+            std::cout << "Jump button held too long, staying in Idle state." << std::endl;
+            jump_time = 0; // Reset jump time
+            return std::make_unique<JumpingState>();
+        }
+        else
+            return nullptr;
     }
-    if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
+
+    if (jump_time > 0 && (IsKeyUp(KEY_SPACE) || IsKeyUp(KEY_UP) || IsKeyUp(KEY_W))) // Half Jump
     {
-        player.velocity.y = -JUMP_FORCE; // Apply jump force
-        ResetJumpBuffer();               // Reset jump buffer after jumping
-        return std::make_unique<JumpingState>();
-    }
-    // Consume jump buffer when grounded
-    if (player.velocity.y == 0 && ConsumeJumpBuffer())
-    {
-        player.velocity.y = -JUMP_FORCE;
-        ResetJumpBuffer();
+        // std::cout << "Jump button released, applying jump force. " << jump_time << " Jump power: " << -JUMP_FORCE * (HALF + float(0.03f * jump_time)) << std::endl;
+        player.velocity.y = -JUMP_FORCE * (HALF + float(0.05f * jump_time)); // Apply half jump force
+        jump_time = 0;                                                       // Reset jump time
         return std::make_unique<JumpingState>();
     }
 
@@ -218,7 +229,7 @@ std::unique_ptr<MarioState> JumpingState::HandleInput(Entity &player, Sprite &sp
         }
         ClampVelocity(player.velocity); // Ensure velocity is clamped
     }
-    
+
     return nullptr; // Stay in Jumping state if no input
 }
 
