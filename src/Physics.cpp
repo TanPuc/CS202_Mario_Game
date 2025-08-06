@@ -3,6 +3,27 @@
 #include "Level.h"
 #include <cmath>
 
+void SetJumpBuffer()
+{
+    active_buffer = JUMP_BUFFER_TIME;
+}
+
+void ResetJumpBuffer()
+{
+    active_buffer = 0; // Reset the jump buffer
+}
+
+bool ConsumeJumpBuffer()
+{
+    std::cout << "Active buffer: " << active_buffer << std::endl;
+    if (active_buffer > 0)
+    {
+        active_buffer--;
+        return true; // Jump available from buffer
+    }
+    return false; // No jump in buffer
+}
+
 void ApplyGravity(Vector2 &velocity, float gravity)
 {
     float dt = GetFrameTime();

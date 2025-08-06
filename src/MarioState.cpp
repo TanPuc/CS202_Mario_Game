@@ -4,13 +4,28 @@
 std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprite)
 {
     float deltaTime = GetFrameTime();
-
-    if ((IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP)) && player.velocity.y == 0) // Only jump if on the ground
+    
+    /// Jumping
+    // Set jump buffer on input
+    if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    {
+        SetJumpBuffer();
+    }
+    if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
         player.velocity.y = -JUMP_FORCE; // Apply jump force
+        ResetJumpBuffer();               // Reset jump buffer after jumping
+        return std::make_unique<JumpingState>();
+    }
+    // Consume jump buffer when grounded
+    if (player.velocity.y == 0 && ConsumeJumpBuffer())
+    {
+        player.velocity.y = -JUMP_FORCE;
+        ResetJumpBuffer();
         return std::make_unique<JumpingState>();
     }
 
+    /// Walking
     if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
         player.velocity.x += (-MAX_VELOCITY * ACCELERATION * deltaTime);
@@ -53,8 +68,8 @@ std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprit
 std::unique_ptr<MarioState> IdleState::Update(Entity &player, Sprite &sprite)
 {
 
-    std::cout << "Current MarioState: Idle" << std::endl;
-    
+    // std::cout << "Current MarioState: Idle" << std::endl;
+
     if (player.velocity.x == 0 && player.velocity.y == 0) // If velocity is zero, stay in Idle state
     {
         sprite.SwitchAnimation(STATE_IDLE); // Ensure Idle animation is set
@@ -81,11 +96,28 @@ void IdleState::Draw(Entity &player, Sprite &sprite)
 std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &player, Sprite &sprite)
 {
     float deltaTime = GetFrameTime();
-    if (IsKeyPressed(KEY_SPACE) && player.velocity.y == 0) // Only jump if on the ground
+
+    /// Jumping
+    // Set jump buffer on input
+    if (IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+    {
+        SetJumpBuffer();
+    }
+    if (IsKeyDown(KEY_SPACE) || IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
         player.velocity.y = -JUMP_FORCE; // Apply jump force
+        ResetJumpBuffer();               // Reset jump buffer after jumping
         return std::make_unique<JumpingState>();
     }
+    // Consume jump buffer when grounded
+    if (player.velocity.y == 0 && ConsumeJumpBuffer())
+    {
+        player.velocity.y = -JUMP_FORCE;
+        ResetJumpBuffer();
+        return std::make_unique<JumpingState>();
+    }
+
+    /// Walking
     if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
         player.velocity.x += (-MAX_VELOCITY * ACCELERATION * deltaTime);
@@ -122,12 +154,12 @@ std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &player, Sprite &sp
         }
         ClampVelocity(player.velocity); // Ensure velocity is clamped
     }
-    return std::make_unique<WalkingState>(); // Stay in Walking state if no input
+    return nullptr; // Stay in Walking state if no input
 }
 
 std::unique_ptr<MarioState> WalkingState::Update(Entity &player, Sprite &sprite)
 {
-    std::cout << "Current MarioState: Walking" << std::endl;
+    // std::cout << "Current MarioState: Walking" << std::endl;
     if (player.velocity.y != 0)
     {
         sprite.SwitchAnimation(STATE_JUMPING);   // Switch to Jumping animation if moving up
@@ -150,6 +182,8 @@ void WalkingState::Draw(Entity &player, Sprite &sprite)
 std::unique_ptr<MarioState> JumpingState::HandleInput(Entity &player, Sprite &sprite)
 {
     float deltaTime = GetFrameTime();
+
+    // Walking
     if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
         player.velocity.x += (-MAX_VELOCITY * ACCELERATION * deltaTime);
@@ -184,19 +218,20 @@ std::unique_ptr<MarioState> JumpingState::HandleInput(Entity &player, Sprite &sp
         }
         ClampVelocity(player.velocity); // Ensure velocity is clamped
     }
+    
     return nullptr; // Stay in Jumping state if no input
 }
 
 std::unique_ptr<MarioState> JumpingState::Update(Entity &player, Sprite &sprite)
 {
-    std::cout << "Current MarioState: Jumping" << std::endl;
+    // std::cout << "Current MarioState: Jumping" << std::endl;
     if (player.velocity.y == 0) // If Mario is on the ground
     {
         sprite.SwitchAnimation(STATE_IDLE);   // Switch to Idle animation if on the ground
         return std::make_unique<IdleState>(); // Transition to Idle state
     }
     sprite.SwitchAnimation(STATE_JUMPING); // Ensure Jumping animation is set
-    return nullptr; // Stay in Jumping state
+    return nullptr;                        // Stay in Jumping state
 }
 
 void JumpingState::Draw(Entity &player, Sprite &sprite)

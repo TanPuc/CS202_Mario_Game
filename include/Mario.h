@@ -3,7 +3,6 @@
 
 #include <raylib.h>
 #include "Entity.h"
-#include "Physics.h"
 #include "Level.h"
 #include "MarioState.h"
 #include <iostream>
@@ -16,7 +15,6 @@ public:
     std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
     // STATE currentState = STATE_IDLE; // Current state of Mario
     Sprite MarioSprite;
-
     Mario(Texture texture, Vector2 position) : Entity(texture, position) {}
 
     void HandleInput()
