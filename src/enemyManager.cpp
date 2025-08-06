@@ -2,6 +2,11 @@
 #include "enemy.h"
 #include "enemyState.h"
 #include "enemyAttackStrategy.h"
+#include "enemyFSMBuilder.h"
+#include "enemyStateTransition.h"
+#include "enemyStateCondition.h"
+#include "enemyEnum.h"
+
 
 void EnemyManager::update() {
 	for (auto e : m_toSpawn)
@@ -16,20 +21,21 @@ void EnemyManager::update() {
 	}
 }
 
-void EnemyManager::spawnEnemyAt(int type, Vector2 position)
+void EnemyManager::spawnEnemyAt(EnemyType type, Vector2 position)
 {
 	Enemy* e = nullptr;
-	switch (type)
+	e->setPosition(position);
+	switch (EnemyType)
 	{
 	case EnemyType::goopa:
 	{
-		e = new Enemy(type, position,new WanderState());
+		e = spawnGooba();
 		break;
 	}
 
 	case EnemyType::koopa:
 	{
-		e = new Enemy(type, position,new KoopaState());
+		e = spawnKoopa();
 		break;
 	}
 
@@ -96,5 +102,119 @@ void EnemyManager::spawnEnemyAt(int type, Vector2 position)
 		break;
 	}
 
+
+
 	m_toSpawn.push_back(e);
+}
+
+Enemy* EnemyManager::spawnGooba()
+{
+	FiniteStateMachine* fsm;
+	FSMBuilder			builder;
+
+	fsm = builder
+		.addState(new WalkState())
+		.addState(new DeadStateStomp())
+		.addTransition(StateType::Walk, new ConditionCollisionY(), StateType::DeadStomp)
+		.setInitialState(StateType::Walk)
+		.build();
+
+	return new Enemy(EnemyType::goopa, fsm);
+}
+Enemy* EnemyManager::spawnKoopa()
+{
+	FiniteStateMachine* fsm;
+	FSMBuilder			builder;
+
+	fsm = builder
+		.addState(new WalkState())
+		.addState(new ShellState())
+		.addState(new ShellSlidingState())
+		.addState(new DeadStateStomp())
+		.addTransition(StateType::Walk, new ConditionCollisionY(), StateType::Shell)
+		.addTransition(StateType::Shell, new ConditionCollisionY(), StateType::ShellSlide)
+		.addTransition(StateType::ShellSlide, new ConditionCollisionY(), StateType::Shell)
+		.setInitialState(StateType::Walk)
+		.build();
+
+	return new Enemy(EnemyType::koopa, fsm);
+}
+Enemy* EnemyManager::spawnSpiny()
+{
+	FiniteStateMachine* fsm;
+	FSMBuilder			builder;
+
+	fsm = builder
+		.addState(new WalkState())
+		.addState(new DeadStateElse())
+		.addTransition(StateType::Walk, new ConditionCollisionX(), StateType::DeadElse)
+		.setInitialState(StateType::Walk)
+		.build();
+
+	return new Enemy(EnemyType::spiny, fsm);
+}
+
+Enemy* EnemyManager::spawnLakitu()
+{
+
+}
+
+Enemy* EnemyManager::spawnParatroopa()
+{
+	FiniteStateMachine* fsm;
+	FSMBuilder			builder;
+
+	fsm = builder
+		.addState(new HopState())
+		.addState(new WalkState())
+		.addState(new ShellState())
+		.addState(new ShellSlidingState())
+		.addState(new DeadStateStomp())
+		.addTransition(StateType::Hop, new ConditionCollisionY(), StateType::Walk)
+		.addTransition(StateType::Walk, new ConditionCollisionY(), StateType::Shell)
+		.addTransition(StateType::Shell, new ConditionCollisionY(), StateType::ShellSlide)
+		.addTransition(StateType::ShellSlide, new ConditionCollisionY(), StateType::Shell)
+		.setInitialState(StateType::Hop)
+		.build();
+
+	return new Enemy(EnemyType::paratroopa, fsm);
+}
+Enemy* EnemyManager::spawnBeezyBettle()
+{
+	FiniteStateMachine* fsm;
+	FSMBuilder			builder;
+
+	fsm = builder
+		.addState(new WalkState())
+		.addState(new ShellState())
+		.addState(new ShellSlidingState())
+		.addState(new DeadStateStomp())
+		.addTransition(StateType::Walk, new ConditionCollisionY(), StateType::Shell)
+		.addTransition(StateType::Shell, new ConditionCollisionY(), StateType::ShellSlide)
+		.addTransition(StateType::ShellSlide, new ConditionCollisionY(), StateType::Shell)
+		.setInitialState(StateType::Walk)
+		.build();
+
+	return new Enemy(EnemyType::beezybettle, fsm);
+}
+
+Enemy* EnemyManager::spawnCheepCheep()
+{
+
+}
+Enemy* EnemyManager::spawnBlooper()
+{
+
+}
+Enemy* EnemyManager::spawnHammerBro()
+{
+
+}
+Enemy* EnemyManager::spawnBowser()
+{
+
+}
+Enemy* EnemyManager::spawnHammer()
+{
+
 }

@@ -30,8 +30,8 @@ int main(void)
 
 		/// RENDER
 		Camera2D camera = {0};
-		camera.target = (Vector2){(float)player->position.x + player->rect.width / 2, 0};
-		camera.offset = (Vector2){200, (float)GetScreenHeight() / 2};
+		camera.target = Vector2{(float)player->position.x + player->rect.width / 2, 0};
+		camera.offset = Vector2{200, (float)GetScreenHeight() / 2};
 		camera.zoom = 0.5f;
 
 		BeginDrawing();

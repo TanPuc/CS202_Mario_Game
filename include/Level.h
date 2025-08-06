@@ -54,7 +54,7 @@ public:
                     // Rectangle src = {0, 0, TILE_SIZE, TILE_SIZE};
                     // Rectangle dest = {(float)x * TILE_SIZE, (float)y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
                     // DrawTexturePro(tileset, src, dest, {0, 0}, 0.0f, WHITE);
-                    DrawTextureEx(tileset, (Vector2){(float)x * TILE_SIZE, (float)y * TILE_SIZE}, 0.0f, 2.0f, WHITE); // Draw the tile
+                    DrawTextureEx(tileset, Vector2{(float)x * TILE_SIZE, (float)y * TILE_SIZE}, 0.0f, 2.0f, WHITE); // Draw the tile
                 }
             }
         }

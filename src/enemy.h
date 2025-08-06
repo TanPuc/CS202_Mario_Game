@@ -59,6 +59,7 @@ class Enemy;
 //private:
 //};
 class EnemyState;
+class FiniteStateMachine;
 
 //strategy
 //class IMoveStrategy
@@ -101,19 +102,19 @@ class EnemyState;
 //};
 class IMoveStrategy;
 class IAttackStrategy;
-class ICollisionStrategy;
+//class ICollisionStrategy;
 
 //context
 class Enemy
 {
 public:
-	Enemy(int type, Vector2 position, EnemyState* state);
+	Enemy(int type, FiniteStateMachine* fsm);
 	~Enemy();
 
 	void setMoveStrategy(IMoveStrategy*);
 	void setAttackStrategy(IAttackStrategy*);
-	void setCollisionStrategy(ICollisionStrategy*);
-	void setState(EnemyState*);
+	//void setCollisionStrategy(ICollisionStrategy*);
+	//void setState(EnemyState*);
 
 	void handleInput(int input);
 	void update();
@@ -125,6 +126,7 @@ public:
 	void addVelocityY(float Y);
 
 	Vector2 getPositon() const;
+	void setPosition(Vector2);
 
 private:
 	int					m_Type				= 0;
@@ -134,11 +136,12 @@ private:
 
 	Rectangle			m_hitbox			= {};
 
-	EnemyState*			m_State				= nullptr;
+	//EnemyState*			m_State				= nullptr;
+	FiniteStateMachine* m_FSM				= nullptr;
 	
 	IMoveStrategy*		m_MoveStrategy		= nullptr;
 	IAttackStrategy*	m_AttackStrategy	= nullptr;
-	ICollisionStrategy* m_CollideStrategy	= nullptr;
+	//ICollisionStrategy* m_CollideStrategy	= nullptr;
 };
 
 

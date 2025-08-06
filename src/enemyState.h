@@ -2,15 +2,15 @@
 
 class Enemy;
 
+class EnemyStateChangeStrategy;
+
 class EnemyState
 {
 public:
-
 	virtual void enter(Enemy& enemy) = 0;
 	virtual void exit(Enemy& enemy) = 0;
 	virtual void update(Enemy& enemy) = 0;
-private:
-
+	virtual StateType getName() const = 0;
 };
 
 //class AliveState : public EnemyState
@@ -30,6 +30,7 @@ public:
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 	int		m_speed;
 	float	m_gravity;
@@ -95,6 +96,7 @@ public:
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 	float m_gravity;
 };

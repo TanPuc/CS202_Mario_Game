@@ -3,9 +3,10 @@
 #include "enemyMoveStrategy.h"
 #include "enemyAttackStrategy.h"
 #include "enemyCollisionStrategy.h"
+#include "enemyFSM.h"
 
-Enemy::Enemy(int type, Vector2 position, EnemyState* state):
-	m_Type(type), m_position(position), m_State(state)
+Enemy::Enemy(int type, FiniteStateMachine* state):
+	m_Type(type), m_FSM(state)
 {}
 Enemy::~Enemy()
 {
@@ -17,7 +18,13 @@ void Enemy::handleInput(int Input)
 {
 	m_State->handleInput(*this, Input);
 }
-
+void Enemy::update()
+{
+	m_AttackStrategy->attack();
+	m_MoveStrategy->move();
+	
+	m_FSM->update(*this);
+}
 
 void Enemy::setState(EnemyState* state)
 {
@@ -36,11 +43,11 @@ void Enemy::setAttackStrategy(IAttackStrategy* strategy)
 	delete m_AttackStrategy;
 	m_AttackStrategy = strategy;
 }
-void Enemy::setCollisionStrategy(ICollisionStrategy* strategy)
-{
-	delete m_CollideStrategy;
-	m_CollideStrategy = strategy;
-}
+//void Enemy::setCollisionStrategy(ICollisionStrategy* strategy)
+//{
+//	delete m_CollideStrategy;
+//	m_CollideStrategy = strategy;
+//}
 
 void Enemy::destroy()
 {
@@ -68,4 +75,9 @@ void Enemy::addVelocityY(float Y)
 Vector2 Enemy::getPositon() const
 {
 	return m_position;
+}
+
+void Enemy::setPosition(Vector2 pos)
+{
+	m_position = pos;
 }

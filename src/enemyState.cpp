@@ -3,6 +3,7 @@
 #include "enemyMoveStrategy.h"
 #include "enemyAttackStrategy.h"
 #include "enemyCollisionStrategy.h"
+#include "enemyEnum.h"
 
 
 //
@@ -123,7 +124,7 @@
 //}
 
 WalkState::WalkState(int speed, float gravity,bool isSwimming, bool isFireImmune):
-	m_isSwimming(isSwimming),m_speed(speed), m_gravity(gravity), m_isFireImmune(isFireImmune) {}
+	m_isSwimming(isSwimming), m_speed(speed), m_gravity(gravity), m_isFireImmune(isFireImmune) {}
 void WalkState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
@@ -137,6 +138,10 @@ void WalkState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed,e));
 	if(!m_isSwimming) compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
+}
+StateType WalkState::getName() const
+{
+	return StateType::Walk;
 }
 
 HoverState::HoverState(int speedRandom, int speedDistace):
@@ -166,58 +171,44 @@ void AttackState::exit(Enemy& e)
 }
 
 FallState::FallState(float gravity):
-	m_gravity(gravity) {}
+	m_gravity(gravity), EnemyState(StateType::Fall) {}
 void FallState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
-	CollisionStrategyCombined* compoCol = new CollisionStrategyCombined();
-	compoCol->addStrategy(new CollisionStrategyFireBall());
-	e.setCollisionStrategy(compoCol);
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
 }
 
 void PiranhaState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
-	e.setCollisionStrategy(new CollisionStrategyFireBall());
 	e.setMoveStrategy(new MoveStrategySwayUpDown(m_magnitude, m_frequency));
 }
 
 void HopState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
-	CollisionStrategyCombined* compoCol = new CollisionStrategyCombined();
-	compoCol->addStrategy(new CollisionStrategyFloorWalk());
-	compoCol->addStrategy(new CollisionStrategyFloorJump(m_power));
-	compoCol->addStrategy(new CollisionStrategyWallReverseDirection());
-	compoCol->addStrategy(new CollisionStrategyPlayerStomp());
-	compoCol->addStrategy(new CollisionStrategyFireBall());
-	e.setCollisionStrategy(compoCol);
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
 }
+
 void ShellState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
-	CollisionStrategyCombined* compoCol = new CollisionStrategyCombined();
-	compoCol->addStrategy(new CollisionStrategyFloorWalk());
-	compoCol->addStrategy(new CollisionStrategyPlayerKick());
-	e.setCollisionStrategy(compoCol);
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(0, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
 }
+StateType ShellState::getName() const
+{
+	return StateType::Shell;
+}
+
 void ShellSlidingState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
-	CollisionStrategyCombined* compoCol = new CollisionStrategyCombined();
-	compoCol->addStrategy(new CollisionStrategyFloorWalk());
-	compoCol->addStrategy(new CollisionStrategyWallReverseDirection());
-	compoCol->addStrategy(new CollisionStrategyPlayerStomp());
-	e.setCollisionStrategy(compoCol);
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
@@ -227,19 +218,16 @@ void ShellSlidingState::enter(Enemy& e)
 void ChaseState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
-	e.setCollisionStrategy(new CollisionStrategyFireBall());
 	e.setMoveStrategy(new MoveStrategyChase(m_speed, play);
 }
 
 void DeadStateStomp::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
-	e.setCollisionStrategy(new CollisionStrategyNothing());
 	e.setMoveStrategy(new MoveStrategyBasic(0,e));
 }
 void DeadStateElse::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
-	e.setCollisionStrategy(new CollisionStrategyNothing());
 	e.setMoveStrategy(new MoveStrategyFall(gra));
 }
