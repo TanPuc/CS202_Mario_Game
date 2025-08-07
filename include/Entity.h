@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include "Level.h"
+#include "GlobalVariables.h"
 
 class Entity
 {
@@ -11,6 +12,7 @@ public:
     Rectangle rect;
     Vector2 position;
     Vector2 velocity;
+    DIRECTION direction = RIGHT; // Default direction
 
     Entity(Texture texture, Vector2 position)
         : texture(texture), position(position), velocity({0.0f, 0.0f})
@@ -23,15 +25,20 @@ public:
     }
 
     virtual void Update() = 0;
-    virtual void Draw() const
+    virtual void Draw()
     {
-        DrawTexturePro(texture, {0, 0, (float)texture.width, (float)texture.height}, rect, {0, 0}, 0.0f, WHITE);
+        DrawTextureEx(texture, position, 0.0f, 2.0f, WHITE);
     }
 
-    virtual void OnCollision(Entity &other) = 0;
+    virtual void ResolveCollision(Entity &other) = 0;
+    virtual void ResolveCollision(Level &level) = 0;
 
     Rectangle GetBounds() const {
         return rect;
+    }
+
+    Vector2 GetPosition() const {
+        return position;
     }
 };
 

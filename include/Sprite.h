@@ -2,96 +2,90 @@
 #define SPRITE_H
 
 #include <raylib.h>
-
-#include "raylib.h"
+#include "GlobalVariables.h"
 #include <unordered_map>
 #include <vector>
 #include <string>
 
-enum class MarioState
-{
-    IDLE,
-    WALKING,
-    JUMPING,
-    FALLING,
-    DUCKING,
-    SWIMMING
-};
-
-struct Animation
-{
-    std::vector<Rectangle> frames; // Rectangles for each frame in the spritesheet
-    float frameTime;               // How long each frame lasts
-    bool loop;                     // Should the animation loop
-};
-
 class Sprite
 {
 public:
-    Sprite(const std::string &filePath, float scale = 1.0f)
-        : currentFrame(0), timer(0.0f), currentState(MarioState::IDLE), scale(scale)
+    Texture2D marioIdleTexture;
+    Texture2D marioWalkTexture;
+    Texture2D marioJumpTexture;
+    std::unique_ptr<Texture2D> currentTexture;
+    STATE prevState; // Previous state for animation switching
+    Rectangle frameRec = {0, 0, 32, 32};
+    int frameCounter = 0;
+    int frameSpeed = 6; // 6fps
+
+    Sprite()
     {
-        texture = LoadTexture(filePath.c_str());
+        // Initialize the current animation to idle state
+        marioIdleTexture = LoadTexture("assets/Mario/mario_idle_sprite.png");
+        marioWalkTexture = LoadTexture("assets/Mario/mario_walk_sprite.png");
+        marioJumpTexture = LoadTexture("assets/Mario/mario_jump_sprite.png");
+        currentTexture = std::make_unique<Texture2D>(marioIdleTexture);
     }
 
-    ~Sprite()
+    void SwitchAnimation(STATE state_)
     {
-        UnloadTexture(texture);
-    }
-
-    void AddAnimation(MarioState state, const Animation &anim)
-    {
-        animations[state] = anim;
-    }
-
-    void SetState(MarioState state)
-    {
-        if (currentState != state)
+        if(state_ == prevState)
+            return; // No change in state, skip switching
+        switch (state_)
         {
-            currentState = state;
-            currentFrame = 0;
-            timer = 0.0f;
+        case STATE_IDLE:
+            currentTexture = std::make_unique<Texture2D>(marioIdleTexture);
+            break;
+        case STATE_WALKING:
+            currentTexture = std::make_unique<Texture2D>(marioWalkTexture);
+            break;
+        case STATE_JUMPING:
+            currentTexture = std::make_unique<Texture2D>(marioJumpTexture);
+            break;
+        case STATE_FALLING:
+            break;
+        case STATE_DUCKING:
+            break;
+        case STATE_SWIMMING:
+            break;
+        default:
+            std::cerr << "Unknown state: " << state_ << std::endl;
+            break;
         }
+        frameCounter = 0;
+        prevState = state_; // Update previous state
     }
 
-    void Update(float deltaTime)
+    void Draw(Entity &entity)
     {
-        Animation &anim = animations[currentState];
-        timer += deltaTime;
-
-        if (timer >= anim.frameTime)
+        if (!currentTexture)
         {
-            timer = 0.0f;
-            currentFrame++;
-            if (currentFrame >= anim.frames.size())
+            std::cerr << "Current texture is not set!" << std::endl;
+            return;
+        }
+        // Update frame counter
+        frameCounter++;
+        if (frameCounter >= frameSpeed)
+        {
+            frameCounter = 0;
+            // Update frame rectangle for animation
+            frameRec.x += frameRec.width;
+            if (frameRec.x >= currentTexture->width)
             {
-                if (anim.loop)
-                    currentFrame = 0;
-                else
-                    currentFrame = anim.frames.size() - 1; // Hold on last frame
+                frameRec.x = 0; // Reset to the first frame
             }
         }
+        if (entity.direction == LEFT)
+        {
+            frameRec.width = -abs(frameRec.width); // Flip the frame for left direction
+        }
+        else
+        {
+            frameRec.width = abs(frameRec.width); // Ensure positive width for right direction
+        }
+        DrawTextureRec(*currentTexture, frameRec, entity.position, WHITE);
     }
-
-    void Draw(Vector2 position, bool flip = false)
-    {
-        Animation &anim = animations[currentState];
-        Rectangle src = anim.frames[currentFrame];
-        Rectangle dest = {position.x, position.y, src.width * scale, src.height * scale};
-
-        Vector2 origin = {0, 0};
-        DrawTexturePro(texture, src, dest, origin, 0.0f,
-                       flip ? WHITE : WHITE);
-    }
-
-private:
-    Texture2D texture;
-    std::unordered_map<MarioState, Animation> animations;
-    MarioState currentState;
-
-    int currentFrame;
-    float timer;
-    float scale;
 };
 
 #endif // SPRITE_H
