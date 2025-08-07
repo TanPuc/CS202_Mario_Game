@@ -1,6 +1,8 @@
 #pragma once	
 
-#include "vector"
+#include <vector>
+
+#include "enemyEnum.h"
 
 using std::vector;
 
@@ -22,7 +24,7 @@ public:
 	void attack(Enemy&) const override;
 private:
 	EnemyManager* m_manager;
-	const int m_type = EnemyType::hammer;
+	EnemyType m_type = EnemyType::hammer;
 };
 
 class AttackFireBall : public IAttackStrategy
@@ -32,7 +34,7 @@ public:
 	void attack(Enemy&) const override;
 private:
 	EnemyManager* m_manager;
-	const int m_type = EnemyType::fireball;
+	EnemyType m_type = EnemyType::fireball;
 };
 
 class AttackSpiny : public IAttackStrategy
@@ -42,7 +44,7 @@ public:
 	void attack(Enemy& e) const override;
 private:
 	EnemyManager* m_manager;
-	const int m_type = EnemyType::spiny;
+	EnemyType m_type = EnemyType::spiny;
 };
 
 class AttackNothing :public IAttackStrategy

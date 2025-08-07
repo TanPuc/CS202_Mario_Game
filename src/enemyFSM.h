@@ -3,7 +3,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include <enemyEnum.h>
+#include "enemyEnum.h"
 
 using namespace std;
 
@@ -18,6 +18,7 @@ public:
     ~FiniteStateMachine();
 
     void setInitialState(EnemyState* initial);
+    void runInitialState(Enemy& e);
 
     void addTransitions(vector<Transition>&&);
     void addStateMap(unordered_map<StateType, EnemyState*>&&);

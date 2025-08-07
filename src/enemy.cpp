@@ -1,13 +1,19 @@
+
+#include "cmath"
+
 #include "enemy.h"
 #include "enemyState.h"
 #include "enemyMoveStrategy.h"
 #include "enemyAttackStrategy.h"
-#include "enemyCollisionStrategy.h"
+#include "enemyCollisionPlayer.h"
+#include "enemyCollisionMap.h"
 #include "enemyFSM.h"
 
-Enemy::Enemy(int type, FiniteStateMachine* state):
+Enemy::Enemy(EnemyType type, FiniteStateMachine* state):
 	m_Type(type), m_FSM(state)
-{}
+{
+	m_FSM->runInitialState(*this);
+}
 Enemy::~Enemy()
 {
 	destroy();
@@ -16,21 +22,18 @@ Enemy::~Enemy()
 
 void Enemy::handleInput(int Input)
 {
-	m_State->handleInput(*this, Input);
+	//m_State->handleInput(*this, Input);
 }
 void Enemy::update()
 {
-	m_AttackStrategy->attack();
-	m_MoveStrategy->move();
+	m_MoveStrategy->move(*this);
+	m_position = Vector2Add(m_position, Vector2Scale(m_velocity, GetFrameTime()));
+
+	m_AttackStrategy->attack(*this);
 	
 	m_FSM->update(*this);
 }
 
-void Enemy::setState(EnemyState* state)
-{
-	delete m_State;
-	m_State = state;
-}
 void Enemy::setMoveStrategy(IMoveStrategy* strategy)
 {
 	delete m_MoveStrategy;
@@ -43,19 +46,24 @@ void Enemy::setAttackStrategy(IAttackStrategy* strategy)
 	delete m_AttackStrategy;
 	m_AttackStrategy = strategy;
 }
-//void Enemy::setCollisionStrategy(ICollisionStrategy* strategy)
-//{
-//	delete m_CollideStrategy;
-//	m_CollideStrategy = strategy;
-//}
+void Enemy::setCollisionMapStrategy(ICollisionMapStrategy* strategy)
+{
+	delete m_CollideMapStrategy;
+	m_CollideMapStrategy = strategy;
+}
+void Enemy::setCollisionPlayerStrategy(ICollisionPlayerStrategy* strategy)
+{
+	delete m_CollidePlayerStrategy;
+	m_CollidePlayerStrategy = strategy;
+}
 
 void Enemy::destroy()
 {
 	delete m_MoveStrategy;
 	m_MoveStrategy = nullptr;
 
-	delete m_State;
-	m_State = nullptr;
+	delete m_FSM;
+	m_FSM = nullptr;
 }
 
 

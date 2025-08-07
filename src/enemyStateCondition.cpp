@@ -8,3 +8,13 @@ bool ConditionTimer::evaluate()
 
 	return timer >= threshold;
 }
+
+bool ConditionCollisionX::evaluate()
+{
+	return false;
+}
+
+bool ConditionCollisionY::evaluate()
+{
+	return false;
+}

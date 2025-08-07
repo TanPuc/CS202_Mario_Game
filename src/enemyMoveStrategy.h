@@ -1,11 +1,13 @@
 #pragma once
 
 #include "vector"
+#include "raylib.h"
 
 using std::vector;
 
 
 class Enemy;
+class Mario;
 
 class IMoveStrategy
 {
@@ -24,36 +26,16 @@ public:
 
 private:
 	int speed;
-	Vector2 velocity = { speed,0 };
+	Vector2 velocity = { (float)speed,0 };
 };
 class MoveStrategySwayUpDown : public IMoveStrategy
 {
 public:
-	MoveStrategySwayUpDown(float, float);
+	MoveStrategySwayUpDown(float magni, float freq);
 	void move(Enemy& e) override;
 private:
-	float magnitude;
-	float frequency;
-};
-class MoveStrategyKeepDistance : public IMoveStrategy
-{
-public:
-	MoveStrategyKeepDistance(int, Vector2, const Player*);
-	void move(Enemy& e) override;
-private:
-	int speed;
-	Vector2 offset;
-	const Player* play;
-
-};
-class MoveStrategyChase : public IMoveStrategy
-{
-public:
-	MoveStrategyChase(int, const Player*);
-	void move(Enemy& e) override;
-private:
-	int speed;
-	const Player* play;
+	float m_magnitude;
+	float m_frequency;
 };
 class MoveStrategyFall : public IMoveStrategy
 {
@@ -63,16 +45,36 @@ public:
 private:
 	int gravity;
 };
+class MoveStrategyKeepDistance : public IMoveStrategy
+{
+public:
+	MoveStrategyKeepDistance(float speed, Vector2 offset, Mario* player);
+	void move(Enemy& e) override;
+private:
+	float m_speed;
+	Vector2 m_offset;
+	Mario* m_player;
+
+};
+class MoveStrategyChase : public IMoveStrategy
+{
+public:
+	MoveStrategyChase(int, Mario*);
+	void move(Enemy& e) override;
+private:
+	int speed;
+	Mario* player;
+};
 class MoveStrategyRandom : public IMoveStrategy
 {
 public:
-	MoveStrategyRandom(int, int, Vector2*);
+	MoveStrategyRandom(float boundary, float speed, Vector2* mark);
 	void move(Enemy&) override;
 private:
-	int boundary;
-	int speed;
-	Vector2* mark;
-	Vector2 randomTarget;
+	float m_boundary;
+	float m_speed;
+	Vector2* m_mark;
+	Vector2 randomTarget = *m_mark;
 };
 //class MoveStrategyJump : public IMoveStrategy
 //{

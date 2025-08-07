@@ -3,6 +3,8 @@
 #include "vector"
 #include "raylib.h"
 
+#include "enemyEnum.h"
+
 using std::vector;
 
 

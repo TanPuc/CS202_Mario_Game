@@ -1,8 +1,15 @@
 #pragma once
 
+#include "enemyEnum.h"
+#include "raylib.h"
+
 class Enemy;
 
 class EnemyStateChangeStrategy;
+class IAttackStrategy;
+class EnemyManager;
+
+class Mario;
 
 class EnemyState
 {
@@ -26,35 +33,52 @@ public:
 class WalkState : public EnemyState
 {
 public:
-	WalkState(int speed, float gravity,bool isSwimming, bool isFireImmune);
+	WalkState(int speed, float gravity, bool isFireImmune);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
 	StateType getName() const override;
 private:
-	int		m_speed;
+	float	m_speed;
 	float	m_gravity;
-	bool	m_isSwimming;
 	bool	m_isFireImmune;
+};
+class SwimState : public EnemyState
+{
+public:
+	SwimState(float speed, float freq, float magnitude);
+	void enter(Enemy& e) override;
+	void exit(Enemy& enemy) override;
+	void update(Enemy& enemy) override;
+	StateType getName() const override;
+private:
+	float	m_speed;
+	float m_frequency;
+	float m_magnitude;
 };
 
 class HoverState : public EnemyState
 {
 public:
-	HoverState(int, int);
+	HoverState(float speedRandom,float boundary, float speedDistance, Vector2 offset, Mario* player);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
-	int m_speedRandom, m_speedDistance;
+	float m_speedRandom, m_boundary;
+	float m_speedDistance;
+	Vector2 m_offset;
+	Mario* m_player;
 };
 class AttackState : public EnemyState
 {
 public:
-	AttackState(EnemyManager*, IAttackStrategy*, EnemyState*);
+	AttackState(EnemyManager*, IAttackStrategy*);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 	EnemyManager* m_manager;
 	int m_direction = 1;
@@ -63,10 +87,11 @@ private:
 class FallState : public EnemyState
 {
 public:
-	FallState(float);
+	FallState(float grav);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 	float m_gravity;
 };
@@ -74,9 +99,11 @@ private:
 class PiranhaState : public EnemyState
 {
 public:
+	PiranhaState(float magni, float freq);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 	float m_magnitude, m_frequency;
 };
@@ -84,15 +111,18 @@ private:
 class HopState : public EnemyState
 {
 public:
+	HopState(float power, float speed, float gravity);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 	float m_power, m_speed, m_gravity;
 };
 class ShellState : public EnemyState
 {
 public:
+	ShellState(float gravity);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
@@ -103,9 +133,11 @@ private:
 class ShellSlidingState : public EnemyState
 {
 public:
+	ShellSlidingState(float, float);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 	float m_speed, m_gravity;
 };
@@ -113,11 +145,14 @@ private:
 class ChaseState : public EnemyState
 {
 public:
+	ChaseState(float speed, Mario* player);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 	float m_speed;
+	Mario* m_player;
 };
 
 class DeadStateStomp : public EnemyState
@@ -126,14 +161,19 @@ public:
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
 private:
 };
 class DeadStateElse : public EnemyState
 {
 public:
+	DeadStateElse(float);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
+	StateType getName() const override;
+private:
+	float m_gravity;
 };
 
 

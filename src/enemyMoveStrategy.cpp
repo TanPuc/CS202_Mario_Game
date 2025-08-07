@@ -2,16 +2,24 @@
 #include "enemy.h"
 #include "raymath.h"
 #include "cmath"
+#include "Mario.h"
 
-MoveStrategyChase::MoveStrategyChase(int value, const Player* p):
-	speed(value), play(p)
-{}
-void MoveStrategyChase::move(Enemy& e)
+MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e) :
+	speed(value)
 {
-	Vector2 direction = play.direction - e.getPositon();
-	Vector2 result = Vector2Scale(direction, speed);
-	e.setVelocityX(result.x);
-	e.setVelocityY(result.y);
+	e.setVelocityX(speed);	//so it is 20 instead of 20+x...
+}
+void MoveStrategyBasic::move(Enemy& e)
+{
+
+}
+
+MoveStrategySwayUpDown::MoveStrategySwayUpDown(float mag, float fre) :
+	m_magnitude(mag), m_frequency(fre)
+{}
+void MoveStrategySwayUpDown::move(Enemy& e)
+{
+	e.setVelocityY(m_magnitude * sinf(GetTime() * m_frequency));
 }
 
 MoveStrategyFall::MoveStrategyFall(int value) :
@@ -22,38 +30,31 @@ void MoveStrategyFall::move(Enemy& e)
 	e.addVelocityY(gravity * GetFrameTime());
 }
 
-MoveStrategyKeepDistance::MoveStrategyKeepDistance(int s, Vector2 off, const Player* p) :
-	speed(s), offset(off), play(p)
+MoveStrategyKeepDistance::MoveStrategyKeepDistance(float s, Vector2 off, Mario* p) :
+	m_speed(s), m_offset(off), m_player(p)
 {}
 void MoveStrategyKeepDistance::move(Enemy& e)
 {
-	Vector2 lakituTarget = play.position + offset;
+	Vector2 lakituTarget = m_player->position + m_offset;
 	Vector2 direction = lakituTarget - e.getPositon();
-	Vector2 temp = Vector2Scale(Vector2Normalize(direction) , speed);
+	Vector2 temp = Vector2Scale(Vector2Normalize(direction) , m_speed);
 	e.setVelocityX(temp.x);
 	e.setVelocityY(temp.y);
 }
 
-MoveStrategyBasic::MoveStrategyBasic(int value,Enemy& e):
-	speed(value)
-{
-	e.setVelocityX(speed);	//so it is 20 instead of 20+x...
-}
-void MoveStrategyBasic::move(Enemy& e)
-{
-
-}
-
-MoveStrategySwayUpDown::MoveStrategySwayUpDown(float vel,float fre):
-	magnitude(vel), frequency(fre)
+MoveStrategyChase::MoveStrategyChase(int value, Mario* p) :
+	speed(value), player(p)
 {}
-void MoveStrategySwayUpDown::move(Enemy& e)
+void MoveStrategyChase::move(Enemy& e)
 {
-	e.setVelocityY(magnitude * sinf(GetTime() * frequency));
+	Vector2 direction = player->position - e.getPositon();
+	Vector2 result = Vector2Scale(direction, speed);
+	e.setVelocityX(result.x);
+	e.setVelocityY(result.y);
 }
 
-MoveStrategyRandom::MoveStrategyRandom(int b, int s, Vector2* m):
-	boundary(b),speed(s), mark(m)
+MoveStrategyRandom::MoveStrategyRandom(float b, float s, Vector2* m):
+	m_boundary(b),m_speed(s), m_mark(m)
 {}
 void MoveStrategyRandom::move(Enemy& e)
 {
@@ -62,15 +63,15 @@ void MoveStrategyRandom::move(Enemy& e)
 	
 	Vector2 temp;
 
-	if (distance < 1.0f || distance > boundary)
+	if (distance < 1.0f || distance > m_boundary)
 	{
-		temp = Vector2Normalize(direction) * speed;
+		temp = Vector2Normalize(direction) * m_speed;
 		e.setVelocityX(temp.x);
 	}
 	else
 	{
-		temp = *mark;
-		temp.x = (float)GetRandomValue(temp.x - boundary,temp.x);
+		temp = *m_mark;
+		temp.x = (float)GetRandomValue(temp.x - m_boundary,temp.x);
 		randomTarget = temp;
 	}
 }

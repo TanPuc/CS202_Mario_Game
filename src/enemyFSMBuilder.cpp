@@ -21,7 +21,7 @@ FSMBuilder& FSMBuilder::setInitialState(StateType name) {
 FiniteStateMachine* FSMBuilder::build() {
     auto fsm = new FiniteStateMachine();
     fsm->setInitialState(m_initialState);
-    fsm->addTransitions(move(*this->m_transitions));
-    fsm->addStateMap(move(*this->m_stateMap));
+    fsm->addTransitions(move(this->m_transitions));
+    fsm->addStateMap(move(this->m_stateMap));
     return fsm;
 }

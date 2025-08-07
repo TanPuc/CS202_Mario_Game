@@ -1,29 +1,9 @@
 #pragma once
 
 #include "raylib.h"
+#include "raymath.h"
 
-enum EnemyType {
-	nothing = 0,
-
-	goopa = 1,
-	koopa = 2,
-	paratroopa = 3,
-	beezybettle = 4,
-	lakitu = 5,
-	spiny = 6,
-	piranhaplant = 7,
-	cheepcheep = 8,
-	blooper = 9,
-	hammerbro = 10,
-	bowser = 11,
-	
-	hammer = 15,
-	fireball = 16,
-	lavabubble = 17,
-	bulletbill= 18,
-
-
-};
+#include "enemyEnum.h"
 
 class Enemy;
 
@@ -102,18 +82,20 @@ class FiniteStateMachine;
 //};
 class IMoveStrategy;
 class IAttackStrategy;
-//class ICollisionStrategy;
+class ICollisionMapStrategy;
+class ICollisionPlayerStrategy;
 
 //context
 class Enemy
 {
 public:
-	Enemy(int type, FiniteStateMachine* fsm);
+	Enemy(EnemyType type, FiniteStateMachine* fsm);
 	~Enemy();
 
 	void setMoveStrategy(IMoveStrategy*);
 	void setAttackStrategy(IAttackStrategy*);
-	//void setCollisionStrategy(ICollisionStrategy*);
+	void setCollisionMapStrategy(ICollisionMapStrategy*);
+	void setCollisionPlayerStrategy(ICollisionPlayerStrategy*);
 	//void setState(EnemyState*);
 
 	void handleInput(int input);
@@ -129,26 +111,26 @@ public:
 	void setPosition(Vector2);
 
 private:
-	int					m_Type				= 0;
+	EnemyType					m_Type					;
 
-	Vector2				m_position			= { 0,0 };
-	Vector2				m_velocity			= { 0,0 };
+	Vector2						m_position				= { 0,0 };
+	Vector2						m_velocity				= { 0,0 };
 
-	Rectangle			m_hitbox			= {};
+	Rectangle					m_hitbox				= {};
 
-	//EnemyState*			m_State				= nullptr;
-	FiniteStateMachine* m_FSM				= nullptr;
+	//EnemyState*				m_State					= nullptr;
+	FiniteStateMachine*			m_FSM					= nullptr;
 	
-	IMoveStrategy*		m_MoveStrategy		= nullptr;
-	IAttackStrategy*	m_AttackStrategy	= nullptr;
-	//ICollisionStrategy* m_CollideStrategy	= nullptr;
+	IMoveStrategy*				m_MoveStrategy			= nullptr;
+	IAttackStrategy*			m_AttackStrategy		= nullptr;
+	ICollisionMapStrategy*		m_CollideMapStrategy	= nullptr;
+	ICollisionPlayerStrategy*	m_CollidePlayerStrategy = nullptr;
 };
 
 
 
 
 /*
-//
 class Monster : public Enemy
 {
 public:

@@ -7,7 +7,10 @@
 
 void FiniteStateMachine::setInitialState(EnemyState* initial) {
     m_currentState = initial;
-    if (m_currentState) m_currentState->enter();
+}
+void FiniteStateMachine::runInitialState(Enemy& e)
+{
+    if (m_currentState) m_currentState->enter(e);
 }
 
 void FiniteStateMachine::addTransitions(vector<Transition>&& builder) {
