@@ -23,6 +23,8 @@ public:
     void addTransitions(vector<Transition>&&);
     void addStateMap(unordered_map<StateType, EnemyState*>&&);
 
+    StateType getCurrentState();
+
     void update(Enemy& e);
 
 private:

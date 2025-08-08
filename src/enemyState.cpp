@@ -6,6 +6,7 @@
 #include "enemyCollisionMap.h"
 #include "enemyEnum.h"
 #include "Mario.h"
+#include "enemySprite.h"
 
 WalkState::WalkState(int speed, float gravity, bool isFireImmune):
 	m_speed(speed), m_gravity(gravity), m_isFireImmune(isFireImmune) {}
@@ -21,6 +22,8 @@ void WalkState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed,e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
+
+	e.setSprite(getName());
 }
 void WalkState::exit(Enemy& e) {}
 void WalkState::update(Enemy& e) {}
@@ -39,6 +42,8 @@ void SwimState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategySwayUpDown(m_magnitude, m_frequency));
 	e.setMoveStrategy(compoMove);
+
+	e.setSprite(getName());
 }
 void SwimState::exit(Enemy& e) {}
 void SwimState::update(Enemy& e) {}
@@ -60,6 +65,8 @@ void HoverState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyRandom(m_boundary, m_speedRandom, &m_player->position));
 	compoMove->addStrategy(new MoveStrategyKeepDistance(m_speedDistance, m_offset , m_player));
 	e.setMoveStrategy(compoMove);
+
+	e.setSprite(getName());
 }
 void HoverState::exit(Enemy& e) {}
 void HoverState::update(Enemy& e) {}
@@ -73,6 +80,8 @@ AttackState::AttackState(EnemyManager* manager, IAttackStrategy* attack):
 void AttackState::enter(Enemy& e)
 {
 	e.setAttackStrategy(m_attack);
+
+	e.setSprite(getName());
 }
 void AttackState::exit(Enemy& e)
 {
@@ -93,6 +102,8 @@ void FallState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
+
+	e.setSprite(getName());
 }
 void FallState::exit(Enemy& e) {}
 void FallState::update(Enemy& e) {}
@@ -107,6 +118,8 @@ void PiranhaState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategySwayUpDown(m_magnitude, m_frequency));
+
+	e.setSprite(getName());
 }
 void PiranhaState::exit(Enemy& e) {}
 void PiranhaState::update(Enemy& e) {}
@@ -125,6 +138,8 @@ void HopState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
+
+	e.setSprite(getName());
 }
 void HopState::exit(Enemy& e) {}
 void HopState::update(Enemy& e) {}
@@ -142,6 +157,8 @@ void ShellState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyBasic(0, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
+
+	e.setSprite(getName());
 }
 void ShellState::exit(Enemy& e) {}
 void ShellState::update(Enemy& e) {}
@@ -159,6 +176,8 @@ void ShellSlidingState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
+
+	e.setSprite(getName());
 }
 void ShellSlidingState::exit(Enemy& e) {}
 void ShellSlidingState::update(Enemy& e) {}
@@ -173,6 +192,8 @@ void ChaseState::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategyChase(m_speed, m_player));
+
+	e.setSprite(getName());
 }
 void ChaseState::exit(Enemy& e) {}
 void ChaseState::update(Enemy& e) {}
@@ -185,6 +206,8 @@ void DeadStateStomp::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategyBasic(0,e));
+
+	e.setSprite(getName());
 }
 void DeadStateStomp::exit(Enemy& e) {}
 void DeadStateStomp::update(Enemy& e) {}
@@ -199,6 +222,8 @@ void DeadStateElse::enter(Enemy& e)
 {
 	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
+
+	e.setSprite(getName());
 }
 void DeadStateElse::exit(Enemy& e) {}
 void DeadStateElse::update(Enemy& e) {}

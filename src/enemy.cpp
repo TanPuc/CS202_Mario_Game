@@ -8,9 +8,10 @@
 #include "enemyCollisionPlayer.h"
 #include "enemyCollisionMap.h"
 #include "enemyFSM.h"
+#include "enemySprite.h"
 
-Enemy::Enemy(EnemyType type, FiniteStateMachine* state):
-	m_Type(type), m_FSM(state)
+Enemy::Enemy(EnemyType type, FiniteStateMachine* state, SpriteEnemy* sprite):
+	m_Type(type), m_FSM(state), m_sprite(sprite)
 {
 	m_FSM->runInitialState(*this);
 }
@@ -32,6 +33,9 @@ void Enemy::update()
 	m_AttackStrategy->attack(*this);
 	
 	m_FSM->update(*this);
+
+	m_sprite->update(*this);
+	m_sprite->draw(*this);
 }
 
 void Enemy::setMoveStrategy(IMoveStrategy* strategy)
@@ -55,6 +59,11 @@ void Enemy::setCollisionPlayerStrategy(ICollisionPlayerStrategy* strategy)
 {
 	delete m_CollidePlayerStrategy;
 	m_CollidePlayerStrategy = strategy;
+}
+
+void Enemy::setSprite(StateType state)
+{
+	m_sprite->setCurrentState(state);
 }
 
 void Enemy::destroy()

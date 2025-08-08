@@ -21,6 +21,12 @@ void FiniteStateMachine::addStateMap(unordered_map<StateType, EnemyState*>&& bui
     m_stateMap = move(builder);
 }
 
+StateType FiniteStateMachine::getCurrentState()
+{
+    if (m_currentState)
+    return m_currentState->getName();
+}
+
 void FiniteStateMachine::update(Enemy& e) {
     for (const auto& t : m_transitions) {
         if (t.m_from == m_currentState && t.m_condition->evaluate()) {

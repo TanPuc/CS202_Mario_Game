@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "Mario.h"
 #include "Level.h"
+//#include "enemyManager.h"
 
 int main(void)
 {
@@ -15,6 +16,10 @@ int main(void)
 	Level *level = new Level();
 	level->LoadFromFile("assets/level1.map");
 
+	/*EnemyManager* manager = new EnemyManager();
+	Vector2 posEnemy = { 300, 300 };
+	manager->spawnEnemyAt(EnemyType::goopa, posEnemy);*/
+
 	while (!WindowShouldClose())
 	{
 		/// UPDATE GAME
@@ -23,8 +28,8 @@ int main(void)
 
 		/// RENDER GAME
 		Camera2D camera = {0};
-		camera.target = (Vector2){float(player->position.x + player->rect.width / 2), 0};
-		camera.offset = (Vector2){float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
+		camera.target = Vector2{float(player->position.x + player->rect.width / 2), 0};
+		camera.offset = Vector2{float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
 		camera.zoom = 0.5f;
 
 		BeginDrawing();

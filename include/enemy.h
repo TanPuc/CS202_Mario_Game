@@ -7,89 +7,21 @@
 
 class Enemy;
 
-//state
-//class EnemyState
-//{
-//public:
-//
-//	virtual void enter(Enemy& enemy) = 0;
-//	virtual void exit(Enemy& enemy) = 0;
-//	virtual void update(Enemy& enemy) = 0;
-//private:
-//
-//};
-//
-//class AliveState : public EnemyState
-//{
-//public:
-//
-//	void enter(Enemy& e) override;
-//	void exit(Enemy& enemy) override;
-//	void update(Enemy& enemy) override;
-//private:
-//};
-//
-//class DeadState : public EnemyState
-//{
-//public:
-//
-//	void enter(Enemy& e) override;
-//	void exit(Enemy& enemy) override;
-//	void update(Enemy& enemy) override;
-//private:
-//};
 class EnemyState;
 class FiniteStateMachine;
 
-//strategy
-//class IMoveStrategy
-//{
-//public:
-//
-//	virtual void move(Enemy& e) = 0;
-//private:
-//
-//};
-//
-//class MoveStrategyBasic : public IMoveStrategy
-//{
-//public:
-//	void move(Enemy& e) override;
-//};
-//
-//class SwayMoveStrategy : public IMoveStrategy
-//{
-//public:
-//	void move(Enemy& e) override;
-//};
-//
-//class MoveStrategyKeepDistance : public IMoveStrategy
-//{
-//public:
-//	void move(Enemy& e) override;
-//};
-//
-//class MoveStrategyChase : public IMoveStrategy
-//{
-//public :
-//	void move(Enemy& e) override;
-//};
-//
-//class DeadMoveStrategy : public IMoveStrategy
-//{
-//public:
-//	void move(Enemy& e) override;
-//};
 class IMoveStrategy;
 class IAttackStrategy;
 class ICollisionMapStrategy;
 class ICollisionPlayerStrategy;
 
+class SpriteEnemy;
+
 //context
 class Enemy
 {
 public:
-	Enemy(EnemyType type, FiniteStateMachine* fsm);
+	Enemy(EnemyType type, FiniteStateMachine* fsm, SpriteEnemy* sprite);
 	~Enemy();
 
 	void setMoveStrategy(IMoveStrategy*);
@@ -97,6 +29,8 @@ public:
 	void setCollisionMapStrategy(ICollisionMapStrategy*);
 	void setCollisionPlayerStrategy(ICollisionPlayerStrategy*);
 	//void setState(EnemyState*);
+
+	void setSprite(StateType);
 
 	void handleInput(int input);
 	void update();
@@ -125,6 +59,8 @@ private:
 	IAttackStrategy*			m_AttackStrategy		= nullptr;
 	ICollisionMapStrategy*		m_CollideMapStrategy	= nullptr;
 	ICollisionPlayerStrategy*	m_CollidePlayerStrategy = nullptr;
+
+	SpriteEnemy*				m_sprite				= nullptr;
 };
 
 
