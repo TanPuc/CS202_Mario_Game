@@ -8,36 +8,30 @@
 class Entity
 {
 public:
-    Texture2D texture;
     Rectangle rect;
     Vector2 position;
     Vector2 velocity;
     DIRECTION direction = RIGHT; // Default direction
 
-    Entity(Texture texture, Vector2 position)
-        : texture(texture), position(position), velocity({0.0f, 0.0f})
+    Entity(Vector2 position, Vector2 size)
+        : position(position), velocity({0.0f, 0.0f})
     {
-        rect = {position.x, position.y, (float)texture.width, (float)texture.height};
-    }
-    virtual ~Entity()
-    {
-        UnloadTexture(texture);
+        rect = {position.x, position.y, size.x, size.y};
     }
 
-    virtual void Update() = 0;
-    virtual void Draw()
-    {
-        DrawTextureEx(texture, position, 0.0f, 2.0f, WHITE);
-    }
+    virtual void Update(Level &level) = 0;
+    virtual void Draw() = 0;
 
     virtual void ResolveCollision(Entity &other) = 0;
     virtual void ResolveCollision(Level &level) = 0;
 
-    Rectangle GetBounds() const {
+    Rectangle GetBounds() const
+    {
         return rect;
     }
 
-    Vector2 GetPosition() const {
+    Vector2 GetPosition() const
+    {
         return position;
     }
 };

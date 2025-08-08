@@ -10,6 +10,14 @@
 class Sprite
 {
 public:
+    virtual void SwitchAnimation(STATE state_) = 0;
+    virtual void Draw(Entity &entity) = 0;
+    virtual ~Sprite() = default;
+};
+
+class MarioSprite : public Sprite
+{
+public:
     Texture2D marioIdleTexture;
     Texture2D marioWalkTexture;
     Texture2D marioJumpTexture;
@@ -19,7 +27,7 @@ public:
     int frameCounter = 0;
     int frameSpeed = 6; // 6fps
 
-    Sprite()
+    MarioSprite()
     {
         // Initialize the current animation to idle state
         marioIdleTexture = LoadTexture("assets/Mario/mario_idle_sprite.png");
@@ -30,7 +38,7 @@ public:
 
     void SwitchAnimation(STATE state_)
     {
-        if(state_ == prevState)
+        if (state_ == prevState)
             return; // No change in state, skip switching
         switch (state_)
         {
