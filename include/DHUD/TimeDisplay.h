@@ -10,6 +10,7 @@ class TimeDisplay : public GUIElement
     public:
         TimeDisplay();
 
+        void reset(int startTime = 400);
         void update();
         void draw() override;
 };

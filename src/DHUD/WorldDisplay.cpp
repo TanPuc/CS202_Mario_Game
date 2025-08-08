@@ -13,5 +13,5 @@ void WorldDisplay::draw()
 {
     DrawText("WORLD", position.x, position.y, 20, WHITE);
     std::string text = std::to_string(world) + " - " + std::to_string(level);
-    DrawText(text.c_str(), position.x + 10, position.y + 25, 20, WHITE);
+    DrawText(text.c_str(), position.x + 15, position.y + 25, 20, WHITE);
 }

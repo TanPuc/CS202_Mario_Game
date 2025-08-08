@@ -1,4 +1,7 @@
 #include "DGameState/PlayingState.h"
+#include "DGameState/GameOverState.h"
+#include "DGameState/WinState.h"
+#include "DGameState/GetReadyState.h"
 
 PlayingState::PlayingState(GameStateManager* manager, int world, int level) : gsm(manager), worldNum(world), levelNum(level) {}
 
@@ -19,6 +22,10 @@ void PlayingState::enter()
     playerAdapter = std::make_unique<PlayerAdapter>(player.get());
 
     playerAdapter->attach(hudManager.get());
+    
+    hudManager->resetTime(400);
+    hudManager->updateWorld(worldNum, levelNum);
+
     playerAdapter->update();
 
     entities.push_back(std::make_unique<Coin>(coinTexture, Vector2{400, 400}));
@@ -36,8 +43,8 @@ void PlayingState::update()
 {
     player->Update();
     player->CheckCollision(*level.get());
-
     playerAdapter->update();
+    hudManager->updateTime();
 
     for (auto it = entities.begin(); it != entities.end(); ) 
     {

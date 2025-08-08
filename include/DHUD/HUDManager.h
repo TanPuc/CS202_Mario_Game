@@ -18,6 +18,7 @@ class HUDManager : public Observer
 public:
     HUDManager(Texture2D heartTexture, Texture2D coinTexture);
     void update(Subject* subject) override;
+    void resetTime(int startTime = 400);
     void updateTime();
     void updateWorld(int w, int l);
     void draw();

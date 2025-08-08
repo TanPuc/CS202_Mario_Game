@@ -5,7 +5,7 @@ class LifePoint: public GUIElement
     private:
         int currentLifePoint;
         Texture2D heartTexture; // Texture for heart icon
-        static const int maxLifePoint = 10;
+        static const int maxLifePoint = 3;
     public: 
         LifePoint(Texture2D heartTexture);
 

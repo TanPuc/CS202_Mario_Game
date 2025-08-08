@@ -34,5 +34,5 @@ void GetReadyState::draw()
 
     DrawTextureEx(lifeIcon, {GetScreenWidth()/2.0f - 50, GetScreenHeight()/2.0f - 16}, 0.0, 2.0, WHITE);
     std::string livesText = "x " + std::to_string(gsm->getContext().lives);
-    DrawText(livesText.c_str(), GetScreenWidth()/2.0f, GetScreenHeight()/2.0f - 10, 30, WHITE);
+    DrawText(livesText.c_str(), GetScreenWidth()/2.0f + 10, GetScreenHeight()/2.0f - 10, 30, WHITE);
 }
