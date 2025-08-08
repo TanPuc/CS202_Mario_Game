@@ -20,10 +20,12 @@ private:
     std::unique_ptr<HUDManager> hudManager;
     std::vector<std::unique_ptr<Entity>> entities;
 
+    int worldNum;
+    int levelNum;
     Texture2D marioTexture, coinTexture, heartTexture, coinIcon;
 
 public:
-    PlayingState(GameStateManager* manager);
+    PlayingState(GameStateManager* manager, int world, int level);
     void enter() override;
     void exit() override;
     void update() override;

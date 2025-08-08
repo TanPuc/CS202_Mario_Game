@@ -7,7 +7,7 @@ private:
 public:
     ScoreDisplay();
     
-    void updateScore(long long change);
+    void updateScore(long long newScore);
     void draw() override;
 };
 

@@ -5,16 +5,9 @@ LifePoint::LifePoint(Texture2D heartTexture) : currentLifePoint(maxLifePoint), h
     this -> size = {float(heartTexture.width), float(heartTexture.height)};
 }
 
-void LifePoint::updateLifePoint(int change) 
+void LifePoint::updateLifePoint(int newCount) 
 {
-    currentLifePoint += change;
-    if (currentLifePoint < 0) 
-    {
-        currentLifePoint = 0;
-    } else if (currentLifePoint > maxLifePoint) 
-    {
-        currentLifePoint = maxLifePoint;
-    }
+    currentLifePoint = newCount;
 }
 
 void LifePoint::draw()

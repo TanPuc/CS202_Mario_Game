@@ -1,13 +1,15 @@
 #include "DHUD/HUDManager.h"
-// #include "Player.h"
+#include "DGameObjects/PlayerAdapter.h"
 
 HUDManager::HUDManager(Texture2D heartTexture, Texture2D coinTexture)
-    : lifePoint(heartTexture), scoreDisplay(), coinDisplay(coinTexture)
+    : lifePoint(heartTexture), scoreDisplay(), coinDisplay(coinTexture), worldDisplay(), timeDisplay()
 {
     // Initialize the position of the HUD elements
-    lifePoint.position = {50, 20};
-    scoreDisplay.position = {250, 20};
-    coinDisplay.position = {450, 20};
+    scoreDisplay.position = {80, 20};
+    coinDisplay.position = {240, 45};
+    worldDisplay.position = {400, 20};
+    timeDisplay.position = {550, 20};
+    lifePoint.position = {680, 20};
 
     // Set visibility and enable state
     lifePoint.isVisible = true;
@@ -16,29 +18,53 @@ HUDManager::HUDManager(Texture2D heartTexture, Texture2D coinTexture)
     scoreDisplay.isEnabled = true;
     coinDisplay.isVisible = true;
     coinDisplay.isEnabled = true;
+    worldDisplay.isVisible = true;
+    worldDisplay.isEnabled= true;
+    timeDisplay.isVisible = true;
+    timeDisplay.isEnabled = true;
 }
 
 void HUDManager::update(Subject* subject)
 {
-    //Player* player = dynamic_cast<Player*>(subject);
-    //if (player)
-    // {
-    //     // Update life points, score, and coins based on player state
-    //     // lifePoint.updateLifePoint(player->getLifeChange());
-    //     // scoreDisplay.updateScore(player->getScoreChange());
-    //     // coinDisplay.updateCoins(player->getCoinChange());
-    // }
+    if (PlayerAdapter* adapter = dynamic_cast<PlayerAdapter*>(subject))
+    {
+        scoreDisplay.updateScore(adapter->getScore());
+        coinDisplay.updateCoins(adapter->getCoins());
+        lifePoint.updateLifePoint(adapter->getLives());
+    }
+
+}
+
+void HUDManager::updateTime()
+{
+    timeDisplay.update();
+}
+
+void HUDManager::updateWorld(int w, int l) 
+{
+    worldDisplay.updateWorld(w,l);
 }
 
 void HUDManager::draw()
 {
-    if (lifePoint.isVisible) {
+    if (lifePoint.isVisible) 
+    {
         lifePoint.draw();
     }
-    if (scoreDisplay.isVisible) {
+    if (scoreDisplay.isVisible) 
+    {
         scoreDisplay.draw();
     }
-    if (coinDisplay.isVisible) {
+    if (coinDisplay.isVisible) 
+    {
         coinDisplay.draw();
+    }
+    if (worldDisplay.isVisible)
+    {
+        worldDisplay.draw();
+    }
+    if (timeDisplay.isVisible)
+    {
+        timeDisplay.draw();
     }
 }

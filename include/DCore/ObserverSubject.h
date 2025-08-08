@@ -17,6 +17,7 @@ class Subject
         std::vector<Observer*> observers;
     
     public:
+        virtual ~Subject() {}
         void attach(Observer* observer)
         {
             if (std::find(observers.begin(), observers.end(), observer) == observers.end()) 

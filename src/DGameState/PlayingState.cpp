@@ -1,13 +1,13 @@
 #include "DGameState/PlayingState.h"
 
-PlayingState::PlayingState(GameStateManager* manager) : gsm(manager) {}
+PlayingState::PlayingState(GameStateManager* manager, int world, int level) : gsm(manager), worldNum(world), levelNum(level) {}
 
 void PlayingState::enter() 
 {
-    heartTexture = LoadTexture("assets/mario_head_icon.png");
-    coinIcon = LoadTexture("assets/coin_icon.png");
+    heartTexture = LoadTexture("assets/mario.png");
+    coinIcon = LoadTexture("assets/mario.png");
     marioTexture = LoadTexture("assets/mario.png");
-    coinTexture = LoadTexture("assets/coin.png");
+    coinTexture = LoadTexture("assets/mario.png");
 
     player = std::make_unique<Mario>(marioTexture, Vector2{100, 0});
     player->lives = 3; player->coins = 0; player->score = 0;

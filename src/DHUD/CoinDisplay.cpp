@@ -5,9 +5,9 @@ CoinDisplay::CoinDisplay(Texture2D coinTexture) : currentCoins(0), coinTexture(c
     this->size = {float(coinTexture.width), float(coinTexture.height)};
 }
 
-void CoinDisplay::updateCoins(int change) 
+void CoinDisplay::updateCoins(int newCount) 
 {
-    currentCoins += change;
+    currentCoins = newCount;
 }
 
 void CoinDisplay::draw()

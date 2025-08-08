@@ -2,9 +2,9 @@
 
 ScoreDisplay::ScoreDisplay() : currentScore(0) {}
 
-void ScoreDisplay::updateScore(long long change) 
+void ScoreDisplay::updateScore(long long newScore) 
 {
-    currentScore += change;
+    currentScore = newScore;
 }
 
 void ScoreDisplay::draw()

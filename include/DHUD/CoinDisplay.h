@@ -9,6 +9,6 @@ class CoinDisplay : public GUIElement
     public:
         CoinDisplay(Texture2D coinTexture);
 
-        void updateCoins(int change);
+        void updateCoins(int newCount);
         void draw() override;
 };

@@ -9,6 +9,6 @@ class LifePoint: public GUIElement
     public: 
         LifePoint(Texture2D heartTexture);
 
-        void updateLifePoint(int change);
+        void updateLifePoint(int newCount);
         void draw() override;
 };

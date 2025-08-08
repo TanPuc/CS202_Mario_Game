@@ -1,32 +1,55 @@
 #pragma once
 #include "DGameState/GameStateManager.h"
 #include "DCore/GameState.h"
+#include <iostream> 
 
-void GameStateManager::changeState(GameState* newState) 
+GameStateManager::GameStateManager() : exiting(false) {}
+GameStateManager::~GameStateManager() 
 {
-    if (currentState) 
-    {
-        currentState->exit();
-    }
-    currentState.reset(newState);
-    if (currentState) 
-    {
-        currentState->enter();
+    while (!states.empty()) {
+        states.back()->exit();
+        states.pop_back();
     }
 }
 
-void GameStateManager::update() 
+void GameStateManager::pushState(GameState* state) 
 {
-    if (currentState) 
+    if (state) 
     {
-        currentState->update();
+        states.emplace_back(state);
+        states.back()->enter();
+    }
+}
+
+void GameStateManager::popState() 
+{
+    if (!states.empty()) 
+    {
+        states.back()->exit();
+        states.pop_back();
+    }
+}
+
+void GameStateManager::changeState(GameState* state) 
+{
+    while (!states.empty()) {
+        states.back()->exit();
+        states.pop_back();
+    }
+    pushState(state);
+}
+
+void GameStateManager::update()
+{
+    if (!states.empty()) {
+        states.back()->update();
     }
 }
 
 void GameStateManager::draw() 
 {
-    if (currentState) 
+    for (const auto& state : states) 
     {
-        currentState->draw();
+        state->draw();
     }
 }
