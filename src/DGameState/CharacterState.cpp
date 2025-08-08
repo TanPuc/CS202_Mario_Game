@@ -1,6 +1,7 @@
 #include "DGameState/CharacterState.h"
 #include "DGUI/Button.h"
 #include "DGameState/MenuState.h" 
+#include "DGameState/GetReadyState.h"
 #include <iostream>
 
 CharacterState::CharacterState(GameStateManager* manager): gsm(manager), guiManager(GUIManager::getInstance()){}
@@ -17,7 +18,6 @@ void CharacterState::enter()
         {
             std::cout<<"Selected Mario\n";
             this->gsm->getContext().selectedCharacter = "mario";
-            this->gsm->changeState(new MenuState(this->gsm));
         }
     ));
 
@@ -27,7 +27,6 @@ void CharacterState::enter()
         {
             std::cout<<"Selected Luigi\n";
             this->gsm->getContext().selectedCharacter = "luigi";
-            this->gsm->changeState(new MenuState(this->gsm));
         }
     ));
 
