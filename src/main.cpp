@@ -21,13 +21,14 @@ int main(void)
 
 		/// RENDER GAME
 		Camera2D camera = {0};
-		Vector2 playerPos = player.GetPosition();
+		Vector2 playerPos = player->GetPosition();
 		if (playerPos.x > CameraPos.x)
 		{
 			CameraPos.x = playerPos.x;
 		}
 		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), 0};
 		camera.offset = (Vector2){float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
+		// camera.offset = (Vector2){200, 600};
 		camera.zoom = 0.5f;
 
 		BeginDrawing();

@@ -16,40 +16,45 @@
 class FireBall : public Entity
 {
 public:
-    Rectangle boundBox = {0, 0, 4, 4}; // Fireball bounding for bouncing
-    Rectangle hitBox = {0, 0, 4, 4};   // Fireball hitbox for enemy collision
+    Rectangle boundBox = {0, 0, 8, 8}; // Fireball bounding for bouncing
+    Rectangle hitBox = {0, 0, 8, 8};   // Fireball hitbox for enemy collision
     Texture2D texture;                 // Fireball texture
     int timer = 0;
 
-    FireBall(Vector2 position) : Entity(position, Vector2({4.0f, 4.0f}))
+    FireBall(Vector2 position, DIRECTION direction) : Entity(position, Vector2({16.0f, 16.0f}))
     {
-        velocity = {100.0f, -200.0f};
+        // velocity = {FIREBALL_SPEED, 100.0f};
+        velocity = {0.0f, 0.0f};
+        this->direction = direction;
         texture = LoadTexture("assets/brick.png"); // Temporary
-        boundBox.x = position.x;
-        boundBox.y = position.y;
-        hitBox.x = position.x;
-        hitBox.y = position.y;
+        boundBox.x = position.x + rect.width / 2 - boundBox.width / 2;
+        boundBox.y = position.y + rect.height;
+        hitBox.x = direction == RIGHT? position.x + rect.width : position.x - hitBox.width;
+        hitBox.y = position.y + rect.height / 2 - hitBox.height / 2;
     }
 
     void Update(Level &level) override
     {
-        float dt = GetFrameTime();
-
         timer++;
-        position.x += velocity.x * dt;
-        position.y += velocity.y * dt;
+        float dt = GetFrameTime();
         ApplyGravity(velocity, 800.0f);
 
-        if (CheckCollision(*this, level)) // Resolve collision
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
+
+        if (CheckCollision(boundBox, level)) // Resolve collision
         {
-            velocity.y = -500.0f; // Stop vertical movement
-            ResolveCollision(level);
+            // ResolveCollision(level);
+            velocity.y = -150.0f;
             position.y = (int)(position.y / 32) * 32; // Snap to tile grid
-            velocity.y = 0;
         }
 
         rect.x = position.x;
         rect.y = position.y;
+        boundBox.x = position.x + rect.width / 2 - boundBox.width / 2;
+        boundBox.y = position.y + rect.height;
+        hitBox.x = direction == RIGHT? position.x + rect.width : position.x - hitBox.width;
+        hitBox.y = position.y + rect.height / 2 - hitBox.height / 2;
     }
 
     bool isOverLifeTime() const
@@ -59,8 +64,10 @@ public:
 
     void Draw() override
     {
-        DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED); // Draw hitbox for debugging
-        DrawTexture(texture, position.x, position.y, WHITE);              // Draw fireball texture
+        DrawRectangleLines(boundBox.x, boundBox.y, boundBox.width, boundBox.height, RED); // Draw bounding box for debugging
+        DrawRectangleLines(hitBox.x, hitBox.y, hitBox.width, hitBox.height, RED);         // Draw hitbox for debugging
+        DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);                 // Draw hitbox for debugging
+        DrawTexture(texture, position.x, position.y, WHITE); // Draw fireball texture
     }
 
     void ResolveCollision(Entity &other) override
@@ -97,7 +104,7 @@ public:
     {
         if (fireballs.size() < FIREBALL_THRESHOLD)
         {
-            FireBall *fireball = new FireBall({position.x + rect.width, position.y + rect.height / 2});
+            FireBall *fireball = new FireBall({position.x + rect.width, position.y + rect.height / 2}, direction);
             fireball->velocity.x = (direction == RIGHT) ? FIREBALL_SPEED : -FIREBALL_SPEED;
             fireballs.push_back(std::unique_ptr<FireBall>(fireball));
         }
@@ -140,7 +147,7 @@ public:
             currentState = std::move(newState);
             sprite->SwitchAnimation(currentState->GetType());
         }
-        float gravity = 800.0f;
+        float gravity = 900.0f;
         float dt = GetFrameTime();
         ApplyGravity(velocity, gravity);
         position.x += velocity.x * dt;

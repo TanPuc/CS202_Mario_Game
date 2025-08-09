@@ -30,6 +30,7 @@ void ApplyGravity(Vector2 &velocity, float gravity);
 void ClampVelocity(Vector2 &velocity);
 bool CheckCollision(const Entity &a, const Entity &b);
 bool CheckCollision(const Entity &a, const Level &level);
+bool CheckCollision(const Rectangle &a, const Level &level);
 bool CheckCollision(const Entity &a, const Level &level, Vector2 &collisionPoint);
 
 #endif // PHYSICS_H
