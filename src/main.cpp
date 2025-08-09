@@ -2,18 +2,18 @@
 #include <iostream>
 #include "raylib.h"
 #include "Mario.h"
-#include "Level.h"
+#include "Tile.h"
 
 int main(void)
 {
-	int width = 1280, height = 720;
+	int width = 256 * scale, height = 240 * scale;
 	InitWindow(width, height, "Mario");
 	SetTargetFPS(60);
 
 	bool pause = false;
 
 	Mario player;
-	Level level;
+	World1_1 world1_1("./assets/tiles/world_1.1.txt");
 
 	while (!WindowShouldClose())
 	{
@@ -27,9 +27,13 @@ int main(void)
 
 		BeginDrawing();
 		ClearBackground(DARKGRAY);
+		BeginMode2D(player.camera);
 
-		level.Draw();
+		world1_1.update( player );
+		world1_1.render();
 		player.Draw();
+
+		EndMode2D();
 
 		EndDrawing();
 	}

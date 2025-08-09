@@ -2,7 +2,6 @@
 #define ENTITUY_H
 
 #include <raylib.h>
-#include "Level.h"
 
 class Entity
 {
