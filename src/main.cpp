@@ -3,6 +3,9 @@
 #include "raylib.h"
 #include "Mario.h"
 #include "Level.h"
+
+#define MARIO_SKYBLUE (Color){68, 145, 190, 255}
+
 int main(void)
 {
 	InitWindow(800, 512, "Mario");
@@ -33,7 +36,7 @@ int main(void)
 
 		BeginDrawing();
 
-		ClearBackground(SKYBLUE);
+		ClearBackground(MARIO_SKYBLUE);
 		BeginMode2D(camera);
 
 		level->Draw();
