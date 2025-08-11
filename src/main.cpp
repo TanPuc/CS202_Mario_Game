@@ -5,14 +5,15 @@
 #include "Level.h"
 #include "enemyManager.h"
 
+#define MARIO_SKYBLUE (Color){68, 145, 190, 255}
+
 int main(void)
 {
 	InitWindow(800, 512, "Mario");
 	SetTargetFPS(60);
 
-	Texture2D marioTexture = LoadTexture("assets/Mario/mario_idle_sprite.png");
-	Mario *player = new Mario(marioTexture, {float(GetScreenWidth() / 2 - 16), 0.0f});
-
+	Vector2 CameraPos = {0, 0};
+	Mario *player = new Mario({float(GetScreenWidth() / 2 - 16), 0.0f});
 	Level *level = new Level();
 	level->LoadFromFile("assets/level1.map");
 
@@ -29,8 +30,14 @@ int main(void)
 
 		/// RENDER GAME
 		Camera2D camera = {0};
-		camera.target = Vector2{float(player->position.x + player->rect.width / 2), 0};
-		camera.offset = Vector2{float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
+		Vector2 playerPos = player->GetPosition();
+		if (playerPos.x > CameraPos.x)
+		{
+			CameraPos.x = playerPos.x;
+		}
+		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), 0};
+		camera.offset = (Vector2){float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
+		// camera.offset = (Vector2){200, 600};
 		camera.zoom = 0.5f;
 
 		///ENEMY
@@ -38,7 +45,7 @@ int main(void)
 
 		BeginDrawing();
 
-		ClearBackground(SKYBLUE);
+		ClearBackground(MARIO_SKYBLUE);
 		BeginMode2D(camera);
 
 		level->Draw();

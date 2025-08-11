@@ -6,85 +6,155 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <iostream>
+
+#define FRAME_PADDING 2 
+
+struct Animation
+{
+    std::vector<Rectangle> frames;
+    int totalFrames;
+    int frameCounter;
+    Animation() : totalFrames(0), frameCounter(0) {}
+
+    Animation(std::vector<Rectangle> frames_)
+        : frames(std::move(frames_)), frameCounter(0)
+    {
+        totalFrames = static_cast<int>(frames.size());
+    }
+
+    Animation(const Animation &other)
+        : frames(other.frames), totalFrames(other.totalFrames), frameCounter(other.frameCounter) {}
+    Animation &operator=(const Animation &other)
+    {
+        if (this != &other)
+        {
+            frames = other.frames;
+            totalFrames = other.totalFrames;
+            frameCounter = other.frameCounter;
+        }
+        return *this;
+    }
+};
 
 class Sprite
 {
 public:
-    Texture2D marioIdleTexture;
-    Texture2D marioWalkTexture;
-    Texture2D marioJumpTexture;
-    std::unique_ptr<Texture2D> currentTexture;
-    STATE prevState; // Previous state for animation switching
-    Rectangle frameRec = {0, 0, 32, 32};
-    int frameCounter = 0;
+    virtual void SwitchAnimation(STATE state_) = 0;
+    virtual void Draw(Entity &entity) = 0;
+    virtual ~Sprite() = default;
+};
+
+class MarioSprite : public Sprite
+{
+private:
+    Animation idleAnimation;
+    Animation walkAnimation;
+    Animation jumpAnimation;
+
+public:
+    Texture2D spriteSheet;
+    Animation *currentAnimation;
+    STATE prevState;
     int frameSpeed = 6; // 6fps
 
-    Sprite()
+    MarioSprite()
+        : idleAnimation({{0, 16, 16, 16}}),
+          walkAnimation({{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}}),
+          jumpAnimation({{32 + FRAME_PADDING * 2, 16, 16, 16}}),
+          prevState(STATE_IDLE)
     {
-        // Initialize the current animation to idle state
-        marioIdleTexture = LoadTexture("assets/Mario/mario_idle_sprite.png");
-        marioWalkTexture = LoadTexture("assets/Mario/mario_walk_sprite.png");
-        marioJumpTexture = LoadTexture("assets/Mario/mario_jump_sprite.png");
-        currentTexture = std::make_unique<Texture2D>(marioIdleTexture);
+        spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
+        currentAnimation = &idleAnimation;
     }
 
-    void SwitchAnimation(STATE state_)
+    ~MarioSprite()
     {
-        if(state_ == prevState)
-            return; // No change in state, skip switching
+        UnloadTexture(spriteSheet);
+    }
+
+    void SwitchAnimation(STATE state_) override
+    {
+        if (state_ == prevState)
+            return;
+
         switch (state_)
         {
         case STATE_IDLE:
-            currentTexture = std::make_unique<Texture2D>(marioIdleTexture);
+            currentAnimation = &idleAnimation;
             break;
         case STATE_WALKING:
-            currentTexture = std::make_unique<Texture2D>(marioWalkTexture);
+            currentAnimation = &walkAnimation;
             break;
         case STATE_JUMPING:
-            currentTexture = std::make_unique<Texture2D>(marioJumpTexture);
-            break;
-        case STATE_FALLING:
+            currentAnimation = &jumpAnimation;
             break;
         case STATE_DUCKING:
+            // Handle ducking state if needed
+            currentAnimation = &idleAnimation; // Fallback to idle
             break;
         case STATE_SWIMMING:
+            // Handle swimming state if needed
+            currentAnimation = &idleAnimation; // Fallback to idle
             break;
         default:
             std::cerr << "Unknown state: " << state_ << std::endl;
+            currentAnimation = &idleAnimation; // Fallback to idle
             break;
         }
-        frameCounter = 0;
-        prevState = state_; // Update previous state
+
+        if (currentAnimation)
+        {
+            currentAnimation->frameCounter = 0;
+        }
+        prevState = state_;
     }
 
-    void Draw(Entity &entity)
+    void Draw(Entity &entity) override
     {
-        if (!currentTexture)
+        if (!currentAnimation)
         {
-            std::cerr << "Current texture is not set!" << std::endl;
+            std::cerr << "Current animation is not set!" << std::endl;
             return;
         }
-        // Update frame counter
-        frameCounter++;
-        if (frameCounter >= frameSpeed)
+
+        static int animationTimer = 0;
+        animationTimer++;
+
+        if (animationTimer >= frameSpeed)
         {
-            frameCounter = 0;
-            // Update frame rectangle for animation
-            frameRec.x += frameRec.width;
-            if (frameRec.x >= currentTexture->width)
+            animationTimer = 0;
+            currentAnimation->frameCounter++;
+            if (currentAnimation->frameCounter >= currentAnimation->totalFrames)
             {
-                frameRec.x = 0; // Reset to the first frame
+                currentAnimation->frameCounter = 0; // Reset frame index
             }
         }
-        if (entity.direction == LEFT)
+
+        // Get current frame
+        if (currentAnimation->frameCounter < currentAnimation->frames.size())
         {
-            frameRec.width = -abs(frameRec.width); // Flip the frame for left direction
+            Rectangle frameRec = currentAnimation->frames[currentAnimation->frameCounter];
+
+            // Handle direction flipping
+            if (entity.direction == LEFT)
+            {
+                frameRec.width = abs(frameRec.width);
+            }
+            else
+            {
+                frameRec.width = -abs(frameRec.width);
+            }
+            // DrawTextureRec(spriteSheet, frameRec, entity.position, WHITE);
+            DrawTexturePro(spriteSheet, frameRec,
+                           {entity.position.x, entity.position.y, frameRec.width * 2, frameRec.height * 2},
+                           {0, 0}, 0.0f, WHITE);
         }
         else
         {
-            frameRec.width = abs(frameRec.width); // Ensure positive width for right direction
+            currentAnimation->frameCounter = 0;
         }
-        DrawTextureRec(*currentTexture, frameRec, entity.position, WHITE);
+        // DrawTexture(spriteSheet, entity.position.x, entity.position.y, WHITE);
     }
 };
 
