@@ -2,6 +2,8 @@
 #include "DGameState/GameOverState.h"
 #include "DGameState/WinState.h"
 #include "DGameState/GetReadyState.h"
+#include "DGameState/PauseState.h"
+
 
 PlayingState::PlayingState(GameStateManager* manager, int world, int level) : gsm(manager), worldNum(world), levelNum(level) {}
 
@@ -13,19 +15,22 @@ void PlayingState::enter()
     coinTexture = LoadTexture("assets/mario.png");
 
     player = std::make_unique<Mario>(marioTexture, Vector2{100, 0});
-    player->lives = 3; player->coins = 0; player->score = 0;
 
     level = std::make_unique<Level>();
     level->LoadFromFile("assets/level1.map");
+
+    player -> lives = gsm->getContext().lives;
+    player -> coins = 0;
+    player -> score = 0;
 
     hudManager = std::make_unique<HUDManager>(heartTexture, coinIcon);
     playerAdapter = std::make_unique<PlayerAdapter>(player.get());
 
     playerAdapter->attach(hudManager.get());
+    playerAdapter->init();
     
     hudManager->resetTime(400);
     hudManager->updateWorld(worldNum, levelNum);
-
     playerAdapter->update();
 
     entities.push_back(std::make_unique<Coin>(coinTexture, Vector2{400, 400}));
@@ -41,6 +46,13 @@ void PlayingState::exit()
 
 void PlayingState::update() 
 {
+    // if we press escape, we want to pause the game
+    if (IsKeyPressed(KEY_ESCAPE)) 
+    {
+        gsm->pushState(new PauseState(gsm, worldNum, levelNum));
+        return;
+    }
+
     player->Update();
     player->CheckCollision(*level.get());
     playerAdapter->update();
@@ -68,6 +80,22 @@ void PlayingState::update()
         {
             ++it;
         }
+    }
+
+    //Check for game over
+    //Time and lives
+    if (hudManager->getTime() <= 0) 
+    {
+        player->lives--;
+        gsm->getContext().lives = player->lives;
+
+        if (player->lives <= 0) {
+            gsm->changeState(new GameOverState(gsm));
+        } else 
+        {
+            gsm->changeState(new GetReadyState(gsm, worldNum, levelNum));
+        }
+        return;
     }
 }
 

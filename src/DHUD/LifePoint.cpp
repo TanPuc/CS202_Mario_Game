@@ -1,4 +1,6 @@
 #include "DHUD/LifePoint.h"
+#include "DCore/ResourceManager.h"
+#include <string>
 
 LifePoint::LifePoint(Texture2D heartTexture) : currentLifePoint(maxLifePoint), heartTexture(heartTexture) 
 {
@@ -12,11 +14,17 @@ void LifePoint::updateLifePoint(int newCount)
 
 void LifePoint::draw()
 {
-    DrawText("LIVES", position.x, position.y, 20, WHITE);
+    Font font = ResourceManager::GetInstance().GetGameFont();
+    float fontSize = 20.0f;
+    float spacing = 1.0f;
+
+    DrawTextEx(font, "LIVES", position, fontSize, spacing, WHITE);
+    // DrawText("LIVES", position.x, position.y, 20, WHITE);
     
     Vector2 iconPosition = { position.x, position.y + 25 };
     DrawTextureV(heartTexture, iconPosition, WHITE);
 
     std::string lifeText = "x " + std::to_string(currentLifePoint);
-    DrawText(lifeText.c_str(), iconPosition.x + heartTexture.width + 10, iconPosition.y + 5, 20, WHITE);
+    DrawTextEx(font, lifeText.c_str(), {iconPosition.x + heartTexture.width + 10, iconPosition.y + 5}, fontSize, spacing, WHITE);
+    // DrawText(lifeText.c_str(), iconPosition.x + heartTexture.width + 10, iconPosition.y + 5, 20, WHITE);
 }

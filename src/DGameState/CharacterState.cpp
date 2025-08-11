@@ -2,6 +2,7 @@
 #include "DGUI/Button.h"
 #include "DGameState/MenuState.h" 
 #include "DGameState/GetReadyState.h"
+#include "DCore/ResourceManager.h"
 #include <iostream>
 
 CharacterState::CharacterState(GameStateManager* manager): gsm(manager), guiManager(GUIManager::getInstance()){}
@@ -55,7 +56,16 @@ void CharacterState::update()
 void CharacterState::draw()
 {
     ClearBackground(BLACK);
-    DrawText("CHOOSE YOUR CHARACTER", 150, 80, 40, WHITE);
+    Font font = ResourceManager::GetInstance().GetGameFont();
+    float fontSize = 39.5f;
+    float spacing = 3.0f;
+
+    const char* title = "CHOOSE YOUR CHARACTER";
+    Vector2 titleSize = MeasureTextEx(font, title, fontSize, spacing);
+
+    float titleX = (GetScreenWidth() - titleSize.x) / 2.0f;
+    float titleY = 50.0f;
+    DrawTextEx(font, title, {titleX, titleY}, fontSize, spacing, WHITE);
 
     DrawTexture(marioChoice, 150, 200, WHITE);
     DrawTexture(luigiChoice, 150, 200, WHITE);
@@ -71,4 +81,3 @@ void CharacterState::draw()
 
     guiManager.draw();
 }
-

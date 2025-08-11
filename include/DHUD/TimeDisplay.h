@@ -13,4 +13,8 @@ class TimeDisplay : public GUIElement
         void reset(int startTime = 400);
         void update();
         void draw() override;
+        int getTimeRemaining() const
+        {
+            return timeRemaining;
+        }
 };

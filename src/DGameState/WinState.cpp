@@ -1,6 +1,7 @@
 #include "DGameState/WinState.h"
 #include "DGUI/Button.h"
 #include "DGameState/MenuState.h"
+#include "DCore/ResourceManager.h"
 #include <iostream>
 #include <cmath> 
 
@@ -38,16 +39,24 @@ void WinState::draw() {
     ClearBackground(DARKBLUE);
 
     //BLING BLING
+    Font font = ResourceManager::GetInstance().GetGameFont();
     float alpha = (sinf(timer * 4.0f) + 1.0f) / 2.0f;
     Color textColor = Fade(YELLOW, alpha);
 
     const char* text1 = "CONGRATULATIONS!";
     const char* text2 = "YOU ARE A SUPER PLAYER!";
-    float textWidth1 = MeasureText(text1, 50);
-    float textWidth2 = MeasureText(text2, 30);
 
-    DrawText(text1, GetScreenWidth() / 2 - textWidth1 / 2, 150, 50, textColor);
-    DrawText(text2, GetScreenWidth() / 2 - textWidth2 / 2, 220, 30, WHITE);
+    // float textWidth1 = MeasureText(text1, 50);
+    // float textWidth2 = MeasureText(text2, 30);
+
+    // DrawText(text1, GetScreenWidth() / 2 - textWidth1 / 2, 150, 50, textColor);
+    // DrawText(text2, GetScreenWidth() / 2 - textWidth2 / 2, 220, 30, WHITE);
     
+    Vector2 size1 = MeasureTextEx(font, text1, 50, 3.0f);
+    Vector2 size2 = MeasureTextEx(font, text2, 30, 2.0f);
+
+    DrawTextEx(font, text1, {GetScreenWidth()/2.0f - size1.x/2, 150}, 50, 3.0f, textColor);
+    DrawTextEx(font, text2, {GetScreenWidth()/2.0f - size2.x/2, 220}, 30, 2.0f, GOLD);
+
     guiManager.draw();
 }

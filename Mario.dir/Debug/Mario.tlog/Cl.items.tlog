@@ -8,6 +8,7 @@ C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGameState\GameStateManager
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGameState\GetReadyState.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\GetReadyState.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGameState\LevelState.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\LevelState.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGameState\MenuState.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\MenuState.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGameState\PauseState.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\PauseState.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGameState\PlayingState.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\PlayingState.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGameState\WinState.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\WinState.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DHUD\CoinDisplay.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\CoinDisplay.obj

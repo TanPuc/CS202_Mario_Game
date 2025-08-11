@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "DGameState/GameStateManager.h"
 #include "DGameState/MenuState.h"
-
+#include "DCore/ResourceManager.h"
 
 int main(void)
 {
@@ -9,22 +9,28 @@ int main(void)
 	InitAudioDevice();
 	SetTargetFPS(60);
 
+	//No exit key
+	SetExitKey(KEY_NULL);
+
+	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
+
     GameStateManager gsm;
     
     gsm.changeState(new MenuState(&gsm));
 
-	while (!WindowShouldClose())
+	while (!WindowShouldClose() && !gsm.isExiting())
 	{
         gsm.update();
 
 		BeginDrawing();
 		ClearBackground(SKYBLUE);
-
+ 
         gsm.draw();
 
 		EndDrawing();
 	}
-    
+	ResourceManager::GetInstance().UnloadResources();
+
 	CloseAudioDevice();
 	CloseWindow();
 

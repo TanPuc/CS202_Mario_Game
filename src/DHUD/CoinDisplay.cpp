@@ -1,4 +1,7 @@
 #include "DHUD/CoinDisplay.h"
+#include "DCore/ResourceManager.h"
+#include <string>
+#include <cstdio>
 
 CoinDisplay::CoinDisplay(Texture2D coinTexture) : currentCoins(0), coinTexture(coinTexture) 
 {
@@ -12,7 +15,13 @@ void CoinDisplay::updateCoins(int newCount)
 
 void CoinDisplay::draw()
 {
-    DrawText ("COINS", position.x, position.y, 20, WHITE);
+    Font font  = ResourceManager::GetInstance().GetGameFont();
+    float fontSize = 20.0f;
+    float spacing = 1.0f;
+
+    DrawTextEx(font, "COINS", {position.x, position.y}, fontSize, spacing, WHITE);
+
+    // DrawText ("COINS", position.x, position.y, 20, WHITE);
 
     DrawTextureV(coinTexture, {position.x, position.y +25}, WHITE);
 
@@ -20,5 +29,5 @@ void CoinDisplay::draw()
 
     float textPositionX = position.x + coinTexture.width + 8;
     float textPositionY = position.y + (coinTexture.height / 2.0f) - 10; 
-    DrawText(text.c_str(), textPositionX, textPositionY + 25, 20, GOLD);
+    DrawTextEx(font, text.c_str(), {textPositionX, textPositionY + 25}, fontSize, spacing, GOLD);
 }

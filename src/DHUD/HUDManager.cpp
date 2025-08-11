@@ -1,6 +1,7 @@
 #include "DHUD/HUDManager.h"
 #include "DGameObjects/PlayerAdapter.h"
 
+
 HUDManager::HUDManager(Texture2D heartTexture, Texture2D coinTexture)
     : lifePoint(heartTexture), scoreDisplay(), coinDisplay(coinTexture), worldDisplay(), timeDisplay()
 {
@@ -50,6 +51,13 @@ void HUDManager::updateWorld(int w, int l)
     worldDisplay.updateWorld(w,l);
 }
 
+void HUDManager::syncWithContext(const GameContext& context)
+{
+    scoreDisplay.updateScore(0);
+    coinDisplay.updateCoins(0);
+    lifePoint.updateLifePoint(context.lives);
+}
+
 void HUDManager::draw()
 {
     if (lifePoint.isVisible) 
@@ -72,4 +80,9 @@ void HUDManager::draw()
     {
         timeDisplay.draw();
     }
+}
+
+int HUDManager::getTime() const
+{
+    return timeDisplay.getTimeRemaining();
 }

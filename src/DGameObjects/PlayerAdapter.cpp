@@ -13,6 +13,13 @@ PlayerAdapter::PlayerAdapter(Mario* target) : mario_target(target)
     }
 }
 
+PlayerAdapter::~PlayerAdapter(){}
+
+void PlayerAdapter::init()
+{
+    notifyObservers();
+}
+
 void PlayerAdapter::update()
 {
     if (!mario_target) return;

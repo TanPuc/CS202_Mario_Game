@@ -1,6 +1,7 @@
 #include "DGameState/GameOverState.h"
 #include "DGUI/Button.h"
 #include "DGameState/MenuState.h"
+#include "DCore/ResourceManager.h"
 #include <iostream>
 
 GameOverState::GameOverState(GameStateManager* manager): gsm(manager), guiManager(GUIManager::getInstance()){}
@@ -33,8 +34,15 @@ void GameOverState::update()
 void GameOverState::draw()
 {
     ClearBackground(BLACK);
+    Font font = ResourceManager::GetInstance().GetGameFont();
     const char* text = "GAME OVER";
-    float textWidth  =MeasureText(text, 80);
-    DrawText(text, GetScreenWidth()/2 - textWidth/2, 200, 80, WHITE);
+    float fontSize = 80.0f;
+    float spacing = 5.0f;
+
+    Vector2 textSize = MeasureTextEx(font, text, fontSize, spacing);
+    DrawTextEx(font, text, {GetScreenWidth() / 2.0f - textSize.x / 2, 200}, fontSize, spacing, WHITE);
+    
+    // float textWidth  =MeasureText(text, 80);
+    // DrawText(text, GetScreenWidth()/2 - textWidth/2, 200, 80, WHITE);
     guiManager.draw();
 }

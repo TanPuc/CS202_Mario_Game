@@ -5,6 +5,7 @@
 #include "DHUD/CoinDisplay.h"
 #include "DHUD/WorldDisplay.h"
 #include "DHUD/TimeDisplay.h"
+#include "DCore/GameContext.h"
 #include "raylib.h"
 
 class HUDManager : public Observer
@@ -21,5 +22,7 @@ public:
     void resetTime(int startTime = 400);
     void updateTime();
     void updateWorld(int w, int l);
+    void syncWithContext(const GameContext& context);
     void draw();
+    int getTime() const;
 };

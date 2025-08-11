@@ -12,7 +12,9 @@ class PlayerAdapter : public Subject
         int last_coins;
     public:
         PlayerAdapter(Mario* target);
+        ~PlayerAdapter();
 
+        void init();
         void update();
         int getLives() const;
         int getCoins() const;

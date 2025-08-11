@@ -2,6 +2,7 @@
 #include "DGUI/Button.h"
 #include "DGameState/MenuState.h"
 #include "DGameState/GetReadyState.h"
+#include "DCore/ResourceManager.h"
 #include <iostream>
 
 LevelState::LevelState(GameStateManager* manager): gsm(manager), guiManager(GUIManager::getInstance()) {}
@@ -57,6 +58,16 @@ void LevelState::update()
 void LevelState::draw()
 {
     ClearBackground(BLACK);
-    DrawText("LEVEL SELECT", 250, 50, 50, WHITE);
+    Font font = ResourceManager::GetInstance().GetGameFont();
+    float fontSize = 50.0f;
+    float spacing = 3.0f;
+
+    const char* title = "CHOOSE LEVEL";
+    Vector2 titleSize = MeasureTextEx(font, title, fontSize, spacing);
+
+    float titleX = (GetScreenWidth() - titleSize.x) / 2.0f;
+    float titleY = 50.0f;
+
+    DrawTextEx(font, title, {titleX, titleY}, fontSize, spacing, WHITE);
     guiManager.draw();
 }
