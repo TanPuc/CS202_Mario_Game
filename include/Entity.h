@@ -6,6 +6,7 @@
 class Entity
 {
 public:
+    bool isOutOfScreen = false;
     Texture2D texture;
     Rectangle rect;
     Vector2 position;

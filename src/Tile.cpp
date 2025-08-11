@@ -33,9 +33,7 @@
 //     DrawTextureEx(texture, pos, 0.0f, scale, WHITE);
 // }
 
-// Handle collision and return collision type: L: 1, R: 2, A: 3, B: 4
-int sHandleCollision( Mario& player, Rectangle& tileBBox ) {
-    int collisionType = 0;
+void sHandleCollision( Mario& player, Rectangle& tileBBox ) {
     Rectangle playerBBox = player.rect;
     float pHW = playerBBox.width / 2, 
           pHH = playerBBox.height / 2,
@@ -51,19 +49,15 @@ int sHandleCollision( Mario& player, Rectangle& tileBBox ) {
     if (overlapX < overlapY) { // Movement come from 2 sides
         if (playerBBox.x < tileBBox.x) { // Left
             player.position.x -= overlapX;
-            collisionType = 1; 
         } else { // Right 
             player.position.x += overlapX;
-            collisionType = 2;
         }
         player.velocity.x = 0; 
     } else { // Movement come from above or below 
         if (playerBBox.y < tileBBox.y) { // Above
             player.position.y -= overlapY;
-            collisionType = 3;
         } else { // Below 
             player.position.y += overlapY;
-            collisionType = 4;
         }
         player.velocity.y = 0;
         player.position.y = (int)(player.position.y / 64.0f ) * 64.0f; // Align to grid 
@@ -71,7 +65,13 @@ int sHandleCollision( Mario& player, Rectangle& tileBBox ) {
     // Update Mario's bounding box after position change
     player.rect.x = player.position.x;
     player.rect.y = player.position.y;
-    return collisionType;
+}
+
+void TileInstance::handleCollision( Mario& player ) {
+    Rectangle playerBBox = player.rect;
+    if ( CheckCollisionRecs(playerBBox, bbox) ) {
+        sHandleCollision(player, bbox );
+    }
 }
 
 TileInstance::TileInstance(Vector2 pos, std::shared_ptr<Tile> tile) 
@@ -80,55 +80,43 @@ TileInstance::TileInstance(Vector2 pos, std::shared_ptr<Tile> tile)
 GroundInstance::GroundInstance(Vector2 pos, std::shared_ptr<Tile> ground) 
     : TileInstance(pos, ground) {}
 
-void GroundInstance::handleCollision(Mario& player) {
-    Rectangle playerBBox = player.rect;
-    Rectangle tileBBox = bbox;
-    if (CheckCollisionRecs(playerBBox, tileBBox)) {
-        sHandleCollision(player, tileBBox);
-    }
+void GroundInstance::update(Mario& player) {
+    handleCollision(player);
 }
 
 void GroundInstance::render() {
     DrawTextureEx(tile->getTexture(), pos, 0.0f, scale, WHITE);
 }
 
-BrickInstance::BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick) 
-    : TileInstance(pos, brick) {}
-
-void BrickInstance::handleCollision(Mario& player) {
+void BrickInstance::handleBreaking(Mario& player){
     Rectangle playerBBox = player.rect;
-    Rectangle tileBBox = bbox;
-    if (CheckCollisionRecs(playerBBox, tileBBox)) {
-        sHandleCollision(player, tileBBox);   
-    }
-}
-
-void BrickInstance::render() {
-    dest.x = pos.x; dest.y = pos.y;
-    DrawTexturePro(tile->getTexture(), normal, dest, Vector2{0, 0}, 0.0f, WHITE);
-}
-
-QuestionInstance::QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question) 
-    : TileInstance(pos, question) {}
-
-void QuestionInstance::handleCollision(Mario& player) {
-    Rectangle playerBBox = player.rect;
-    Rectangle tileBBox = bbox;
-    if (CheckCollisionRecs(playerBBox, tileBBox)) {
-        // Mario can only activate the question block from below
-        if ( sHandleCollision(player, tileBBox) == 4 ) {
-            switch ( state ) {
-                case STATE_NORMAL: {
-                    state = STATE_ACTIVATED;
-                } break;
-                default: break;
-            }
+    if(CheckCollisionRecs(playerBBox, hbox)){
+        switch(state) {
+            case STATE_NORMAL: state = STATE_BROKEN; break;
+            default: break;
         }
     }
 }
 
-void QuestionInstance::render() {
+BrickInstance::BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick) 
+    : TileInstance(pos, brick), hbox(Rectangle{pos.x + 24, pos.y + 60, 16, 6}) {}
+
+void BrickInstance::update(Mario& player) {
     dest.x = pos.x; dest.y = pos.y;
+    handleCollision(player);
+    handleBreaking(player);
+
+}
+
+void BrickInstance::render() {
+    DrawTexturePro(tile->getTexture(), normal, dest, Vector2{0, 0}, 0.0f, WHITE);
+    DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox 
+}
+
+QuestionInstance::QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question) 
+    : TileInstance(pos, question), hbox(Rectangle{pos.x + 24, pos.y + 60, 16, 6}) {}
+
+void QuestionInstance::handleAnimation(){
     switch ( state ) {
         case STATE_NORMAL:{
             frameCounter++;
@@ -150,11 +138,35 @@ void QuestionInstance::render() {
         } break;
         default: break;
     }
+}
+
+void QuestionInstance::handleActivation(Mario& player){
+    Rectangle playerBBox = player.rect;
+    if ( CheckCollisionRecs(playerBBox, hbox) ) {
+        switch(state) {
+            case STATE_NORMAL: state = STATE_ACTIVATED; break;
+        }
+    }
+}
+
+void QuestionInstance::update(Mario& player) {
+    dest.x = pos.x; dest.y = pos.y;
+    handleCollision(player);
+    handleActivation(player);
+    handleAnimation();
+}
+
+void QuestionInstance::render() {
     DrawTexturePro(tile->getTexture(), normal, dest, Vector2{0, 0}, 0.0f, WHITE);
+    DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox 
 }
 
 BackgroundInstance::BackgroundInstance(Vector2 pos, std::shared_ptr<Tile> background) 
     : TileInstance(pos, background) {}
+
+void BackgroundInstance::update(Mario& player) {
+    handleCollision(player);
+}
 
 void BackgroundInstance::render() {
     DrawTextureEx(tile->getTexture(), pos, 0.0f, scale, WHITE);
@@ -168,27 +180,9 @@ PipeInstance3::PipeInstance3(Vector2 pos, std::shared_ptr<Tile> pipe) : TileInst
     bbox = Rectangle{pos.x, pos.y, 16 * scale * 2, 16 * scale * 4};
 }
 
-void PipeInstance1::handleCollision(Mario& player) {
-    Rectangle playerBBox = player.rect;
-    Rectangle tileBBox = bbox;
-    if (CheckCollisionRecs(playerBBox, tileBBox)) {
-        sHandleCollision(player, tileBBox);
-    }
-}
-void PipeInstance2::handleCollision(Mario& player) {
-    Rectangle playerBBox = player.rect;
-    Rectangle tileBBox = bbox;
-    if (CheckCollisionRecs(playerBBox, tileBBox)) {
-        sHandleCollision(player, tileBBox);
-    }
-}
-void PipeInstance3::handleCollision(Mario& player) {
-    Rectangle playerBBox = player.rect;
-    Rectangle tileBBox = bbox;
-    if (CheckCollisionRecs(playerBBox, tileBBox)) {
-        sHandleCollision(player, tileBBox);
-    }
-}
+void PipeInstance1::update(Mario& player){ handleCollision(player); }
+void PipeInstance2::update(Mario& player){ handleCollision(player); }
+void PipeInstance3::update(Mario& player){ handleCollision(player); }
 
 void PipeInstance1::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, scale, WHITE); }
 void PipeInstance2::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, scale, WHITE); }
@@ -197,12 +191,8 @@ void PipeInstance3::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, scal
 HardblockInstance::HardblockInstance(Vector2 pos, std::shared_ptr<Tile> hardblock) 
     : TileInstance(pos, hardblock) {}
 
-void HardblockInstance::handleCollision(Mario& player) {
-    Rectangle playerBBox = player.rect;
-    Rectangle tileBBox = bbox;
-    if (CheckCollisionRecs(playerBBox, tileBBox)) {
-        sHandleCollision(player, tileBBox);
-    }
+void HardblockInstance::update(Mario& player){
+    handleCollision(player);
 }
 
 void HardblockInstance::render() { 
@@ -211,6 +201,10 @@ void HardblockInstance::render() {
 
 GoalpoleInstance::GoalpoleInstance(Vector2 pos, std::shared_ptr<Tile> goalpole) 
     : TileInstance(pos, goalpole) {}
+
+void GoalpoleInstance::update(Mario& player){
+
+}
 
 void GoalpoleInstance::render() {
     DrawTextureEx(tile->getTexture(), pos, 0.0f, scale, WHITE);
@@ -221,6 +215,17 @@ FortressInstance::FortressInstance(Vector2 pos, std::shared_ptr<Tile> fortress)
 
 void FortressInstance::render() {
     DrawTextureEx(tile->getTexture(), pos, 0.0f, scale, WHITE);
+}
+
+void TileManager::handleBrickPieces(Vector2 position){
+    std::shared_ptr<Entity> brickPiece1 = std::make_shared<BrickPiece>("./assets/tiles/brick.png", Vector2{position.x, position.y}, Vector2{32, 32}, Rectangle{16, 0, 8, 8}, Vector2{-200, -500});
+    std::shared_ptr<Entity> brickPiece2 = std::make_shared<BrickPiece>("./assets/tiles/brick.png", Vector2{position.x + 32, position.y}, Vector2{32, 32}, Rectangle{24, 0, 8, 8}, Vector2{200, -500});
+    std::shared_ptr<Entity> brickPiece3 = std::make_shared<BrickPiece>("./assets/tiles/brick.png", Vector2{position.x, position.y + 32}, Vector2{32, 32}, Rectangle{16, 8, 8, 8}, Vector2{-200, -250});
+    std::shared_ptr<Entity> brickPiece4 = std::make_shared<BrickPiece>("./assets/tiles/brick.png", Vector2{position.x + 32, position.y + 32}, Vector2{32, 32}, Rectangle{24, 8, 8, 8}, Vector2{200, -250});
+    brickPieces.push_back(brickPiece1);
+    brickPieces.push_back(brickPiece2);
+    brickPieces.push_back(brickPiece3);
+    brickPieces.push_back(brickPiece4);
 }
 
 std::shared_ptr<TileInstance> TileManager::addTileInstance(Vector2 pos, int tileID) {
@@ -239,25 +244,38 @@ std::shared_ptr<TileInstance> TileManager::addTileInstance(Vector2 pos, int tile
         default: break;
     }
     if ( tileInstance ) tileInstances.push_back(tileInstance);
+
+    // gridMap[int(pos.y / (TILE_SIZE * SCALE))][int(pos.x / (TILE_SIZE * SCALE))] = tileInstance;
+
     return tileInstance;
 }
 
-void TileManager::handleCollision(Mario& player, int** grid) {
-    // Sau này chỉ cần kiểm tra block gần player 
-    for ( const auto& tileInstance : tileInstances ) {
-        tileInstance->handleCollision(player);   
-    }
-    int minX = player.position.x / TILE_SIZE * SCALE;
-    int maxX = (player.position.x + player.rect.width) / TILE_SIZE * SCALE;
-    int minY = player.position.y / TILE_SIZE * SCALE;
-    int maxY = (player.position.y + player.rect.height) / TILE_SIZE * SCALE
-    for ( int y = minY; y <= maxY; ++y ) {
-        for ( int x = minX; x <= maxX; ++x ) {
-            if ( x > 0 && x < gridWidth && y > 0 && y < gridHeight ) {
-                
-            }
+void TileManager::update(Mario& player){
+    for ( int i = 0; i < tileInstances.size(); i++ ) {
+        tileInstances[i]->update(player);
+        switch( tileInstances[i]->getState() ) {
+            case STATE_BROKEN: {
+                toRemoveTiles.push_back(i);
+                handleBrickPieces( tileInstances[i]->getPos() );
+            } break;
+            default: break;
         }
     }
+    std::sort(toRemoveTiles.rbegin(), toRemoveTiles.rend());
+    for ( const auto& idx : toRemoveTiles ) 
+        tileInstances.erase(tileInstances.begin() + idx);
+    toRemoveTiles.clear();
+
+
+    for ( int i = 0; i < brickPieces.size(); i++ ) {
+        brickPieces[i]->Update();
+        if ( brickPieces[i]->isOutOfScreen )
+            toRemoveEntities.push_back(i);
+    }
+    std::sort(toRemoveEntities.rbegin(), toRemoveEntities.rend());
+    for ( const auto& idx : toRemoveEntities ) 
+        brickPieces.erase(brickPieces.begin() + idx);
+    toRemoveEntities.clear();
 
 }
 
@@ -266,23 +284,26 @@ void TileManager::render() {
         tileInstance->render();
         DrawRectangleLinesEx(tileInstance->getBBox(), 2.0f, RED); // Debug: Draw bounding box
     }
+    for ( const auto& brickPiece : brickPieces ) {
+        brickPiece->Draw();
+    }
 }
 
 World1_1::World1_1(const std::string& fileName) {
     std::ifstream fin(fileName);
     if ( fin.is_open() ){
-        for (int i = 0; i < gridHeight; ++i)
-            for (int j = 0; j < gridWidth; ++j) {
+        for (int i = 0; i < GRID_HEIGHT; ++i)
+            for (int j = 0; j < GRID_WIDTH; ++j) {
                 fin >> grid[i][j];
-                Vector2 pos = Vector2{ j * 16.0f * scale, i * 16.0f * scale };
+                Vector2 pos = Vector2{ j * TILE_SIZE * SCALE, i * TILE_SIZE * SCALE };
                 tileManager.addTileInstance(pos, grid[i][j]);
             }
         fin.close();
     }
 }
 
-void World1_1::update( Mario& player ){
-    tileManager.handleCollision( player, grid );
+void World1_1::update(Mario& player){
+    tileManager.update(player);
 }
 
 void World1_1::render() {
