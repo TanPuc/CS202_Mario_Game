@@ -17,4 +17,15 @@ enum DIRECTION
     RIGHT
 };
 
+enum MARIO_FORM
+{
+    SMALL,
+    BIG,
+    FIRE,
+    SUPER
+};
+#define MARIO_WIDTH 32.0f
+#define MARIO_HEIGHT 32.0f
+#define FRAME_PADDING 2
+
 #endif // GLOBAL_VARIABLES_H

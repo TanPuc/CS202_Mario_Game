@@ -15,11 +15,12 @@ class Mario : public Entity
 public:
     std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
     MarioSprite *sprite;
+    MARIO_FORM form;
     std::vector<std::unique_ptr<FireBall>> fireballs;
 
-    Mario(Vector2 position) : Entity(position, Vector2({32.0f, 32.0f}))
+    Mario(Vector2 position) : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})), form(SMALL)
     {
-        rect = {position.x, position.y, 32.0f, 32.0f};
+        rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
         sprite = new MarioSprite();
     }
     ~Mario()
@@ -37,6 +38,39 @@ public:
         }
     }
 
+    void ChangeForm()
+    {
+        if (IsKeyPressed(KEY_F))
+        {
+            if (form == SMALL)
+            {
+                form = BIG;
+                rect.height = MARIO_HEIGHT * 2.0f; // Increase height for big Mario
+            }
+            else if (form == BIG)
+            {
+                form = FIRE;
+                rect.height = MARIO_HEIGHT * 2.0f; // Keep the same size for fire Mario
+            }
+            else if (form == FIRE)
+            {
+                form = SMALL;               // Reset to small Mario
+                rect.width = MARIO_WIDTH;   // Reset width
+                rect.height = MARIO_HEIGHT; // Reset height
+            }
+            std::cout << "Mario changed form to: " << form << std::endl;
+        }
+        if (IsKeyPressed(KEY_R))
+        {
+            // Reset Mario's form
+            form = SMALL;
+            rect.width = MARIO_WIDTH;
+            rect.height = MARIO_HEIGHT;
+        }
+
+        sprite->SwitchForm(form);
+    }
+
     void HandleInput()
     {
         std::unique_ptr<MarioState> newState = currentState->HandleInput(*this, *sprite);
@@ -50,6 +84,8 @@ public:
         {
             ShootFireBall();
         }
+
+        ChangeForm();
     }
 
     void Draw() override
@@ -82,9 +118,7 @@ public:
 
         if (CheckCollision(*this, level)) // Resolve collision
         {
-            // ResolveCollision(level);
-            position.y = (int)(position.y / 32) * 32; // Snap to tile grid
-            velocity.y = 0;
+            ResolveCollision(level);
         }
         rect.x = position.x;
         rect.y = position.y;
@@ -110,7 +144,10 @@ public:
         }
     }
 
-    void ResolveCollision(Level &level) override {
+    void ResolveCollision(Level &level) override
+    {
+        position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
+        velocity.y = 0;
     };
 
     void ResolveCollision(Entity &other) override

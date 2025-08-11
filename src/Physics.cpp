@@ -92,26 +92,22 @@ bool CheckCollision(const Rectangle &a, const Level &level)
 
 bool CheckCollision(const Entity &a, const Level &level, Vector2 &collisionPoint)
 {
-    int minX = floor(a.GetBounds().x / TILE_SIZE);
-    int maxX = floor((a.GetBounds().x + a.GetBounds().width) / TILE_SIZE);
-    int minY = floor(a.GetBounds().y / TILE_SIZE);
-    int maxY = floor((a.GetBounds().y + a.GetBounds().height) / TILE_SIZE);
 
-    for (int x = minX; x <= maxX; x++)
+    int minX = a.GetPosition().x / TILE_SIZE;
+    int maxX = (a.GetPosition().x + a.GetBounds().width) / TILE_SIZE;
+    int minY = a.GetPosition().y / TILE_SIZE;
+    int maxY = (a.GetPosition().y + a.GetBounds().height) / TILE_SIZE;
+
+    for (int y = minY; y <= maxY; y++)
     {
-        for (int y = minY; y <= maxY; y++)
+        for (int x = minX; x <= maxX; x++)
         {
-            if (x < 0 || y < 0 || y >= (int)level.tiles.size() || x >= (int)level.tiles[y].size())
-                continue;
-
-            if (level.tiles[y][x] > 0)
+            if (y >= 0 && y < (int)level.tiles.size() &&
+                x >= 0 && x < (int)level.tiles[y].size() &&
+                level.tiles[y][x] > 0)
             {
-                Rectangle tileRect = {float(x * TILE_SIZE), float(y * TILE_SIZE), float(TILE_SIZE), float(TILE_SIZE)};
-                if (CheckCollisionRecs(a.GetBounds(), tileRect))
-                {
-                    collisionPoint = {tileRect.x, tileRect.y};
-                    return true;
-                }
+                collisionPoint = {static_cast<float>(x), static_cast<float>(y)};
+                return true;
             }
         }
     }
