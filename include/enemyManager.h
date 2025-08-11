@@ -4,6 +4,7 @@
 #include "raylib.h"
 
 #include "enemyEnum.h"
+#include "enemyAsset.h"
 
 using std::vector;
 

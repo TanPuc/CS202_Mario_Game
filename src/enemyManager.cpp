@@ -1,4 +1,5 @@
 #include "enemyManager.h"
+
 #include "enemy.h"
 #include "enemyState.h"
 #include "enemyAttackStrategy.h"
@@ -8,7 +9,6 @@
 #include "enemySprite.h"
 
 #include "enemyEnum.h"
-#include "enemyAsset.h"
 
 const float WALKSPEED = 20;
 const float SHELLSPEED = 40;
@@ -36,14 +36,14 @@ void EnemyManager::update() {
 
 	for (auto e : m_enemies)
 	{
-		e->update();
+		e->Update();
 	}
 }
 
 void EnemyManager::spawnEnemyAt(EnemyType type, Vector2 position)
 {
 	Enemy* e = nullptr;
-	e->setPosition(position);
+	
 	switch (type)
 	{
 	case EnemyType::goopa:
@@ -115,6 +115,8 @@ void EnemyManager::spawnEnemyAt(EnemyType type, Vector2 position)
 		break;
 	}
 
+	e->setPosition(position);
+
 	m_toSpawn.push_back(e);
 }
 
@@ -123,7 +125,6 @@ Enemy* EnemyManager::spawnGooba()
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
 
-
 	fsm = builder
 		.addState(new WalkState(WALKSPEED, GRAVITY, false))
 		.addState(new DeadStateStomp())
@@ -131,9 +132,13 @@ Enemy* EnemyManager::spawnGooba()
 		.setInitialState(StateType::Walk)
 		.build();
 
+	Texture2D text = enemyAsset::GetTexture(EnemyType::goopa);
+
 	SpriteEnemy* sprite = new SpriteEnemy();
-	sprite->addSpriteConfig(StateType::Walk, {TexGoopa, {0,0,16,16}, 0, 2 , 1.0f});
-	sprite->addSpriteConfig(StateType::DeadStomp, {TexGoopa, {32,0,16,16}, 32, 1 , 1.0f} );
+	sprite->addSpriteConfig(StateType::Walk, {text, {0,0,16,16}, 0, 2 , 1.0f});
+	sprite->addSpriteConfig(StateType::DeadStomp, {text, {32,0,16,16}, 32, 1 , 1.0f} );
+
+	Rectangle hitbox = { 0,0,16,16 };
 
 	return new Enemy(EnemyType::goopa, fsm, sprite);
 }
@@ -159,7 +164,9 @@ Enemy* EnemyManager::spawnKoopa()
 	sprite->addSpriteConfig(StateType::ShellSlide, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	return new Enemy(EnemyType::koopa, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::koopa, fsm, sprite, hitbox);
 }
 Enemy* EnemyManager::spawnSpiny()
 {
@@ -180,7 +187,9 @@ Enemy* EnemyManager::spawnSpiny()
 	sprite->addSpriteConfig(StateType::Walk, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	return new Enemy(EnemyType::spiny, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::spiny, fsm, sprite, hitbox);
 }
 
 Enemy* EnemyManager::spawnLakitu()
@@ -199,7 +208,9 @@ Enemy* EnemyManager::spawnLakitu()
 	sprite->addSpriteConfig(StateType::Hover, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	return new Enemy(EnemyType::lakitu, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::lakitu, fsm, sprite, hitbox);
 }
 
 Enemy* EnemyManager::spawnParatroopa()
@@ -228,7 +239,9 @@ Enemy* EnemyManager::spawnParatroopa()
 	sprite->addSpriteConfig(StateType::ShellSlide, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	return new Enemy(EnemyType::paratroopa, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::paratroopa, fsm, sprite,);
 }
 Enemy* EnemyManager::spawnBeezyBettle()
 {
@@ -252,7 +265,9 @@ Enemy* EnemyManager::spawnBeezyBettle()
 	sprite->addSpriteConfig(StateType::ShellSlide, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	return new Enemy(EnemyType::beezybettle, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::beezybettle, fsm, sprite, hitbox);
 }
 
 Enemy* EnemyManager::spawnCheepCheep()
@@ -271,7 +286,9 @@ Enemy* EnemyManager::spawnCheepCheep()
 	sprite->addSpriteConfig(StateType::Swim, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	return new Enemy(EnemyType::beezybettle, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::beezybettle, fsm, sprite, hitbox);
 }
 Enemy* EnemyManager::spawnBlooper()
 {
@@ -294,7 +311,9 @@ Enemy* EnemyManager::spawnBlooper()
 	sprite->addSpriteConfig(StateType::Chase, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	return new Enemy(EnemyType::blooper, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::blooper, fsm, sprite, hitbox);
 }
 Enemy* EnemyManager::spawnHammerBro()
 {
@@ -307,7 +326,9 @@ Enemy* EnemyManager::spawnHammerBro()
 
 	SpriteEnemy* sprite = new SpriteEnemy();
 
-	return new Enemy(EnemyType::hammerbro, fsm,sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::hammerbro, fsm,sprite, hitbox);
 }
 Enemy* EnemyManager::spawnBowser()
 {
@@ -320,7 +341,9 @@ Enemy* EnemyManager::spawnBowser()
 
 	SpriteEnemy* sprite = new SpriteEnemy();
 
-	return new Enemy(EnemyType::bowser, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::bowser, fsm, sprite, hitbox );
 }
 Enemy* EnemyManager::spawnHammer()
 {
@@ -335,5 +358,7 @@ Enemy* EnemyManager::spawnHammer()
 
 	SpriteEnemy* sprite = new SpriteEnemy();
 
-	return new Enemy(EnemyType::hammer, fsm, sprite);
+	Rectangle hitbox = {};
+
+	return new Enemy(EnemyType::hammer, fsm, sprite, hitbox);
 }
