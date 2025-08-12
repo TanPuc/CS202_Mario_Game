@@ -2,6 +2,7 @@
 
 enum StateType
 {
+	Nothing = 0,
 	Walk = 1,
 	Hover = 2,
 	Attack = 3,

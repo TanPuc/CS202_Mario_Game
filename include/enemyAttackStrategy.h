@@ -15,6 +15,7 @@ class IAttackStrategy
 {
 public:
 	virtual void attack(Enemy&) const = 0;
+	virtual ~IAttackStrategy() = default;
 };
 
 class AttackThrowHammer : public IAttackStrategy
@@ -45,12 +46,6 @@ public:
 private:
 	EnemyManager* m_manager;
 	EnemyType m_type = EnemyType::spiny;
-};
-
-class AttackNothing :public IAttackStrategy
-{
-public:
-	void attack(Enemy&) const override;
 };
 
 class AttackCombined : public IAttackStrategy

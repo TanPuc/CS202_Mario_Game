@@ -4,6 +4,7 @@
 #include "raymath.h"
 
 #include "enemyEnum.h"
+#include "Entity.h"
 
 class Enemy;
 
@@ -13,27 +14,30 @@ class FiniteStateMachine;
 class IMoveStrategy;
 class IAttackStrategy;
 class ICollisionMapStrategy;
-class ICollisionPlayerStrategy;
+class CollisionMap;
 
 class SpriteEnemy;
 
 //context
-class Enemy
+class Enemy : public Entity
 {
 public:
-	Enemy(EnemyType type, FiniteStateMachine* fsm, SpriteEnemy* sprite);
+	Enemy(EnemyType type, FiniteStateMachine* fsm, SpriteEnemy* sprite, Vector2 size, Vector2 positon);
 	~Enemy();
 
 	void setMoveStrategy(IMoveStrategy*);
 	void setAttackStrategy(IAttackStrategy*);
-	void setCollisionMapStrategy(ICollisionMapStrategy*);
-	void setCollisionPlayerStrategy(ICollisionPlayerStrategy*);
+	void setCollisionMap(CollisionMap*);
+	//void setCollisionPlayerStrategy(ICollisionPlayerStrategy*);
 	//void setState(EnemyState*);
 
 	void setSprite(StateType);
 
 	void handleInput(int input);
+	void Update(Level& level) override;
+	//void Update(Mario& mario);
 	void update();
+	void Draw() override;
 
 	void destroy();
 
@@ -41,26 +45,40 @@ public:
 	void setVelocityY(float Y);
 	void addVelocityY(float Y);
 
-	Vector2 getPositon() const;
+	int getDirection() const;
+	void reverseDirection();
+
+	//Vector2 getPositon() const;
 	void setPosition(Vector2);
+	Vector2 getPrevPosition() const;
+
+	Rectangle getHitBox() const;
+	void setHitBox();		//unfinished
+
+
+	void ResolveCollision(Entity& other) override;
+	void ResolveCollision(Level& level) override;
 
 private:
 	EnemyType					m_Type					;
 
-	Vector2						m_position				= { 0,0 };
 	Vector2						m_velocity				= { 0,0 };
+	int							m_direction				= 1;
 
-	Rectangle					m_hitbox				= {};
+	Rectangle					m_HitBox				= {};  //bound is hurtbox
 
-	//EnemyState*				m_State					= nullptr;
 	FiniteStateMachine*			m_FSM					= nullptr;
 	
 	IMoveStrategy*				m_MoveStrategy			= nullptr;
 	IAttackStrategy*			m_AttackStrategy		= nullptr;
-	ICollisionMapStrategy*		m_CollideMapStrategy	= nullptr;
-	ICollisionPlayerStrategy*	m_CollidePlayerStrategy = nullptr;
+	CollisionMap*				m_CollideMap			= nullptr;
 
 	SpriteEnemy*				m_sprite				= nullptr;
+
+	//ICollisionMapStrategy*	m_CollideMapStrategy	= nullptr;
+	//Vector2					m_position				= { 0,0 };
+	//EnemyState*				m_State					= nullptr;
+	//ICollisionPlayerStrategy*	m_CollidePlayerStrategy = nullptr;
 };
 
 

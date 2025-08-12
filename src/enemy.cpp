@@ -10,7 +10,8 @@
 #include "enemyFSM.h"
 #include "enemySprite.h"
 
-Enemy::Enemy(EnemyType type, FiniteStateMachine* state, SpriteEnemy* sprite):
+Enemy::Enemy(EnemyType type, FiniteStateMachine* state, SpriteEnemy* sprite, Vector2 size, Vector2 positon):
+	Entity(positon, size),
 	m_Type(type), m_FSM(state), m_sprite(sprite)
 {
 	m_FSM->runInitialState(*this);
@@ -25,16 +26,32 @@ void Enemy::handleInput(int Input)
 {
 	//m_State->handleInput(*this, Input);
 }
+
+void Enemy::Update(Level& level)
+{
+	if (m_CollideMap) m_CollideMap->handleCollide(*this, level);
+
+	update();
+
+}
 void Enemy::update()
 {
-	m_MoveStrategy->move(*this);
-	m_position = Vector2Add(m_position, Vector2Scale(m_velocity, GetFrameTime()));
+	if (m_MoveStrategy) m_MoveStrategy->move(*this);
+	position = Vector2Add(position, Vector2Scale(Vector2Scale(m_velocity, GetFrameTime()), float(m_direction)));
 
-	m_AttackStrategy->attack(*this);
+
+	if (m_AttackStrategy) m_AttackStrategy->attack(*this);
 	
-	m_FSM->update(*this);
+	if (m_FSM) m_FSM->update(*this);
 
-	m_sprite->update(*this);
+	if (m_sprite) m_sprite->update(*this);
+
+	rect.x = position.x; //most stupid fck i have ever seen
+	rect.x = position.y;
+	DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);
+}
+void Enemy::Draw()
+{
 	m_sprite->draw(*this);
 }
 
@@ -50,15 +67,10 @@ void Enemy::setAttackStrategy(IAttackStrategy* strategy)
 	delete m_AttackStrategy;
 	m_AttackStrategy = strategy;
 }
-void Enemy::setCollisionMapStrategy(ICollisionMapStrategy* strategy)
+void Enemy::setCollisionMap(CollisionMap* collidemap)
 {
-	delete m_CollideMapStrategy;
-	m_CollideMapStrategy = strategy;
-}
-void Enemy::setCollisionPlayerStrategy(ICollisionPlayerStrategy* strategy)
-{
-	delete m_CollidePlayerStrategy;
-	m_CollidePlayerStrategy = strategy;
+	delete m_CollideMap;
+	m_CollideMap = collidemap;
 }
 
 void Enemy::setSprite(StateType state)
@@ -89,12 +101,49 @@ void Enemy::addVelocityY(float Y)
 	m_velocity.y += Y;
 }
 
-Vector2 Enemy::getPositon() const
+int Enemy::getDirection() const
 {
-	return m_position;
+	return m_direction;
+}
+void Enemy::reverseDirection()
+{
+	m_direction *= -1;
+}
+
+Rectangle Enemy::getHitBox() const {
+	return m_HitBox;
+}
+void Enemy::setHitBox()
+{
+	//rect.
+}
+
+Vector2 Enemy::getPrevPosition() const
+{
+	Vector2 result = { rect.x - m_velocity.x, rect.y - m_velocity.y };
+	return result;
 }
 
 void Enemy::setPosition(Vector2 pos)
 {
-	m_position = pos;
+	position = pos;
 }
+
+void Enemy::ResolveCollision(Entity& other)
+{
+
+}
+void Enemy::ResolveCollision(Level& level)
+{
+
+}
+
+//Vector2 Enemy::getPositon() const
+//{
+//	return position;
+//}
+//void Enemy::setCollisionPlayerStrategy(ICollisionPlayerStrategy* strategy)
+//{
+//	delete m_CollidePlayerStrategy;
+//	m_CollidePlayerStrategy = strategy;
+//}

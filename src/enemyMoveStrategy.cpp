@@ -7,7 +7,7 @@
 MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e) :
 	speed(value)
 {
-	e.setVelocityX(speed);	//so it is 20 instead of 20+x...
+	e.setVelocityX(-speed);	//so it is 20 instead of 20+x...
 }
 void MoveStrategyBasic::move(Enemy& e)
 {
@@ -27,7 +27,7 @@ MoveStrategyFall::MoveStrategyFall(int value) :
 {}
 void MoveStrategyFall::move(Enemy& e)
 {
-	e.addVelocityY(gravity * GetFrameTime());
+	e.addVelocityY(-gravity * GetFrameTime());
 }
 
 MoveStrategyKeepDistance::MoveStrategyKeepDistance(float s, Vector2 off, Mario* p) :
@@ -36,7 +36,7 @@ MoveStrategyKeepDistance::MoveStrategyKeepDistance(float s, Vector2 off, Mario* 
 void MoveStrategyKeepDistance::move(Enemy& e)
 {
 	Vector2 lakituTarget = m_player->position + m_offset;
-	Vector2 direction = lakituTarget - e.getPositon();
+	Vector2 direction = lakituTarget - e.GetPosition();
 	Vector2 temp = Vector2Scale(Vector2Normalize(direction) , m_speed);
 	e.setVelocityX(temp.x);
 	e.setVelocityY(temp.y);
@@ -47,7 +47,7 @@ MoveStrategyChase::MoveStrategyChase(int value, Mario* p) :
 {}
 void MoveStrategyChase::move(Enemy& e)
 {
-	Vector2 direction = player->position - e.getPositon();
+	Vector2 direction = player->position - e.GetPosition();
 	Vector2 result = Vector2Scale(direction, speed);
 	e.setVelocityX(result.x);
 	e.setVelocityY(result.y);
@@ -58,7 +58,7 @@ MoveStrategyRandom::MoveStrategyRandom(float b, float s, Vector2* m):
 {}
 void MoveStrategyRandom::move(Enemy& e)
 {
-	Vector2 direction = Vector2Subtract(randomTarget, e.getPositon());
+	Vector2 direction = Vector2Subtract(randomTarget, e.GetPosition());
 	float distance = Vector2Length(direction);
 	
 	Vector2 temp;

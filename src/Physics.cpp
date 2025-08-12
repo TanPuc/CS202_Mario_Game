@@ -117,3 +117,27 @@ bool CheckCollision(const Entity &a, const Level &level, Vector2 &collisionPoint
     }
     return false;
 }
+
+bool CheckOverlapX(const Rectangle& A, const Rectangle& B)
+{
+    if ((A.x < B.x + B.width) && (B.x < A.x + A.width))
+    {
+        return true;
+    }
+
+    return false;
+}
+bool CheckOverlapY(const Rectangle& A, const Rectangle& B)
+{
+    if ((A.y < B.y + B.height) && (B.y < A.y + A.height))
+    {
+        return true;
+    }
+
+    return false;
+}
+bool CheckOverlap(const Rectangle& A, const Rectangle& B)
+{
+    return CheckOverlapX(A, B) && CheckOverlapY(A, B);
+}
+

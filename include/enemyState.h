@@ -33,7 +33,7 @@ public:
 class WalkState : public EnemyState
 {
 public:
-	WalkState(int speed, float gravity, bool isFireImmune);
+	WalkState(int speed, float gravity);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
@@ -41,7 +41,6 @@ public:
 private:
 	float	m_speed;
 	float	m_gravity;
-	bool	m_isFireImmune;
 };
 class SwimState : public EnemyState
 {

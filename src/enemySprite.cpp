@@ -12,7 +12,8 @@ void SpriteEnemy::draw(Enemy& e)
 
     Rectangle src = sprite.m_FrameRect;
     src.x = sprite.m_offset + src.width * m_CurrentFrame;
-    DrawTextureRec(sprite.m_Texture, src, e.getPositon(), WHITE);
+    src.width *= e.getDirection() * -1;
+    DrawTextureRec(sprite.m_Texture, src, e.GetPosition(), WHITE);
 }
 
 void SpriteEnemy::update(Enemy& e)

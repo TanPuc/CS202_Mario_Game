@@ -8,16 +8,12 @@
 #include "Mario.h"
 #include "enemySprite.h"
 
-WalkState::WalkState(int speed, float gravity, bool isFireImmune):
-	m_speed(speed), m_gravity(gravity), m_isFireImmune(isFireImmune) {}
+WalkState::WalkState(int speed, float gravity):
+	m_speed(speed), m_gravity(gravity) {}
 void WalkState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
-	CollisionMapStrategyCombined* compoCol = new CollisionMapStrategyCombined();
-	compoCol->addStrategy(new CollisionStrategyFloorWalk());
-	compoCol->addStrategy(new CollisionStrategyWallReverseDirection());
-	//if (!m_isFireImmune) compoCol->addStrategy(new CollisionStrategyFireBall());
-	e.setCollisionMapStrategy(compoCol);
+	e.setCollisionMap(new CollisionMap(new CollisionStrategyXReverse(), new CollisionStrategyYPushOut()));
+
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed,e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
@@ -36,8 +32,6 @@ SwimState::SwimState(float speed, float freq, float magni) :
 	m_speed(speed), m_frequency(freq), m_magnitude(magni) {}
 void SwimState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
-	e.setCollisionMapStrategy(new CollisionStrategyMapNothing);
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategySwayUpDown(m_magnitude, m_frequency));
@@ -56,11 +50,6 @@ HoverState::HoverState(float speedRandom, float boundary, float speedDistace, Ve
 	m_speedDistance(speedDistace),m_boundary(boundary), m_speedRandom(speedRandom),m_offset(offset), m_player(player) {}
 void HoverState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
-	CollisionPlayerStrategyCombined* compoCol = new CollisionPlayerStrategyCombined();
-	compoCol->addStrategy(new CollisionStrategyFireBall());
-	//compoCol->addStrategy(new CollisionStrategyPlayerStomp());
-	e.setCollisionPlayerStrategy(compoCol);
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyRandom(m_boundary, m_speedRandom, &m_player->position));
 	compoMove->addStrategy(new MoveStrategyKeepDistance(m_speedDistance, m_offset , m_player));
@@ -85,7 +74,7 @@ void AttackState::enter(Enemy& e)
 }
 void AttackState::exit(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
+	e.setAttackStrategy(nullptr);
 }
 void AttackState::update(Enemy& e)
 {
@@ -100,7 +89,6 @@ FallState::FallState(float gravity):
 	m_gravity(gravity) {}
 void FallState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
 
 	e.setSprite(getName());
@@ -116,7 +104,6 @@ PiranhaState::PiranhaState(float boundary, float frequency):
 	m_magnitude(boundary), m_frequency(frequency) {}
 void PiranhaState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategySwayUpDown(m_magnitude, m_frequency));
 
 	e.setSprite(getName());
@@ -133,7 +120,6 @@ HopState::HopState(float power, float speed, float gravity):
 {}
 void HopState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
@@ -152,7 +138,6 @@ ShellState::ShellState(float gravity):
 	m_gravity(gravity) {}
 void ShellState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(0, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
@@ -171,7 +156,6 @@ ShellSlidingState::ShellSlidingState(float speed, float gravity) :
 	m_speed(speed), m_gravity(gravity) {}
 void ShellSlidingState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
@@ -190,7 +174,6 @@ ChaseState::ChaseState(float speed, Mario* player) :
 	m_speed(speed), m_player(player) {}
 void ChaseState::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategyChase(m_speed, m_player));
 
 	e.setSprite(getName());
@@ -204,7 +187,6 @@ StateType ChaseState::getName() const
 
 void DeadStateStomp::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategyBasic(0,e));
 
 	e.setSprite(getName());
@@ -220,7 +202,6 @@ DeadStateElse::DeadStateElse(float gravity):
 	m_gravity(gravity) {}
 void DeadStateElse::enter(Enemy& e)
 {
-	e.setAttackStrategy(new AttackNothing());
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
 
 	e.setSprite(getName());

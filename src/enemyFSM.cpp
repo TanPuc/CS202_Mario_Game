@@ -23,13 +23,15 @@ void FiniteStateMachine::addStateMap(unordered_map<StateType, EnemyState*>&& bui
 
 StateType FiniteStateMachine::getCurrentState()
 {
-    if (m_currentState)
-    return m_currentState->getName();
+    if (m_currentState) {
+        return m_currentState->getName();
+    }
+    return StateType::Nothing;
 }
 
 void FiniteStateMachine::update(Enemy& e) {
     for (const auto& t : m_transitions) {
-        if (t.m_from == m_currentState && t.m_condition->evaluate()) {
+        if (t.m_from == m_currentState && t.m_condition->evaluate(e)) {
             m_currentState->exit(e);
             m_currentState = t.m_to;
             m_currentState->enter(e);

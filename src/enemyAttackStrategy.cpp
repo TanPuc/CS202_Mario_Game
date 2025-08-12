@@ -2,16 +2,12 @@
 #include "enemyManager.h"
 #include "enemy.h"
 
-void AttackNothing::attack(Enemy& e) const
-{
-}
-
 AttackThrowHammer::AttackThrowHammer(EnemyManager* manager) :
 	m_manager(manager)
 {}
 void AttackThrowHammer::attack(Enemy& e) const
 {
-	m_manager->spawnEnemyAt(m_type, e.getPositon());
+	m_manager->spawnEnemyAt(m_type, e.GetPosition());
 }
 
 AttackFireBall::AttackFireBall(EnemyManager* manager):
@@ -19,14 +15,14 @@ AttackFireBall::AttackFireBall(EnemyManager* manager):
 {}
 void AttackFireBall::attack(Enemy& e) const
 {
-	m_manager->spawnEnemyAt(m_type, e.getPositon());
+	m_manager->spawnEnemyAt(m_type, e.GetPosition());
 }
 
 AttackSpiny::AttackSpiny(EnemyManager* manager) :
 	m_manager(manager) {}
 void AttackSpiny::attack(Enemy& e) const
 {
-	m_manager->spawnEnemyAt(m_type, e.getPositon());
+	m_manager->spawnEnemyAt(m_type, e.GetPosition());
 }
 
 void AttackCombined::attack(Enemy& e) const

@@ -5,7 +5,7 @@
 #include "Level.h"
 #include "enemyManager.h"
 
-#define MARIO_SKYBLUE (Color){68, 145, 190, 255}
+#define MARIO_SKYBLUE Color{68, 145, 190, 255}
 
 int main(void)
 {
@@ -18,7 +18,7 @@ int main(void)
 	level->LoadFromFile("assets/level1.map");
 
 	enemyAsset::Load();
-	EnemyManager* manager = new EnemyManager();
+	EnemyManager* manager = new EnemyManager(player, level);
 	Vector2 posEnemy = { 300, 300 };
 	manager->spawnEnemyAt(EnemyType::goopa, posEnemy);
 
@@ -27,6 +27,8 @@ int main(void)
 		/// UPDATE GAME
 		player->HandleInput();
 		player->Update(*level); // Handling player collision and movement
+		///ENEMY
+		manager->update();
 
 		/// RENDER GAME
 		Camera2D camera = {0};
@@ -35,13 +37,12 @@ int main(void)
 		{
 			CameraPos.x = playerPos.x;
 		}
-		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), 0};
-		camera.offset = (Vector2){float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
+		camera.target = Vector2{float(CameraPos.x + player->rect.width / 2), 0};
+		camera.offset = Vector2{float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
 		// camera.offset = (Vector2){200, 600};
 		camera.zoom = 0.5f;
 
-		///ENEMY
-		manager->update();
+
 
 		BeginDrawing();
 
@@ -50,6 +51,8 @@ int main(void)
 
 		level->Draw();
 		player->Draw();
+		manager->draw();
+		
 
 		EndMode2D();
 		EndDrawing();

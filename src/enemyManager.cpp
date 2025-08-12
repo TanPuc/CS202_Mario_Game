@@ -19,14 +19,16 @@ const float CHASESPEED = 30;
 const float SWIMSPEED = 20;
 const float FREQUENCY = 5;
 const float MAGNITUDE = 10;
-const float GRAVITY = 10;
 const float GRAVITYPREMIUM = 20;
 const float HOPPOWER = 40;
 
 const Vector2 OFFSET = { 500, 600};
-Mario* PLAYER;
+vector<FireBall*> FIREBALLS;
 
+const float TIMER = 5;
 
+EnemyManager::EnemyManager(Mario* mario, Level* level) :
+	m_player(mario), m_level(level) {}
 void EnemyManager::update() {
 	for (auto e : m_toSpawn)
 	{
@@ -36,7 +38,15 @@ void EnemyManager::update() {
 
 	for (auto e : m_enemies)
 	{
-		e->Update();
+		e->Update(*m_level);
+	}
+}
+
+void EnemyManager::draw()
+{
+	for (auto e : m_enemies)
+	{
+		e->Draw();
 	}
 }
 
@@ -126,9 +136,9 @@ Enemy* EnemyManager::spawnGooba()
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new WalkState(WALKSPEED, GRAVITY, false))
+		.addState(new WalkState(WALKSPEED, GRAVITY))
 		.addState(new DeadStateStomp())
-		.addTransition(StateType::Walk, new ConditionCollisionY(), StateType::DeadStomp)
+		.addTransition(StateType::Walk, new ConditionStomped(*m_player), StateType::DeadStomp)
 		.setInitialState(StateType::Walk)
 		.build();
 
@@ -138,9 +148,9 @@ Enemy* EnemyManager::spawnGooba()
 	sprite->addSpriteConfig(StateType::Walk, {text, {0,0,16,16}, 0, 2 , 1.0f});
 	sprite->addSpriteConfig(StateType::DeadStomp, {text, {32,0,16,16}, 32, 1 , 1.0f} );
 
-	Rectangle hitbox = { 0,0,16,16 };
+	Vector2 hitbox = { 16,16 };
 
-	return new Enemy(EnemyType::goopa, fsm, sprite);
+	return new Enemy(EnemyType::goopa, fsm, sprite, hitbox, {0,0});
 }
 Enemy* EnemyManager::spawnKoopa()
 {
@@ -148,13 +158,13 @@ Enemy* EnemyManager::spawnKoopa()
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new WalkState(WALKSPEED, GRAVITY, false))
+		.addState(new WalkState(WALKSPEED, GRAVITY))
 		.addState(new ShellState(GRAVITY))
 		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
-		.addTransition(StateType::Walk, new ConditionCollisionY(), StateType::Shell)
-		.addTransition(StateType::Shell, new ConditionCollisionY(), StateType::ShellSlide)
-		.addTransition(StateType::ShellSlide, new ConditionCollisionY(), StateType::Shell)
+		.addTransition(StateType::Walk, new ConditionStomped(*m_player), StateType::Shell)
+		.addTransition(StateType::Shell, new ConditionStomped(*m_player), StateType::ShellSlide)
+		.addTransition(StateType::ShellSlide, new ConditionStomped(*m_player), StateType::Shell)
 		.setInitialState(StateType::Walk)
 		.build();
 
@@ -164,9 +174,9 @@ Enemy* EnemyManager::spawnKoopa()
 	sprite->addSpriteConfig(StateType::ShellSlide, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::koopa, fsm, sprite, hitbox);
+	return new Enemy(EnemyType::koopa, fsm, sprite, hitbox, {});
 }
 Enemy* EnemyManager::spawnSpiny()
 {
@@ -175,10 +185,10 @@ Enemy* EnemyManager::spawnSpiny()
 
 	fsm = builder
 		.addState(new FallState(GRAVITY))
-		.addState(new WalkState(WALKSPEED, GRAVITY, false))
+		.addState(new WalkState(WALKSPEED, GRAVITY))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
-		.addTransition(StateType::Fall, new ConditionCollisionY(), StateType::Walk)
-		.addTransition(StateType::Walk, new ConditionCollisionX(), StateType::DeadElse)
+		.addTransition(StateType::Fall, new ConditionStomped(*m_player), StateType::Walk)
+		.addTransition(StateType::Walk, new ConditionFireBall(FIREBALLS), StateType::DeadElse)
 		.setInitialState(StateType::Fall)
 		.build();
 
@@ -187,9 +197,9 @@ Enemy* EnemyManager::spawnSpiny()
 	sprite->addSpriteConfig(StateType::Walk, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::spiny, fsm, sprite, hitbox);
+	return new Enemy(EnemyType::spiny, fsm, sprite, hitbox, {});
 }
 
 Enemy* EnemyManager::spawnLakitu()
@@ -198,9 +208,9 @@ Enemy* EnemyManager::spawnLakitu()
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new HoverState(RANDOMSPEED, RANDOMBOUNDARY, DISTANCESPEED, OFFSET, PLAYER))
+		.addState(new HoverState(RANDOMSPEED, RANDOMBOUNDARY, DISTANCESPEED, OFFSET, m_player))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
-		.addTransition(StateType::Hover, new ConditionCollisionY(), StateType::DeadElse)
+		.addTransition(StateType::Hover, new ConditionStomped(*m_player), StateType::DeadElse)
 		.setInitialState(StateType::Hover)
 		.build();
 
@@ -208,9 +218,9 @@ Enemy* EnemyManager::spawnLakitu()
 	sprite->addSpriteConfig(StateType::Hover, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::lakitu, fsm, sprite, hitbox);
+	return new Enemy(EnemyType::lakitu, fsm, sprite, hitbox, {});
 }
 
 Enemy* EnemyManager::spawnParatroopa()
@@ -220,15 +230,15 @@ Enemy* EnemyManager::spawnParatroopa()
 
 	fsm = builder
 		.addState(new HopState(HOPPOWER, WALKSPEED, GRAVITY))
-		.addState(new WalkState(WALKSPEED, GRAVITY, false))
+		.addState(new WalkState(WALKSPEED, GRAVITY))
 		.addState(new ShellState(GRAVITY))
 		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY))
 		.addState(new DeadStateStomp())
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
-		.addTransition(StateType::Hop, new ConditionCollisionY(), StateType::Walk)
-		.addTransition(StateType::Walk, new ConditionCollisionY(), StateType::Shell)
-		.addTransition(StateType::Shell, new ConditionCollisionY(), StateType::ShellSlide)
-		.addTransition(StateType::ShellSlide, new ConditionCollisionY(), StateType::Shell)
+		.addTransition(StateType::Hop, new ConditionStomped(*m_player), StateType::Walk)
+		.addTransition(StateType::Walk, new ConditionStomped(*m_player), StateType::Shell)
+		.addTransition(StateType::Shell, new ConditionStomped(*m_player), StateType::ShellSlide)
+		.addTransition(StateType::ShellSlide, new ConditionStomped(*m_player), StateType::Shell)
 		.setInitialState(StateType::Hop)
 		.build();
 
@@ -239,9 +249,9 @@ Enemy* EnemyManager::spawnParatroopa()
 	sprite->addSpriteConfig(StateType::ShellSlide, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::paratroopa, fsm, sprite,);
+	return new Enemy(EnemyType::paratroopa, fsm, sprite, hitbox, {});
 }
 Enemy* EnemyManager::spawnBeezyBettle()
 {
@@ -249,13 +259,13 @@ Enemy* EnemyManager::spawnBeezyBettle()
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new WalkState(WALKSPEED, GRAVITY, true))
+		.addState(new WalkState(WALKSPEED, GRAVITY))
 		.addState(new ShellState(GRAVITY))
 		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
-		.addTransition(StateType::Walk, new ConditionCollisionY(), StateType::Shell)
-		.addTransition(StateType::Shell, new ConditionCollisionY(), StateType::ShellSlide)
-		.addTransition(StateType::ShellSlide, new ConditionCollisionY(), StateType::Shell)
+		.addTransition(StateType::Walk, new ConditionStomped(*m_player), StateType::Shell)
+		.addTransition(StateType::Shell, new ConditionStomped(*m_player), StateType::ShellSlide)
+		.addTransition(StateType::ShellSlide, new ConditionStomped(*m_player), StateType::Shell)
 		.setInitialState(StateType::Walk)
 		.build();
 
@@ -265,9 +275,9 @@ Enemy* EnemyManager::spawnBeezyBettle()
 	sprite->addSpriteConfig(StateType::ShellSlide, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::beezybettle, fsm, sprite, hitbox);
+	return new Enemy(EnemyType::beezybettle, fsm, sprite, hitbox, {});
 }
 
 Enemy* EnemyManager::spawnCheepCheep()
@@ -278,7 +288,7 @@ Enemy* EnemyManager::spawnCheepCheep()
 	fsm = builder
 		.addState(new SwimState(SWIMSPEED, FREQUENCY, MAGNITUDE))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
-		.addTransition(StateType::Swim, new ConditionCollisionY(), StateType::DeadElse)
+		.addTransition(StateType::Swim, new ConditionStomped(*m_player), StateType::DeadElse)
 		.setInitialState(StateType::Swim)
 		.build();
 
@@ -286,9 +296,9 @@ Enemy* EnemyManager::spawnCheepCheep()
 	sprite->addSpriteConfig(StateType::Swim, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::beezybettle, fsm, sprite, hitbox);
+	return new Enemy(EnemyType::beezybettle, fsm, sprite, hitbox, {});
 }
 Enemy* EnemyManager::spawnBlooper()
 {
@@ -297,12 +307,12 @@ Enemy* EnemyManager::spawnBlooper()
 
 	fsm = builder
 		.addState(new FallState(GRAVITY))
-		.addState(new ChaseState(CHASESPEED, PLAYER))
+		.addState(new ChaseState(CHASESPEED, m_player))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
-		.addTransition(StateType::Fall, new ConditionTimer(), StateType::Chase)
-		.addTransition(StateType::Chase, new ConditionTimer(), StateType::Fall)
-		.addTransition(StateType::Fall, new ConditionCollisionY(), StateType::DeadElse)
-		.addTransition(StateType::Chase, new ConditionCollisionY(), StateType::DeadElse)
+		.addTransition(StateType::Fall, new ConditionTimer(TIMER), StateType::Chase)
+		.addTransition(StateType::Chase, new ConditionTimer(TIMER), StateType::Fall)
+		.addTransition(StateType::Fall, new ConditionStomped(*m_player), StateType::DeadElse)
+		.addTransition(StateType::Chase, new ConditionStomped(*m_player), StateType::DeadElse)
 		.setInitialState(StateType::Fall)
 		.build();
 
@@ -311,9 +321,9 @@ Enemy* EnemyManager::spawnBlooper()
 	sprite->addSpriteConfig(StateType::Chase, {});
 	sprite->addSpriteConfig(StateType::DeadElse, {});
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::blooper, fsm, sprite, hitbox);
+	return new Enemy(EnemyType::blooper, fsm, sprite, hitbox, {});
 }
 Enemy* EnemyManager::spawnHammerBro()
 {
@@ -326,9 +336,9 @@ Enemy* EnemyManager::spawnHammerBro()
 
 	SpriteEnemy* sprite = new SpriteEnemy();
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::hammerbro, fsm,sprite, hitbox);
+	return new Enemy(EnemyType::hammerbro, fsm, sprite, hitbox, {});
 }
 Enemy* EnemyManager::spawnBowser()
 {
@@ -341,9 +351,9 @@ Enemy* EnemyManager::spawnBowser()
 
 	SpriteEnemy* sprite = new SpriteEnemy();
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::bowser, fsm, sprite, hitbox );
+	return new Enemy(EnemyType::bowser, fsm, sprite, hitbox, {});
 }
 Enemy* EnemyManager::spawnHammer()
 {
@@ -358,7 +368,7 @@ Enemy* EnemyManager::spawnHammer()
 
 	SpriteEnemy* sprite = new SpriteEnemy();
 
-	Rectangle hitbox = {};
+	Vector2 hitbox = {};
 
-	return new Enemy(EnemyType::hammer, fsm, sprite, hitbox);
+	return new Enemy(EnemyType::hammer, fsm, sprite, hitbox, {});
 }

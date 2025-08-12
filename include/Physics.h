@@ -33,4 +33,8 @@ bool CheckCollision(const Entity &a, const Level &level);
 bool CheckCollision(const Rectangle &a, const Level &level);
 bool CheckCollision(const Entity &a, const Level &level, Vector2 &collisionPoint);
 
+bool CheckOverlapX(const Rectangle& A, const Rectangle& B);
+bool CheckOverlapY(const Rectangle& A, const Rectangle& B);
+bool CheckOverlap(const Rectangle& A, const Rectangle& B);
+
 #endif // PHYSICS_H
