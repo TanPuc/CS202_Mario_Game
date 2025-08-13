@@ -26,9 +26,19 @@
 
 #define TILE_SIZE 16.0f
 #define SCALE 4.0f
-const float scale = 4.0f;
 #define GRID_WIDTH 211
 #define GRID_HEIGHT 15
+
+namespace aabb{
+    bool CheckCollisionRecLine( Vector2& start, Vector2& direction, Rectangle* rect,
+        Vector2& contact_point, Vector2& contact_normal, float& t_hit_near);
+    bool CheckCollisionStaticRectDynamicRect(Rectangle* dynamic, Vector2& velocity, Rectangle& r_static, 
+        Vector2& contact_point, Vector2& contact_normal, float& contact_time, float fElapsedTime );
+    bool ResolveStaticRectDynamicRect ( Rectangle* dynamic, Vector2& velocity, float fElapsedTime, Rectangle* r_static );
+}
+
+float Q_rsqrt( float number );
+bool compare(const std::pair<int, float>& a, const std::pair<int, float>& b);
 
 enum TileState {
     STATE_NORMAL,
@@ -94,16 +104,17 @@ public:
 
 class TileInstance {
 protected:
+    // int ID;
     bool isDestroyed = false;
     Vector2 pos;
     Rectangle bbox;
     std::shared_ptr<Tile> tile;
     TileState state = STATE_NORMAL;
     Rectangle normal = {0, 0, 16, 16};
-    Rectangle dest = {0, 0, 16 * scale, 16 * scale};
+    Rectangle dest = {0, 0, 16 * SCALE, 16 * SCALE};
     void handleCollision( Mario& player );
 public:
-    Rectangle getBBox() const { return bbox; }
+    Rectangle& getBBox() { return bbox; }
     TileState getState() const { return state; }
     Vector2 getPos() const { return pos; }
     TileInstance(Vector2 pos, std::shared_ptr<Tile> tile);
@@ -215,7 +226,7 @@ public:
         }
 
         // IsOutOfBound
-        if ( position.y > screenHeight * scale ) isOutOfScreen = true;
+        if ( position.y > screenHeight * SCALE ) isOutOfScreen = true;
     }
     void Draw() {
         rect.x = position.x; rect.y = position.y;
@@ -224,43 +235,23 @@ public:
 
 };
 
-// class Test {
-//     void a() {
-//         std::shared_ptr<Entity> brickPiece1 = std::make_shared<BrickPiece>("./assets/tiles/brick.png", Vector2{position.x, position.y}, Vector2{32, 32}, Rectangle{16, 0, 8, 8}, Vector2{-50, -50});
-//         std::shared_ptr<Entity> brickPiece2 = std::make_shared<BrickPiece>("./assets/tiles/brick.png", Vector2{position.x + 32, position.y}, Vector2{32, 32}, Rectangle{24, 0, 8, 8}, Vector2{50, -50});
-//         std::shared_ptr<Entity> brickPiece3 = std::make_shared<BrickPiece>("./assets/tiles/brick.png", Vector2{position.x, position.y + 32}, Vector2{32, 32}, Rectangle{16, 8, 8, 8}, Vector2{-50, 50});
-//         std::shared_ptr<Entity> brickPiece4 = std::make_shared<BrickPiece>("./assets/tiles/brick.png", Vector2{position.x + 32, position.y + 32}, Vector2{32, 32}, Rectangle{24, 8, 8, 8}, Vector2{50, 50});
-//         brickPieces.push_back(brickPiece1);
-//         brickPieces.push_back(brickPiece2);
-//         brickPieces.push_back(brickPiece3);
-//         brickPieces.push_back(brickPiece4);
-//         for ( const auto& brickPiece : brickPieces ) {
-//             brickPiece->Update();
-//             brickPiece->Draw();
-//         }   
-//     }
-// };
-
 class TileManager {
 private:
+    // Collision-related variables 
+    Vector2 cp, cn; float t;
+    std::vector<std::pair<int, float>> z;
+
     // Flyweight pattern 
-    std::shared_ptr<Tile> fortress = std::make_shared<Fortress>();
-    std::shared_ptr<Tile> goalpole = std::make_shared<Goalpole>();
-    std::shared_ptr<Tile> hardblock = std::make_shared<Hardblock>();
-    std::shared_ptr<Tile> pipe1 = std::make_shared<Pipe1>();
-    std::shared_ptr<Tile> pipe2 = std::make_shared<Pipe2>();
-    std::shared_ptr<Tile> pipe3 = std::make_shared<Pipe3>();
-    std::shared_ptr<Tile> background = std::make_shared<Background>();
-    std::shared_ptr<Tile> question = std::make_shared<Question>();
-    std::shared_ptr<Tile> brick = std::make_shared<Brick>();
-    std::shared_ptr<Tile> ground = std::make_shared<Ground>();
-    std::vector<std::shared_ptr<TileInstance>> tileInstances;
+    std::map<int, std::shared_ptr<Tile>> tileMap;
+    std::vector<std::shared_ptr<TileInstance>> tileInstances; // Store all tile instances 
     std::vector<int> toRemoveTiles; // Remove safely while iterating 
+
     std::vector<std::shared_ptr<Entity>> brickPieces; // Broken brick entities 
-    std::vector<int> toRemoveEntities;
+    std::vector<int> toRemoveEntities; // Remove safely while iterating
+
     void handleBrickPieces(Vector2 position);
-    // std::shared_ptr<TileInstance> gridMap[GRID_HEIGHT][GRID_WIDTH];
 public:
+    TileManager();
     std::shared_ptr<TileInstance> addTileInstance(Vector2 pos, int tileID);
     void update(Mario& player);
     void render();

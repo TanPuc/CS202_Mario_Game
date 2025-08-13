@@ -3,11 +3,14 @@
 
 #include <raylib.h>
 #include <iostream>
+#include <cmath>
 #include "Entity.h"
 
-const int screenWidth = 256;
+const int screenWidth = 320;
 const int screenHeight = 240;
 #define JUMP_FORCE 600.0f 
+
+float Q_rsqrt( float number );
 
 class Mario
 {
@@ -24,10 +27,11 @@ public:
     Mario()
     {
         camera = { 0 };
-        camera.offset = { 256.0f * 2.0f, 240.0f * 2.0f };
+        camera.zoom = 1.0f;
+        camera.offset = { screenWidth * 2.0f, screenHeight * 2.0f };
+        camera.target = { screenWidth * 2.0f, screenHeight * 2.0f };
         texture = LoadTexture("./assets/mario.png");
         position = {500.0f, 700.0f}; // Initial position
-        camera.target = { position.x + texture.width / 2.0f, position.y + texture.height / 2.0f };
         rect = {position.x, position.y, static_cast<float>(texture.width * 2), static_cast<float>(texture.height * 2)};
         std::cout << rect.width << " " << rect.height << std::endl;
         moveLeft = false;
@@ -70,24 +74,28 @@ public:
 
     void Update()
     {
-        // std::cout << "Updating Mario at position: (" << position.x << ", " << position.y << ")\n";
-        camera.target = Vector2{ position.x + texture.width / 2.0f, position.y + texture.height / 2.0f };
-        camera.zoom = 1.2f; 
+        if ( position.x + texture.width * 2.0f > screenWidth * 2.0f ) 
+            camera.target.x = position.x + texture.width * 2.0f;
+
+
         float gravity = 500.0f; // Gravity effect
-        float speed = 1000.0f; // Speed of Mario
+        float speed = 100.0f; // Speed of Mario
         float deltaTime = GetFrameTime();
 
-        velocity.x += speed * deltaTime; 
+        // velocity.x += speed * deltaTime; 
         velocity.y += gravity * deltaTime; // Update velocity with gravity
 
         if(moveLeft)
         {
-            position.x -= speed * deltaTime; // Move left
+            // position.x -= speed * deltaTime; // Move left
+            velocity.x = -speed;
         }
         else if(moveRight)
         {
-            position.x += speed * deltaTime; // Move right
+            // position.x += speed * deltaTime; // Move right
+            velocity.x = speed;
         }
+        position.x += velocity.x * deltaTime; // Apply horizontal movement
         position.y += velocity.y * deltaTime; // Apply gravity to Mario's position
 
         if (position.y > screenHeight * 4 - texture.height * 2 ) // Prevent going below the ground
@@ -101,7 +109,6 @@ public:
 
     void Draw()
     {
-        // std::cout << "Drawing Mario at position: (" << position.x << ", " << position.y << ")\n";
         DrawTextureEx(texture, position, 0.0f, 2.0f, WHITE);
         DrawRectangleLinesEx(rect, 2.0f, RED);
     }
