@@ -52,7 +52,8 @@ void PauseState::enter()
     guiManager.addElement(new Button({startX, startY + gapY}, buttonSize, buttonLabels[1],
         [this]() 
         { 
-            this->gsm->changeState(new GetReadyState(this->gsm, currentWorld, currentLevel)); 
+            this->gsm->getContext().lives = 3; 
+            this->gsm->changeState(new GetReadyState(this->gsm, this->currentWorld, this->currentLevel)); 
         }
     ));
 
