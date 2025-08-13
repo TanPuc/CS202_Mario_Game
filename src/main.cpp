@@ -3,6 +3,8 @@
 #include "raylib.h"
 #include "Mario.h"
 #include "Level.h"
+#include "items/Coin.h"
+#include "items/Mushroom.h"
 
 #define MARIO_SKYBLUE (Color){68, 145, 190, 255}
 
@@ -14,6 +16,9 @@ int main(void)
 	Vector2 CameraPos = {0, 0};
 	Mario *player = new Mario({float(GetScreenWidth() / 2 - 16), 0.0f});
 	Level *level = new Level();
+	Coin *coin = new Coin({200, 100});
+	Mushroom *mushroom = new Mushroom({300, 100});
+
 	level->LoadFromFile("assets/level1.map");
 
 	while (!WindowShouldClose())
@@ -21,6 +26,8 @@ int main(void)
 		/// UPDATE GAME
 		player->HandleInput();
 		player->Update(*level); // Handling player collision and movement
+		coin->Update(*level, *player);
+		mushroom->Update(*level, *player);
 
 		/// RENDER GAME
 		Camera2D camera = {0};
@@ -41,6 +48,8 @@ int main(void)
 
 		level->Draw();
 		player->Draw();
+		coin->Draw();
+		mushroom->Draw();
 
 		EndMode2D();
 		EndDrawing();

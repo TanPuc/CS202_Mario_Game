@@ -1,14 +1,14 @@
 #ifndef MARIO_H
 #define MARIO_H
 
+#include <iostream>
 #include <raylib.h>
+#include "GlobalVariables.h"
 #include "Entity.h"
 #include "Level.h"
 #include "MarioState.h"
-#include "Sprite.h"
-#include "GlobalVariables.h"
+#include "sprite/MarioSprite.h"
 #include "FireBall.h"
-#include <iostream>
 
 class Mario : public Entity
 {
@@ -16,7 +16,7 @@ public:
     std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
     MarioSprite *sprite;
     MARIO_FORM form;
-    std::vector<std::unique_ptr<FireBall>> fireballs;
+    std::vector<std::shared_ptr<FireBall>> fireballs;
 
     Mario(Vector2 position) : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})), form(SMALL)
     {
@@ -34,7 +34,16 @@ public:
         {
             FireBall *fireball = new FireBall({position.x + rect.width, position.y + rect.height / 2}, direction);
             fireball->velocity.x = (direction == RIGHT) ? FIREBALL_SPEED : -FIREBALL_SPEED;
-            fireballs.push_back(std::unique_ptr<FireBall>(fireball));
+            fireballs.push_back(std::shared_ptr<FireBall>(fireball));
+        }
+    }
+
+    void Grow()
+    {
+        if (form == SMALL)
+        {
+            form = BIG;
+            rect.height = MARIO_HEIGHT * 2.0f; // Increase height for big Mario
         }
     }
 
