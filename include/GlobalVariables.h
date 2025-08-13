@@ -1,0 +1,31 @@
+#ifndef GLOBAL_VARIABLES_H
+#define GLOBAL_VARIABLES_H
+
+enum STATE
+{
+    STATE_IDLE,
+    STATE_WALKING,
+    STATE_JUMPING,
+    STATE_FALLING,
+    STATE_DUCKING,
+    STATE_SWIMMING
+};
+
+enum DIRECTION
+{
+    LEFT,
+    RIGHT
+};
+
+enum MARIO_FORM
+{
+    SMALL,
+    BIG,
+    FIRE,
+    SUPER
+};
+#define MARIO_WIDTH 32.0f
+#define MARIO_HEIGHT 32.0f
+#define FRAME_PADDING 2
+
+#endif // GLOBAL_VARIABLES_H
