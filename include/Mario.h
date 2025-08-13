@@ -2,6 +2,12 @@
 #define MARIO_H
 
 #include <raylib.h>
+#include "Entity.h"
+#include "Level.h"
+#include "MarioState.h"
+#include "Sprite.h"
+#include "GlobalVariables.h"
+#include "FireBall.h"
 #include <iostream>
 #include <cmath>
 #include "Entity.h"
@@ -12,105 +18,150 @@ const int screenHeight = 240;
 
 float Q_rsqrt( float number );
 
-class Mario
+class Mario : public Entity
 {
 public:
-    Texture2D texture;
-    Rectangle rect;
-    Vector2 position;
-    Vector2 velocity;
-    bool moveLeft;
-    bool moveRight;
-    Camera2D camera;
-    Vector2 centeredPos;
+    std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
+    MarioSprite *sprite;
+    MARIO_FORM form;
+    std::vector<std::unique_ptr<FireBall>> fireballs;
 
-    Mario()
+    Mario(Vector2 position) : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})), form(SMALL)
     {
-        camera = { 0 };
-        camera.zoom = 1.0f;
-        camera.offset = { screenWidth * 2.0f, screenHeight * 2.0f };
-        camera.target = { screenWidth * 2.0f, screenHeight * 2.0f };
-        texture = LoadTexture("./assets/mario.png");
-        position = {500.0f, 700.0f}; // Initial position
-        rect = {position.x, position.y, static_cast<float>(texture.width * 2), static_cast<float>(texture.height * 2)};
-        std::cout << rect.width << " " << rect.height << std::endl;
-        moveLeft = false;
-        moveRight = false;
-        velocity = {0.0f, 0.0f}; // Initial velocity
+        rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
+        sprite = new MarioSprite();
+    }
+    ~Mario()
+    {
+        delete sprite;
+    }
+
+    void ShootFireBall()
+    {
+        if (fireballs.size() < FIREBALL_THRESHOLD)
+        {
+            FireBall *fireball = new FireBall({position.x + rect.width, position.y + rect.height / 2}, direction);
+            fireball->velocity.x = (direction == RIGHT) ? FIREBALL_SPEED : -FIREBALL_SPEED;
+            fireballs.push_back(std::unique_ptr<FireBall>(fireball));
+        }
+    }
+
+    void ChangeForm()
+    {
+        if (IsKeyPressed(KEY_F))
+        {
+            if (form == SMALL)
+            {
+                form = BIG;
+                rect.height = MARIO_HEIGHT * 2.0f; // Increase height for big Mario
+            }
+            else if (form == BIG)
+            {
+                form = FIRE;
+                rect.height = MARIO_HEIGHT * 2.0f; // Keep the same size for fire Mario
+            }
+            else if (form == FIRE)
+            {
+                form = SMALL;               // Reset to small Mario
+                rect.width = MARIO_WIDTH;   // Reset width
+                rect.height = MARIO_HEIGHT; // Reset height
+            }
+            std::cout << "Mario changed form to: " << form << std::endl;
+        }
+        if (IsKeyPressed(KEY_R))
+        {
+            // Reset Mario's form
+            form = SMALL;
+            rect.width = MARIO_WIDTH;
+            rect.height = MARIO_HEIGHT;
+        }
+
+        sprite->SwitchForm(form);
     }
 
     void HandleInput()
     {
-        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
+        std::unique_ptr<MarioState> newState = currentState->HandleInput(*this, *sprite);
+        if (newState != nullptr)
         {
-            moveLeft = true;
+            currentState = std::move(newState);
+            sprite->SwitchAnimation(currentState->GetType());
+        }
 
-            if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
-            {
-                moveLeft = false;
-                moveRight = true;
-            }
-        }
-        else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
+        if (IsKeyPressed(KEY_LEFT_SHIFT))
         {
-            moveRight = true;
+            ShootFireBall();
+        }
 
-            if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
-            {
-                moveRight = false;
-                moveLeft = true;
-            }
-        }
-        else
-        {
-            moveLeft = false;
-            moveRight = false;
-        }
-        if ( IsKeyPressed(KEY_SPACE) && velocity.y == 0 )
-        {
-            velocity.y = -JUMP_FORCE; // Apply jump force
-        }
+        ChangeForm();
     }
 
-    void Update()
+    void Draw() override
     {
-        if ( position.x + texture.width * 2.0f > screenWidth * 2.0f ) 
-            camera.target.x = position.x + texture.width * 2.0f;
-
-
-        float gravity = 500.0f; // Gravity effect
-        float speed = 100.0f; // Speed of Mario
-        float deltaTime = GetFrameTime();
-
-        // velocity.x += speed * deltaTime; 
-        velocity.y += gravity * deltaTime; // Update velocity with gravity
-
-        if(moveLeft)
+        DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED); // Draw hitbox for debugging
+        currentState->Draw(*this, *sprite);
+        if (!fireballs.empty())
         {
-            // position.x -= speed * deltaTime; // Move left
-            velocity.x = -speed;
+            for (auto &fireball : fireballs)
+            {
+                fireball->Draw();
+            }
         }
-        else if(moveRight)
-        {
-            // position.x += speed * deltaTime; // Move right
-            velocity.x = speed;
-        }
-        position.x += velocity.x * deltaTime; // Apply horizontal movement
-        position.y += velocity.y * deltaTime; // Apply gravity to Mario's position
+        // Draw fireballs
+    }
 
-        if (position.y > screenHeight * 4 - texture.height * 2 ) // Prevent going below the ground
+    void Update(Level &level) override
+    {
+        std::unique_ptr<MarioState> newState = currentState->Update(*this, *sprite);
+        if (newState != nullptr)
         {
-            position.y = screenHeight * 4 - texture.height * 2;
+            currentState = std::move(newState);
+            sprite->SwitchAnimation(currentState->GetType());
+        }
+        float gravity = 900.0f;
+        float dt = GetFrameTime();
+        ApplyGravity(velocity, gravity);
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
+
+        if (CheckCollision(*this, level)) // Resolve collision
+        {
+            ResolveCollision(level);
         }
         rect.x = position.x;
         rect.y = position.y;
-        centeredPos = Vector2{ position.x + texture.width / 2.0f, position.y + texture.height / 2.0f };
+
+        // Update fireballs
+        for (auto it = fireballs.begin(); it != fireballs.end();)
+        {
+            if ((*it)->isOverLifeTime())
+            {
+                std::cout << "Fireball expired!" << std::endl;
+                it = fireballs.erase(it); // Remove expired fireball
+                continue;
+            }
+            (*it)->Update(level);
+            if ((*it)->GetPosition().y < 0 || (*it)->GetPosition().y > GetScreenHeight())
+            {
+                it = fireballs.erase(it); // Remove fireball if it goes out of bounds
+            }
+            else
+            {
+                ++it; // Move to the next fireball
+            }
+        }
     }
 
-    void Draw()
+    void ResolveCollision(Level &level) override
     {
-        DrawTextureEx(texture, position, 0.0f, 2.0f, WHITE);
-        DrawRectangleLinesEx(rect, 2.0f, RED);
+        position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
+        velocity.y = 0;
+    };
+
+    void ResolveCollision(Entity &other) override
+    {
+        // Handle collision with other entities if needed
+        std::cout << "Collision with another entity detected!" << std::endl;
     }
 };
 

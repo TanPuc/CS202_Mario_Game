@@ -2,28 +2,38 @@
 #define ENTITUY_H
 
 #include <raylib.h>
+#include "Level.h"
+#include "GlobalVariables.h"
 
 class Entity
 {
 public:
     bool isOutOfScreen = false;
-    Texture2D texture;
     Rectangle rect;
     Vector2 position;
+    Vector2 velocity;
+    DIRECTION direction = RIGHT; // Default direction
 
-    Entity(char const *filePath, Vector2 position, Vector2 size)
+    Entity(Vector2 position, Vector2 size)
+        : position(position), velocity({0.0f, 0.0f})
     {
-        this->texture = LoadTexture(filePath);
-        this->position = position;
         rect = {position.x, position.y, size.x, size.y};
     }
 
-    virtual void Update() = 0;
+    virtual void Update(Level &level) = 0;
     virtual void Draw() = 0;
 
-    ~Entity()
+    virtual void ResolveCollision(Entity &other) = 0;
+    virtual void ResolveCollision(Level &level) = 0;
+
+    Rectangle GetBounds() const
     {
-        UnloadTexture(texture);
+        return rect;
+    }
+
+    Vector2 GetPosition() const
+    {
+        return position;
     }
 };
 

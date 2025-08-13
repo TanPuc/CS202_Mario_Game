@@ -4,87 +4,52 @@
 #include "Mario.h"
 #include "Tile.h"
 
+#define MARIO_SKYBLUE (Color){68, 145, 190, 255}
+
 int main(void)
 {
-	InitWindow(screenWidth * SCALE, screenHeight * SCALE, "Mario");
+	InitWindow(800, 512, "Mario");
 	SetTargetFPS(60);
 
-	bool pause = false;
-
-	Mario player;
-	World1_1 world1_1("./assets/tiles/world_1.1.txt");
-
-	//===============================
-	// std::vector<Rectangle> vRects;
-	// vRects.push_back(Rectangle{170.0f, 70.0f, 10.0f, 40.0f});
-	// vRects.push_back(Rectangle{150.0f, 50.0f, 20.0f, 20.0f});
-	// vRects.push_back(Rectangle{150.0f, 150.0f, 75.0f, 20.0f});
-	// vRects.push_back(Rectangle{170.0f, 50.0f, 20.0f, 20.0f});
-	// vRects.push_back(Rectangle{190.0f, 50.0f, 20.0f, 20.0f});
-	// vRects.push_back(Rectangle{110.0f, 50.0f, 20.0f, 20.0f});
-	// vRects.push_back(Rectangle{50.0f, 130.0f, 20.0f, 20.0f});
-	// vRects.push_back(Rectangle{50.0f, 150.0f, 20.0f, 20.0f});
-	// vRects.push_back(Rectangle{50.0f, 170.0f, 20.0f, 20.0f});
-	// vRects.push_back(Rectangle{150.0f, 100.0f, 10.0f, 1.0f});
-	// vRects.push_back(Rectangle{200.0f, 100.0f, 20.0f, 60.0f});
-	// Vector2 velocity = {0.0f, 0.0f};
-	//===============================
+	Vector2 CameraPos = {0, 0};
+	Mario *player = new Mario({float(GetScreenWidth() / 2 - 16), 0.0f});
+	Level *level = new Level();
+	level->LoadFromFile("assets/level1.map");
 
 	while (!WindowShouldClose())
 	{
-		if (IsKeyPressed(KEY_P))
-		{
-			pause = !pause;
-		}
+		/// UPDATE GAME
+		player->HandleInput();
+		player->Update(*level); // Handling player collision and movement
 
-		player.HandleInput();
-		world1_1.update( player );
-		player.Update();
+		/// RENDER GAME
+		Camera2D camera = {0};
+		Vector2 playerPos = player->GetPosition();
+		if (playerPos.x > CameraPos.x)
+		{
+			CameraPos.x = playerPos.x;
+		}
+		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), 0};
+		camera.offset = (Vector2){float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
+		// camera.offset = (Vector2){200, 600};
+		camera.zoom = 0.5f;
 
 		BeginDrawing();
-		ClearBackground(DARKGRAY);
-		BeginMode2D(player.camera);
 
-		world1_1.render();
-		player.Draw();
+		ClearBackground(MARIO_SKYBLUE);
+		BeginMode2D(camera);
+
+		level->Draw();
+		player->Draw();
 
 		EndMode2D();
-
-		//===============================
-		// float et = GetFrameTime();
-		// Vector2 vMouse = GetMousePosition();
-		// Vector2 vPoint = { 128.0f, 120.0f };
-		// if ( IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
-		// 	float a = ( vMouse.x - vPoint.x ) * ( vMouse.x - vPoint.x ) + ( vMouse.y - vPoint.y ) * ( vMouse.y - vPoint.y );
-		// 	float b = Q_rsqrt(a);
-		// 	velocity.x += (vMouse.x - vPoint.x) * 100.0f * et * b;
-		// 	velocity.y += (vMouse.y - vPoint.y) * 100.0f * et * b;
-		// }
-
-		// for ( const auto& r : vRects )
-		// 	DrawRectangle(r.x, r.y, r.width, r.height, WHITE);
-
-		// // CHECK AND SOLVE
-		// Vector2 cp, cn;
-		// float t = 0.0f;
-		// std::vector<std::pair<int, float>> z;
-		// for ( size_t i = 1; i < vRects.size(); i++ ) {
-		// 	if ( aabb::CheckCollisionStaticRectDynamicRect(&vRects[0], velocity, vRects[i], cp, cn, t, et)) {
-		// 		z.push_back({ i, t });
-		// 	}
-		// }
-		// std::sort(z.begin(), z.end(), compare);
-		// for ( auto j : z ) 
-		// 	aabb::ResolveStaticRectDynamicRect(&vRects[0], velocity, et, &vRects[j.first]);
-
-		// // UPDATE POSITION
-		// vRects[0].x += velocity.x * et;
-		// vRects[0].y += velocity.y * et;
-		//===============================
-
 		EndDrawing();
 	}
 
+	if (player)
+		delete player;
+	if (level)
+		delete level;
 	CloseWindow();
 
 	return 0;
