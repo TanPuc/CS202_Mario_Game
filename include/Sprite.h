@@ -2,262 +2,96 @@
 #define SPRITE_H
 
 #include <raylib.h>
-#include "GlobalVariables.h"
+
+#include "raylib.h"
 #include <unordered_map>
 #include <vector>
 #include <string>
-#include <iostream>
+
+enum class MarioState
+{
+    IDLE,
+    WALKING,
+    JUMPING,
+    FALLING,
+    DUCKING,
+    SWIMMING
+};
 
 struct Animation
 {
-    std::vector<Rectangle> frames;
-    int totalFrames;
-    int frameCounter;
-    Animation() : totalFrames(0), frameCounter(0) {}
-
-    Animation(std::vector<Rectangle> frames_)
-        : frames(std::move(frames_)), frameCounter(0)
-    {
-        totalFrames = static_cast<int>(frames.size());
-    }
-
-    Animation(const Animation &other)
-        : frames(other.frames), totalFrames(other.totalFrames), frameCounter(other.frameCounter) {}
-    Animation &operator=(const Animation &other)
-    {
-        if (this != &other)
-        {
-            frames = other.frames;
-            totalFrames = other.totalFrames;
-            frameCounter = other.frameCounter;
-        }
-        return *this;
-    }
-
-    Animation &operator=(const std::vector<Rectangle> &other)
-    {
-        frames = other;
-        totalFrames = static_cast<int>(frames.size());
-        frameCounter = 0;
-        return *this;
-    }
+    std::vector<Rectangle> frames; // Rectangles for each frame in the spritesheet
+    float frameTime;               // How long each frame lasts
+    bool loop;                     // Should the animation loop
 };
 
 class Sprite
 {
 public:
-    virtual void SwitchAnimation(STATE state_) = 0;
-    virtual void Draw(Entity &entity) = 0;
-    virtual ~Sprite() = default;
-};
+    Sprite(const std::string &filePath, float scale = 1.0f)
+        : currentFrame(0), timer(0.0f), currentState(MarioState::IDLE), scale(scale)
+    {
+        texture = LoadTexture(filePath.c_str());
+    }
 
-class FireBallSprite : public Sprite
-{
+    ~Sprite()
+    {
+        UnloadTexture(texture);
+    }
+
+    void AddAnimation(MarioState state, const Animation &anim)
+    {
+        animations[state] = anim;
+    }
+
+    void SetState(MarioState state)
+    {
+        if (currentState != state)
+        {
+            currentState = state;
+            currentFrame = 0;
+            timer = 0.0f;
+        }
+    }
+
+    void Update(float deltaTime)
+    {
+        Animation &anim = animations[currentState];
+        timer += deltaTime;
+
+        if (timer >= anim.frameTime)
+        {
+            timer = 0.0f;
+            currentFrame++;
+            if (currentFrame >= anim.frames.size())
+            {
+                if (anim.loop)
+                    currentFrame = 0;
+                else
+                    currentFrame = anim.frames.size() - 1; // Hold on last frame
+            }
+        }
+    }
+
+    void Draw(Vector2 position, bool flip = false)
+    {
+        Animation &anim = animations[currentState];
+        Rectangle src = anim.frames[currentFrame];
+        Rectangle dest = {position.x, position.y, src.width * scale, src.height * scale};
+
+        Vector2 origin = {0, 0};
+        DrawTexturePro(texture, src, dest, origin, 0.0f,
+                       flip ? WHITE : WHITE);
+    }
+
 private:
-    Animation fireballAnimation;
+    Texture2D texture;
+    std::unordered_map<MarioState, Animation> animations;
+    MarioState currentState;
 
-public:
-    Texture2D spriteSheet;
-    Animation *currentAnimation;
-    STATE prevState;
-    int frameSpeed = 6; // 6fps
-
-    FireBallSprite()
-        : fireballAnimation({{247, 302, 8, 16},
-                             {247 + 8 + FRAME_PADDING, 302, 8, 16},
-                             {247 + (8 + FRAME_PADDING) * 2, 302, 8, 16},
-                             {247 + (8 + FRAME_PADDING) * 3, 302, 8, 16}}),
-          prevState(STATE_IDLE)
-    {
-        spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
-        currentAnimation = &fireballAnimation;
-    }
-
-    ~FireBallSprite()
-    {
-        UnloadTexture(spriteSheet);
-    }
-
-    void SwitchAnimation(STATE state_) override {}
-
-    void Draw(Entity &entity) override
-    {
-        if (!currentAnimation)
-        {
-            std::cerr << "Current animation is not set!" << std::endl;
-            return;
-        }
-
-        static int animationTimer = 0;
-        animationTimer++;
-
-        if (animationTimer >= frameSpeed)
-        {
-            animationTimer = 0;
-            currentAnimation->frameCounter++;
-            if (currentAnimation->frameCounter >= currentAnimation->totalFrames)
-            {
-                currentAnimation->frameCounter = 0; // Reset frame index
-            }
-        }
-
-        // Get current frame
-        if (currentAnimation->frameCounter < currentAnimation->frames.size())
-        {
-            Rectangle frameRec = currentAnimation->frames[currentAnimation->frameCounter];
-
-            // Handle direction flipping
-            if (entity.direction == LEFT)
-            {
-                frameRec.width = abs(frameRec.width);
-            }
-            else
-            {
-                frameRec.width = -abs(frameRec.width);
-            }
-            DrawTexturePro(spriteSheet, frameRec,
-                           {entity.position.x, entity.position.y, frameRec.width * 1.5f, frameRec.height * 1.5f},
-                           {0, 0}, 0.0f, WHITE);
-        }
-        else
-        {
-            currentAnimation->frameCounter = 0;
-        }
-    }
-};
-
-class MarioSprite : public Sprite
-{
-private:
-    Animation idleAnimation;
-    Animation walkAnimation;
-    Animation jumpAnimation;
-
-public:
-    Texture2D spriteSheet;
-    Animation *currentAnimation;
-    STATE prevState;
-    Rectangle frameRec;
-    int animationTimer = 0;
-    int frameCounter = 0;
-    int frameSpeed = 12; // 12fps
-
-    MarioSprite()
-        : idleAnimation({{0, 16, 16, 16}}),
-          walkAnimation({{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}}),
-          jumpAnimation({{32 + FRAME_PADDING * 2, 16, 16, 16}}),
-          prevState(STATE_IDLE)
-    {
-        spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
-        currentAnimation = &idleAnimation;
-        frameRec = currentAnimation->frames[0];
-    }
-
-    ~MarioSprite()
-    {
-        UnloadTexture(spriteSheet);
-    }
-
-    void SwitchForm(MARIO_FORM newForm)
-    {
-        if (newForm == SMALL)
-        {
-            idleAnimation = {{0, 16, 16, 16}};
-            walkAnimation = {{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}};
-            jumpAnimation = {{32 + FRAME_PADDING * 2, 16, 16, 16}};
-        }
-        else if (newForm == BIG)
-        {
-            idleAnimation = {{0, 88, 16, 16 * 2}};
-            walkAnimation = {{(16 + FRAME_PADDING) * 2, 88, 16, 16 * 2}, {16 + FRAME_PADDING, 88, 16, 16 * 2}, {0, 88, 16, 16 * 2}};
-            jumpAnimation = {{(16 + FRAME_PADDING) * 4, 88, 16, 16 * 2}};
-        }
-        else if (newForm == FIRE)
-        {
-            idleAnimation = {{0, 260, 16, 16 * 2}};
-            walkAnimation = {{(16 + FRAME_PADDING) * 2, 260, 16, 16 * 2}, {16 + FRAME_PADDING, 260, 16, 16 * 2}, {0, 260, 16, 16 * 2}};
-            jumpAnimation = {{(16 + FRAME_PADDING) * 4, 260, 16, 16 * 2}};
-        }
-        else
-        {
-            std::cerr << "Unknown Mario form!" << std::endl;
-        }
-    }
-
-    void SwitchAnimation(STATE state_) override
-    {
-        if (state_ == prevState)
-            return;
-
-        switch (state_)
-        {
-        case STATE_IDLE:
-            currentAnimation = &idleAnimation;
-            break;
-        case STATE_WALKING:
-            currentAnimation = &walkAnimation;
-            break;
-        case STATE_JUMPING:
-            currentAnimation = &jumpAnimation;
-            break;
-        case STATE_DUCKING:
-            // Handle ducking state if needed
-            currentAnimation = &idleAnimation; // Fallback to idle
-            break;
-        case STATE_SWIMMING:
-            // Handle swimming state if needed
-            currentAnimation = &idleAnimation; // Fallback to idle
-            break;
-        default:
-            std::cerr << "Unknown state: " << state_ << std::endl;
-            currentAnimation = &idleAnimation; // Fallback to idle
-            break;
-        }
-
-        if (currentAnimation)
-        {
-            currentAnimation->frameCounter = 0;
-        }
-        prevState = state_;
-    }
-
-    void Draw(Entity &entity) override
-    {
-        if (!currentAnimation)
-        {
-            std::cerr << "Current animation is not set!" << std::endl;
-            return;
-        }
-
-        animationTimer++;
-
-        if (animationTimer >= frameSpeed)
-        {
-            animationTimer = 0;
-
-            // Update Frame Rectangle
-            frameCounter++;
-            if (frameCounter >= currentAnimation->totalFrames)
-            {
-                frameCounter = 0; // Reset frame index
-            }
-            frameRec = currentAnimation->frames[frameCounter];
-        }
-
-        // Handle direction flipping
-        if (entity.direction == LEFT)
-        {
-            frameRec.width = abs(frameRec.width);
-        }
-        else
-        {
-            frameRec.width = -abs(frameRec.width);
-        }
-        // DrawTextureRec(spriteSheet, frameRec, entity.position, WHITE);
-        DrawTexturePro(spriteSheet, frameRec,
-                       {entity.position.x, entity.position.y, entity.rect.width, entity.rect.height},
-                       {0, 0}, 0.0f, WHITE);
-    }
+    int currentFrame;
+    float timer;
+    float scale;
 };
 
 #endif // SPRITE_H

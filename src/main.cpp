@@ -4,48 +4,46 @@
 #include "Mario.h"
 #include "Level.h"
 
-#define MARIO_SKYBLUE (Color){68, 145, 190, 255}
-
 int main(void)
 {
 	InitWindow(800, 512, "Mario");
 	SetTargetFPS(60);
 
-	Vector2 CameraPos = {0, 0};
-	Mario *player = new Mario({float(GetScreenWidth() / 2 - 16), 0.0f});
+	Texture2D marioTexture = LoadTexture("assets/mario.png");
+	Mario *player = new Mario(marioTexture, {(float)GetScreenWidth() / 2 - 16, 0});
+
 	Level *level = new Level();
 	level->LoadFromFile("assets/level1.map");
 
+	bool pause = false;
+
 	while (!WindowShouldClose())
 	{
-		/// UPDATE GAME
-		player->HandleInput();
-		player->Update(*level); // Handling player collision and movement
-
-		/// RENDER GAME
-		Camera2D camera = {0};
-		Vector2 playerPos = player->GetPosition();
-		if (playerPos.x > CameraPos.x)
+		/// UPDATE
+		if (IsKeyPressed(KEY_P))
 		{
-			CameraPos.x = playerPos.x;
+			pause = !pause;
 		}
-		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), 0};
-		camera.offset = (Vector2){float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
-		// camera.offset = (Vector2){200, 600};
+
+		player->Update();
+		player->CheckCollision(*level);
+
+		/// RENDER
+		Camera2D camera = {0};
+		camera.target = (Vector2){(float)player->position.x + player->rect.width / 2, 0};
+		camera.offset = (Vector2){200, (float)GetScreenHeight() / 2};
 		camera.zoom = 0.5f;
 
 		BeginDrawing();
-
-		ClearBackground(MARIO_SKYBLUE);
+		ClearBackground(SKYBLUE);
 		BeginMode2D(camera);
 
-		level->Draw();
+		level->Draw(camera);
 		player->Draw();
 
 		EndMode2D();
 		EndDrawing();
 	}
-
 	if (player)
 		delete player;
 	if (level)
