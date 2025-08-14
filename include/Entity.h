@@ -18,6 +18,7 @@ public:
     {
         rect = {position.x, position.y, size.x, size.y};
     }
+    virtual ~Entity() = default;
 
     virtual void Update(Level &level) = 0;
     virtual void Draw() = 0;

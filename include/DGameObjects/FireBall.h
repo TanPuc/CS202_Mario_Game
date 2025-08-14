@@ -7,7 +7,7 @@
 #include "Level.h"
 #include "Physics.h"
 #include "GlobalVariables.h"
-#include "sprite/FireBallSprite.h"
+#include "GameSprite/FireBallSprite.h"
 
 #define FIREBALL_SPEED 300.0f // Speed of the fireball
 #define FIREBALL_THRESHOLD 3  // Number of maximum fireballs

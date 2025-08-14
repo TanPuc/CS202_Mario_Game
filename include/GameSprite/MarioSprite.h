@@ -66,6 +66,8 @@ public:
         if (state_ == prevState)
             return;
 
+        std::cout << "Switching to state: " << state_ << std::endl;
+
         switch (state_)
         {
         case STATE_IDLE:

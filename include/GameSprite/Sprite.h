@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include "GlobalVariables.h"
 #include <vector>
+#include "Entity.h"
 #include <iostream>
 
 struct Animation

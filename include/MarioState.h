@@ -6,7 +6,7 @@
 #include "Level.h"
 #include "GlobalVariables.h"
 #include "Physics.h"
-#include "sprite/MarioSprite.h"
+#include "GameSprite/MarioSprite.h"
 #include <iostream>
 #include <memory>
 

@@ -5,17 +5,16 @@
 #include <iostream>
 #include "Entity.h"
 #include "GlobalVariables.h"
-#include "sprite/MushroomSprite.h"
-#include "Item.h"
+#include "GameSprite/MushroomSprite.h"
 
-class Mushroom : public Item
+class Mushroom : public Entity
 {
 public:
     MushroomSprite MushroomSprite;
 
-    Mushroom(Vector2 pos) : Item(pos, {16, 16}) {}
+    Mushroom(Vector2 pos) : Entity(pos, {16, 16}) {}
 
-    void OnCollect(Mario &mario) override
+    void OnCollect(Mario &mario)
     {
         std::cout << "Mushroom collected!" << std::endl;
         mario.Grow();
