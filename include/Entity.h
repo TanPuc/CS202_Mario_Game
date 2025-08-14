@@ -1,14 +1,15 @@
-#ifndef ENTITUY_H
-#define ENTITUY_H
+#ifndef ENTITY_H
+#define ENTITY_H
 
 #include <raylib.h>
-#include "Level.h"
 #include "GlobalVariables.h"
+
+// Forward declaration
+class Level;
 
 class Entity
 {
 public:
-    bool isOutOfScreen = false;
     Rectangle rect;
     Vector2 position;
     Vector2 velocity;

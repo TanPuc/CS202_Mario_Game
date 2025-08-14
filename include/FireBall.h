@@ -2,7 +2,7 @@
 #define FIREBALL_H
 #include <raylib.h>
 #include "Entity.h"
-#include "Level.h"
+#include "Tile.h"
 #include "Physics.h"
 #include <iostream>
 #include "GlobalVariables.h"
@@ -47,12 +47,12 @@ public:
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
 
-        if (CheckCollision(boundBox, level)) // Resolve collision
-        {
-            // ResolveCollision(level);
-            velocity.y = -150.0f;
-            position.y = (int)(position.y / 32) * 32; // Snap to tile grid
-        }
+        // if (CheckCollision(boundBox, level)) // Resolve collision
+        // {
+        //     // ResolveCollision(level);
+        //     velocity.y = -150.0f;
+        //     position.y = (int)(position.y / 32) * 32; // Snap to tile grid
+        // }
 
         rect.x = position.x;
         rect.y = position.y;

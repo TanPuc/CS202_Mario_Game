@@ -1,6 +1,5 @@
 #ifndef TILE_H
 #define TILE_H
-// #pragma once
 
 #include <fstream>
 #include <map>
@@ -9,9 +8,14 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include "Mario.h"
+#include <array>
+#include <raylib.h>
 #include "Entity.h"
-#include "raylib.h"
+#include "Collision.h"
+#include "BrickPieces.h"
+
+// Forward declaration
+class Mario;
 
 // pipe2: 1
 // background: 2
@@ -25,20 +29,11 @@
 // brick: 17
 
 #define TILE_SIZE 16.0f
-#define SCALE 4.0f
 #define GRID_WIDTH 211
 #define GRID_HEIGHT 15
 
-namespace aabb{
-    bool CheckCollisionRecLine( Vector2& start, Vector2& direction, Rectangle* rect,
-        Vector2& contact_point, Vector2& contact_normal, float& t_hit_near);
-    bool CheckCollisionStaticRectDynamicRect(Rectangle* dynamic, Vector2& velocity, Rectangle& r_static, 
-        Vector2& contact_point, Vector2& contact_normal, float& contact_time, float fElapsedTime );
-    bool ResolveStaticRectDynamicRect ( Rectangle* dynamic, Vector2& velocity, float fElapsedTime, Rectangle* r_static );
-}
-
 float Q_rsqrt( float number );
-bool compare(const std::pair<int, float>& a, const std::pair<int, float>& b);
+bool compare(const std::pair<std::array<int, 2>, float>& a, const std::pair<std::array<int, 2>, float>& b);
 
 enum TileState {
     STATE_NORMAL,
@@ -104,15 +99,10 @@ public:
 
 class TileInstance {
 protected:
-    // int ID;
-    bool isDestroyed = false;
     Vector2 pos;
     Rectangle bbox;
     std::shared_ptr<Tile> tile;
     TileState state = STATE_NORMAL;
-    Rectangle normal = {0, 0, 16, 16};
-    Rectangle dest = {0, 0, 16 * SCALE, 16 * SCALE};
-    void handleCollision( Mario& player );
 public:
     Rectangle& getBBox() { return bbox; }
     TileState getState() const { return state; }
@@ -120,6 +110,13 @@ public:
     TileInstance(Vector2 pos, std::shared_ptr<Tile> tile);
     virtual void update(Mario& player) = 0;
     virtual void render() = 0;
+};
+
+class DummyInstance : public TileInstance {
+public: 
+    DummyInstance(Vector2 pos) : TileInstance ( pos, nullptr ) {}
+    void update(Mario& player) override {}
+    void render() override {}
 };
 
 class GroundInstance : public TileInstance {
@@ -131,6 +128,8 @@ public:
 
 class BrickInstance : public TileInstance {
 private:
+    Rectangle normal = {0, 0, 16, 16};
+    Rectangle dest;
     Rectangle hbox;
     void handleBreaking(Mario& player);
 public:
@@ -144,6 +143,8 @@ private:
     int frameCounter = 0;
     const int frameSpeed = 12;
     const int frameSpeed2 = 36;
+    Rectangle normal = {0, 0, 16, 16};
+    Rectangle dest;
     Rectangle hbox;
     void handleAnimation();
     void handleActivation(Mario& player);
@@ -156,7 +157,7 @@ public:
 class BackgroundInstance : public TileInstance {
 public:
     BackgroundInstance(Vector2 pos, std::shared_ptr<Tile> background);
-    void update(Mario& player) override;
+    void update(Mario& player) override {}
     void render() override;
 };
 
@@ -200,71 +201,37 @@ public:
     void render() override;
 };
 
-class BrickPiece : public Entity {
-private:
-    int frameCounter = 0;
-    const int frameSpeed = 12;
-    const float gravity = 1000.0f;
-    Rectangle source; 
-    Vector2 velocity;
+class EntityManager {
 public:
-    BrickPiece ( char const *filePath, Vector2 position, Vector2 size, Rectangle source, Vector2 velocity )
-        : Entity(filePath, position, size), source(source), velocity(velocity) {}
-    void Update() override {
-        // Position 
-        float deltaTime = GetFrameTime();
-        velocity.y += gravity * deltaTime;
-        position.x += velocity.x * deltaTime;
-        position.y += velocity.y * deltaTime;
+    std::vector<std::shared_ptr<BrickPiece>> brickPieces;
+    std::vector<int> toRemove;
 
-        // Animation 
-        frameCounter++;
-        if (frameCounter >= frameSpeed) {
-            frameCounter = 0;
-            source.x += 8;
-            if (source.x > 24) source.x = 16;
-        }
-
-        // IsOutOfBound
-        if ( position.y > screenHeight * SCALE ) isOutOfScreen = true;
-    }
-    void Draw() {
-        rect.x = position.x; rect.y = position.y;
-        DrawTexturePro(texture, source, rect, Vector2{0, 0}, 0.0f, WHITE);
-    }
-
+    void addBrickPieces(Vector2 position);
+    void update();
+    void render();
 };
 
 class TileManager {
-private:
-    // Collision-related variables 
-    Vector2 cp, cn; float t;
-    std::vector<std::pair<int, float>> z;
-
+public:
     // Flyweight pattern 
     std::map<int, std::shared_ptr<Tile>> tileMap;
     std::vector<std::shared_ptr<TileInstance>> tileInstances; // Store all tile instances 
-    std::vector<int> toRemoveTiles; // Remove safely while iterating 
+    std::vector<int> toRemove; // Remove safely while iterating 
+    std::shared_ptr<TileInstance> tileInstancesGrid[GRID_HEIGHT][GRID_WIDTH] = { nullptr }; // Fast access to tile instances
+    // Managing broken brick pieces 
+    EntityManager entityManager;
 
-    std::vector<std::shared_ptr<Entity>> brickPieces; // Broken brick entities 
-    std::vector<int> toRemoveEntities; // Remove safely while iterating
-
-    void handleBrickPieces(Vector2 position);
-public:
     TileManager();
-    std::shared_ptr<TileInstance> addTileInstance(Vector2 pos, int tileID);
+    void addTileInstance(Vector2 pos, int tileID, int x, int y);
     void update(Mario& player);
     void render();
 };
 
-class World1_1 {
-private:
-    TileManager tileManager;
-    int grid[GRID_HEIGHT][GRID_WIDTH];
+class Level {
 public:
-    World1_1(const std::string& fileName);
-    void update(Mario& player);
-    void render();
+    TileManager tileManager;
+    Level(const std::string& fileName);
+    void run(Mario& player);
 };
 
 

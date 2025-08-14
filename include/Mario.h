@@ -1,22 +1,16 @@
 #ifndef MARIO_H
 #define MARIO_H
 
-#include <raylib.h>
 #include "Entity.h"
-#include "Level.h"
+#include "Tile.h"
 #include "MarioState.h"
 #include "Sprite.h"
 #include "GlobalVariables.h"
 #include "FireBall.h"
+#include <raylib.h>
 #include <iostream>
+#include <array>
 #include <cmath>
-#include "Entity.h"
-
-const int screenWidth = 320;
-const int screenHeight = 240;
-#define JUMP_FORCE 600.0f 
-
-float Q_rsqrt( float number );
 
 class Mario : public Entity
 {
@@ -121,13 +115,41 @@ public:
         float gravity = 900.0f;
         float dt = GetFrameTime();
         ApplyGravity(velocity, gravity);
+        
+
+        //==================================
+        // CHECK COLLISION
+        Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
+        int minX = std::floor(std::min(position.x, nextPos.x) / 64.0f);
+        int minY = std::floor(std::min(position.y, nextPos.y) / 64.0f);
+        int maxX = std::floor(std::max(position.x + rect.width, nextPos.x + rect.width) / 64.0f);
+        int maxY = std::floor(std::max(position.y + rect.height, nextPos.y + rect.height) / 64.0f);
+        Vector2 cp, cn; float t;
+        float et = GetFrameTime();
+        std::vector<std::pair<std::array<int, 2>, float>> z;
+
+        for ( int y = minY; y <= maxY; y++ ) {
+            for ( int x = minX; x <= maxX; x++ ) {
+                if ( x < 0 || y < 0 || x >= GRID_WIDTH || y >= GRID_HEIGHT ) continue;
+                if ( level.tileManager.tileInstancesGrid[y][x] ) {
+                    if ( aabb::CheckCollisionStaticRectDynamicRect(rect, velocity, 
+                        level.tileManager.tileInstancesGrid[y][x]->getBBox(), cp, cn, t, et) ) {
+                            std::array<int, 2> temp = {y, x};
+                            z.push_back({temp, t});
+                    }
+                }
+            }
+        }
+        // RESOLVE COLLISION
+        std::sort(z.begin(), z.end(), compare);
+        for ( auto j : z ) {
+            aabb::ResolveStaticRectDynamicRect(rect, velocity, et, level.tileManager.tileInstancesGrid[j.first[0]][j.first[1]]->getBBox());
+        }
+        z.clear();
+        //==================================
+
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
-
-        if (CheckCollision(*this, level)) // Resolve collision
-        {
-            ResolveCollision(level);
-        }
         rect.x = position.x;
         rect.y = position.y;
 
@@ -154,8 +176,8 @@ public:
 
     void ResolveCollision(Level &level) override
     {
-        position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
-        velocity.y = 0;
+        // position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
+        // velocity.y = 0;
     };
 
     void ResolveCollision(Entity &other) override
