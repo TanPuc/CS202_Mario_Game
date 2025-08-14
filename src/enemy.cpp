@@ -37,22 +37,23 @@ void Enemy::Update(Level& level)
 void Enemy::update()
 {
 	if (m_MoveStrategy) m_MoveStrategy->move(*this);
-	position = Vector2Add(position, Vector2Scale(Vector2Scale(m_velocity, GetFrameTime()), float(m_direction)));
+	//position = Vector2Add(position, Vector2Scale(Vector2Scale(m_velocity, GetFrameTime()), float(m_direction)));// direction should only X
+	position = Vector2Add(position, Vector2Scale(Vector2{m_velocity.x ,m_velocity.y}, GetFrameTime()));
 
-
-	if (m_AttackStrategy) m_AttackStrategy->attack(*this);
+	//if (m_AttackStrategy) m_AttackStrategy->attack(*this);
 	
 	if (m_FSM) m_FSM->update(*this);
 
 	if (m_sprite) m_sprite->update(*this);
 
 	rect.x = position.x; //most stupid fck i have ever seen
-	rect.x = position.y;
-	DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);
+	rect.y = position.y;
+	
 }
 void Enemy::Draw()
 {
 	m_sprite->draw(*this);
+	DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);
 }
 
 void Enemy::setMoveStrategy(IMoveStrategy* strategy)
@@ -60,13 +61,10 @@ void Enemy::setMoveStrategy(IMoveStrategy* strategy)
 	delete m_MoveStrategy;
 	m_MoveStrategy = strategy;
 }
-void Enemy::setAttackStrategy(IAttackStrategy* strategy)
-{
-	setVelocityX(0);
-	setVelocityY(0);
-	delete m_AttackStrategy;
-	m_AttackStrategy = strategy;
-}
+//void Enemy::setAttackStrategy(IAttackStrategy* strategy)
+//{
+//	m_AttackStrategy = strategy;
+//}
 void Enemy::setCollisionMap(CollisionMap* collidemap)
 {
 	delete m_CollideMap;
@@ -103,11 +101,15 @@ void Enemy::addVelocityY(float Y)
 
 int Enemy::getDirection() const
 {
-	return m_direction;
+	if (m_velocity.x <= 0)
+	{
+		return 1;
+	}
+	else return -1;
 }
 void Enemy::reverseDirection()
 {
-	m_direction *= -1;
+	m_velocity.x *= -1;
 }
 
 Rectangle Enemy::getHitBox() const {

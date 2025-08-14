@@ -12,8 +12,14 @@ void SpriteEnemy::draw(Enemy& e)
 
     Rectangle src = sprite.m_FrameRect;
     src.x = sprite.m_offset + src.width * m_CurrentFrame;
-    src.width *= e.getDirection() * -1;
-    DrawTextureRec(sprite.m_Texture, src, e.GetPosition(), WHITE);
+    src.width *= e.getDirection() ;
+
+    //DrawTextureRec(sprite.m_Texture, src, e.GetPosition(), WHITE);
+    //Rectangle dest = { e.rect.x,e.rect.y, e.rect.width,e.rect.height };
+
+    Rectangle dest = e.rect;
+
+    DrawTexturePro(sprite.m_Texture, src, dest, { 0,0 }, 0, WHITE);
 }
 
 void SpriteEnemy::update(Enemy& e)
@@ -33,4 +39,5 @@ void SpriteEnemy::addSpriteConfig(StateType state, const SpriteConfig& config)
 void SpriteEnemy::setCurrentState(StateType state)
 {
     m_CurrentState = state;
+    m_CurrentFrame = 0;
 }

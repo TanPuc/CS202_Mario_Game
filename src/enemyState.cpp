@@ -9,13 +9,18 @@
 #include "enemySprite.h"
 
 WalkState::WalkState(int speed, float gravity):
-	m_speed(speed), m_gravity(gravity) {}
+	m_speed(speed), m_gravity(gravity) , m_mario(nullptr){
+}
+WalkState::WalkState(int speed, float gravity, Mario* mario) :
+	m_speed(speed), m_gravity(gravity), m_mario(mario) {
+}
 void WalkState::enter(Enemy& e)
 {
 	e.setCollisionMap(new CollisionMap(new CollisionStrategyXReverse(), new CollisionStrategyYPushOut()));
 
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
-	compoMove->addStrategy(new MoveStrategyBasic(m_speed,e));
+	if(m_mario) compoMove->addStrategy(new MoveStrategyBasic(m_speed,e, *m_mario));
+	else compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
 
@@ -66,15 +71,17 @@ StateType HoverState::getName() const
 
 AttackState::AttackState(EnemyManager* manager, IAttackStrategy* attack):
 	m_manager(manager), m_attack(attack) {}
+AttackState::~AttackState() { delete m_attack; }
 void AttackState::enter(Enemy& e)
 {
-	e.setAttackStrategy(m_attack);
+	//e.setAttackStrategy(m_attack);
 
 	e.setSprite(getName());
 }
 void AttackState::exit(Enemy& e)
 {
-	e.setAttackStrategy(nullptr);
+	m_attack->attack(e);
+	//e.setAttackStrategy(nullptr);
 }
 void AttackState::update(Enemy& e)
 {
@@ -89,6 +96,7 @@ FallState::FallState(float gravity):
 	m_gravity(gravity) {}
 void FallState::enter(Enemy& e)
 {
+	e.setVelocityX(0);
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
 
 	e.setSprite(getName());
@@ -143,6 +151,9 @@ void ShellState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
 
+	e.rect.width = 16*2;
+	e.rect.height = 16*2;
+
 	e.setSprite(getName());
 }
 void ShellState::exit(Enemy& e) {}
@@ -174,15 +185,40 @@ ChaseState::ChaseState(float speed, Mario* player) :
 	m_speed(speed), m_player(player) {}
 void ChaseState::enter(Enemy& e)
 {
-	e.setMoveStrategy(new MoveStrategyChase(m_speed, m_player));
+	e.setMoveStrategy(new MoveStrategyChase(m_speed, m_player, e));
 
 	e.setSprite(getName());
 }
-void ChaseState::exit(Enemy& e) {}
+void ChaseState::exit(Enemy& e) {
+	e.setVelocityX(0);
+	e.setVelocityY(0);
+}
 void ChaseState::update(Enemy& e) {}
 StateType ChaseState::getName() const
 {
 	return StateType::Chase;
+}
+
+PatrolState::PatrolState(float boundary, float speed) :
+	m_boundary(boundary), m_speed(speed) {}
+void PatrolState::enter(Enemy& e)
+{
+	Vector2* mark = new Vector2(e.GetPosition());
+	e.setMoveStrategy(new MoveStrategyRandom(m_boundary,m_speed,mark));
+
+	e.setSprite(getName());
+}
+void PatrolState::exit(Enemy& enemy)
+{
+
+}
+void PatrolState::update(Enemy& enemy)
+{
+
+}
+StateType PatrolState::getName() const
+{
+	return StateType::Patrol;
 }
 
 void DeadStateStomp::enter(Enemy& e)
@@ -202,6 +238,8 @@ DeadStateElse::DeadStateElse(float gravity):
 	m_gravity(gravity) {}
 void DeadStateElse::enter(Enemy& e)
 {
+	e.setVelocityX(0);
+	e.setVelocityY(100);
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
 
 	e.setSprite(getName());

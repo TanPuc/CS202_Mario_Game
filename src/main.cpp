@@ -19,8 +19,16 @@ int main(void)
 
 	enemyAsset::Load();
 	EnemyManager* manager = new EnemyManager(player, level);
-	Vector2 posEnemy = { 300, 300 };
-	manager->spawnEnemyAt(EnemyType::goopa, posEnemy);
+	Vector2 posEnemy = { 300, 300};
+	//manager->spawnEnemyAt(EnemyType::goopa, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::koopa, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::beezybettle, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::blooper, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::spiny, posEnemy);
+	manager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
+
 
 	while (!WindowShouldClose())
 	{
@@ -49,9 +57,9 @@ int main(void)
 		ClearBackground(MARIO_SKYBLUE);
 		BeginMode2D(camera);
 
+		manager->draw();
 		level->Draw();
 		player->Draw();
-		manager->draw();
 		
 
 		EndMode2D();

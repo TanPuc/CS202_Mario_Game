@@ -33,14 +33,16 @@ public:
 class WalkState : public EnemyState
 {
 public:
+	WalkState(int speed, float gravity, Mario* mario);
 	WalkState(int speed, float gravity);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
 	StateType getName() const override;
 private:
-	float	m_speed;
-	float	m_gravity;
+	float			m_speed;
+	float			m_gravity;
+	Mario*	m_mario;
 };
 class SwimState : public EnemyState
 {
@@ -74,6 +76,7 @@ class AttackState : public EnemyState
 {
 public:
 	AttackState(EnemyManager*, IAttackStrategy*);
+	~AttackState();
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
@@ -152,6 +155,19 @@ public:
 private:
 	float m_speed;
 	Mario* m_player;
+};
+
+class PatrolState : public EnemyState
+{
+public:
+	PatrolState(float boundary, float speed);
+	void enter(Enemy& e) override;
+	void exit(Enemy& enemy) override;
+	void update(Enemy& enemy) override;
+	StateType getName() const override;
+private:
+	float m_boundary;
+	float m_speed;
 };
 
 class DeadStateStomp : public EnemyState

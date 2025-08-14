@@ -15,6 +15,7 @@ enum StateType
 	DeadStomp = 10,
 	DeadElse = 11,
 	Swim = 12,
+	Patrol =13,
 };
 
 enum EnemyType {

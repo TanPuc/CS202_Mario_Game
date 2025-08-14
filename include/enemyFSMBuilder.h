@@ -17,6 +17,10 @@ class FSMBuilder
 	vector<Transition> m_transitions;
 
 public:
+    FSMBuilder() {
+        //m_transitions.reserve(10);
+    }
+
     FSMBuilder& addState(EnemyState* state);
 
     FSMBuilder& addTransition(StateType from, EnemyStateCondition* cond, StateType to);

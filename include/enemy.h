@@ -26,8 +26,8 @@ public:
 	~Enemy();
 
 	void setMoveStrategy(IMoveStrategy*);
-	void setAttackStrategy(IAttackStrategy*);
 	void setCollisionMap(CollisionMap*);
+	//void setAttackStrategy(IAttackStrategy*);
 	//void setCollisionPlayerStrategy(ICollisionPlayerStrategy*);
 	//void setState(EnemyState*);
 
@@ -70,11 +70,11 @@ private:
 	FiniteStateMachine*			m_FSM					= nullptr;
 	
 	IMoveStrategy*				m_MoveStrategy			= nullptr;
-	IAttackStrategy*			m_AttackStrategy		= nullptr;
 	CollisionMap*				m_CollideMap			= nullptr;
 
 	SpriteEnemy*				m_sprite				= nullptr;
 
+	//IAttackStrategy*			m_AttackStrategy		= nullptr;
 	//ICollisionMapStrategy*	m_CollideMapStrategy	= nullptr;
 	//Vector2					m_position				= { 0,0 };
 	//EnemyState*				m_State					= nullptr;

@@ -8,7 +8,12 @@ bool ConditionTimer::evaluate(Enemy& e)
 {
 	timer += GetFrameTime();
 
-	return timer >= threshold;
+	if (timer >= threshold)
+	{
+		timer = 0;
+		return true;
+	}
+	return false;
 }
 
 ConditionShell::ConditionShell(const vector<Enemy*>& shells) :
@@ -50,3 +55,12 @@ bool ConditionStomped::evaluate(Enemy& e)
 	}
 	return false;
 }
+
+ConditionGrounded::ConditionGrounded(const Level& level) :
+	m_level(level) {}
+bool ConditionGrounded::evaluate(Enemy& e)
+{
+	return CheckCollision(e, m_level);
+	
+}
+

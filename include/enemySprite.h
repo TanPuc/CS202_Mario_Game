@@ -33,7 +33,7 @@ public:
 
 private:
 	unordered_map<StateType, SpriteConfig>		m_Sprites;
-	StateType									m_CurrentState		= StateType::Walk;
+	StateType									m_CurrentState		= StateType::Nothing;
 	float										m_AnimationTimer	= 0;
 	int											m_CurrentFrame		= 0;
 };

@@ -49,5 +49,12 @@ public :
 private:
 	const Mario& m_player;
 };
-
+class ConditionGrounded : public EnemyStateCondition
+{
+public :
+	ConditionGrounded(const Level& level);
+	bool evaluate(Enemy& e) override;
+private:
+	const Level& m_level;
+};
 

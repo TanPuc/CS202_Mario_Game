@@ -95,17 +95,26 @@ void CollisionMap::handleCollide(Enemy& e, const Level& level)
         std::cout << "bruh";
         Vector2 prev = e.getPrevPosition();
         Rectangle now = e.GetBounds();
-        if (CheckCollision(Rectangle{ prev.x,now.y,now.width,now.height}, level))
+        if (!CheckCollision(Rectangle{ prev.x,now.y,now.width,now.height}, level))
         {
-            e.position.y = (int)((e.position.y + 16) / 32) * 32;
-            if (m_Y) m_Y->collide(e);
-        }
-        else if (CheckCollision(Rectangle{ now.x,prev.x,now.width,now.height }, level))
-        {
-            e.position.x = (int)((e.position.x + 16) / 32) * 32;
+           /* e.position.y = (int)((e.position.y + 16) / 32) * 32;
+            if (m_Y) m_Y->collide(e);*/
+
+            e.position.x = (int)((e.position.x ) / 32) * 32;
             if (m_X) m_X->collide(e);
-        }
-        else 
+
+        }else
+
+        if (!CheckCollision(Rectangle{ now.x,prev.y,now.width,now.height }, level))
+        {
+            /*e.position.x = (int)((e.position.x + 16) / 32) * 32;
+            if (m_X) m_X->collide(e);*/
+
+            e.position.y = (int)((e.position.y ) / 32) * 32;
+            if (m_Y) m_Y->collide(e);
+        }else
+
+        
         {
             e.position.x = (int)((e.position.x + 16) / 32) * 32;
             e.position.y = (int)((e.position.y + 16) / 32) * 32;
@@ -124,6 +133,7 @@ void CollisionStrategyYJump::collide(Enemy& e)
 }
 void CollisionStrategyYPushOut::collide(Enemy& e)
 {
+    e.position.y = (int)((e.position.y) / 32) * 32;
 	e.setVelocityY(0);
 }
 
@@ -134,6 +144,7 @@ void CollisionStrategyXReverse::collide(Enemy& e)
 }
 void CollisionStrategyXPushOut::collide(Enemy& e)
 {
+    e.position.x = (int)((e.position.x) / 32) * 32;
     e.setVelocityX(0);
 }
 

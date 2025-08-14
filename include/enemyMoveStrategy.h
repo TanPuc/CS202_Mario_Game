@@ -22,6 +22,7 @@ class MoveStrategyBasic : public IMoveStrategy
 {
 public:
 	MoveStrategyBasic(int,Enemy&);
+	MoveStrategyBasic(int, Enemy&, const Mario& mario);
 	void move(Enemy& e) override;
 
 private:
@@ -59,11 +60,12 @@ private:
 class MoveStrategyChase : public IMoveStrategy
 {
 public:
-	MoveStrategyChase(int, Mario*);
+	MoveStrategyChase(int, Mario*, const Enemy& e);
 	void move(Enemy& e) override;
 private:
-	int speed;
+	int magnitude;
 	Mario* player;
+	Vector2 m_result;
 };
 class MoveStrategyRandom : public IMoveStrategy
 {
