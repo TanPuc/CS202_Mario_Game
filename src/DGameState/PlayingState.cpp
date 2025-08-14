@@ -18,8 +18,10 @@ void PlayingState::enter()
     level->LoadFromFile("assets/level1.map");
 
     // Items
-    entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
-    entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
+    // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
+    // entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
+    entityManager.AddEntity(std::make_unique<Coin>(Vector2{200, 100}));
+    entityManager.AddEntity(std::make_unique<Mushroom>(Vector2{300, 100}));
 
     player->lives = gsm->getContext().lives;
     player->coins = 0;
@@ -59,31 +61,33 @@ void PlayingState::update()
     playerAdapter->update();
     hudManager->updateTime();
 
-    for (auto it = entities.begin(); it != entities.end();)
-    {
-        (*it)->Update(*level); // Update each entity
-        if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
-        {
-            if (auto coin = dynamic_cast<Coin *>((*it).get()))
-            {
-                if (!coin->isCollected)
-                {
-                    coin->isCollected = true;
-                    player->coins++;
-                    player->score += 100;
-                }
-            }
-        }
+    entityManager.UpdateEntities(*level); // Update all entities
 
-        if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
-        {
-            it = entities.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
+    // for (auto it = entities.begin(); it != entities.end();)
+    // {
+    //     (*it)->Update(*level); // Update each entity
+    //     if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
+    //     {
+    //         if (auto coin = dynamic_cast<Coin *>((*it).get()))
+    //         {
+    //             if (!coin->isCollected)
+    //             {
+    //                 coin->isCollected = true;
+    //                 player->coins++;
+    //                 player->score += 100;
+    //             }
+    //         }
+    //     }
+
+    //     if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
+    //     {
+    //         it = entities.erase(it);
+    //     }
+    //     else
+    //     {
+    //         ++it;
+    //     }
+    // }
 
     // Check for game over
     // Time and lives
@@ -121,10 +125,9 @@ void PlayingState::draw()
     BeginMode2D(camera);
     player->Draw();
     level->Draw();
-    for (const auto &entity : entities)
-    {
-        entity->Draw();
-    }
+
+    entityManager.DrawEntities();
+
     level->Draw();
     EndMode2D();
 

@@ -12,9 +12,10 @@ public:
     Vector2 position;
     Vector2 velocity;
     DIRECTION direction = RIGHT; // Default direction
+    bool isActive;
 
     Entity(Vector2 position, Vector2 size)
-        : position(position), velocity({0.0f, 0.0f})
+        : position(position), velocity({0.0f, 0.0f}), isActive(true)
     {
         rect = {position.x, position.y, size.x, size.y};
     }

@@ -89,7 +89,7 @@ public:
         if (newState != nullptr)
         {
             currentState = std::move(newState);
-            sprite->SwitchAnimation(currentState->GetType());
+            // sprite->SwitchAnimation(currentState->GetType());
         }
 
         if (IsKeyPressed(KEY_LEFT_SHIFT))
@@ -120,7 +120,7 @@ public:
         if (newState != nullptr)
         {
             currentState = std::move(newState);
-            sprite->SwitchAnimation(currentState->GetType());
+            // sprite->SwitchAnimation(currentState->GetType());
         }
 
         float gravity = 900.0f;

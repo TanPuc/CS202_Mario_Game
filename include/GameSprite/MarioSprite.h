@@ -9,6 +9,7 @@ private:
     Animation idleAnimation;
     Animation walkAnimation;
     Animation jumpAnimation;
+    Animation decelerationAnimation;
 
 public:
     Texture2D spriteSheet;
@@ -23,6 +24,7 @@ public:
         : idleAnimation({{0, 16, 16, 16}}),
           walkAnimation({{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}}),
           jumpAnimation({{32 + FRAME_PADDING * 2, 16, 16, 16}}),
+          decelerationAnimation({{108, 16, 16, 16}}),
           prevState(STATE_IDLE)
     {
         spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
@@ -42,18 +44,21 @@ public:
             idleAnimation = {{0, 16, 16, 16}};
             walkAnimation = {{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}};
             jumpAnimation = {{32 + FRAME_PADDING * 2, 16, 16, 16}};
+            decelerationAnimation = {{108, 16, 16, 16}};
         }
         else if (newForm == BIG)
         {
             idleAnimation = {{0, 88, 16, 16 * 2}};
             walkAnimation = {{(16 + FRAME_PADDING) * 2, 88, 16, 16 * 2}, {16 + FRAME_PADDING, 88, 16, 16 * 2}, {0, 88, 16, 16 * 2}};
             jumpAnimation = {{(16 + FRAME_PADDING) * 4, 88, 16, 16 * 2}};
+            decelerationAnimation = {{194, 88, 16, 16 * 2}};
         }
         else if (newForm == FIRE)
         {
             idleAnimation = {{0, 260, 16, 16 * 2}};
             walkAnimation = {{(16 + FRAME_PADDING) * 2, 260, 16, 16 * 2}, {16 + FRAME_PADDING, 260, 16, 16 * 2}, {0, 260, 16, 16 * 2}};
             jumpAnimation = {{(16 + FRAME_PADDING) * 4, 260, 16, 16 * 2}};
+            decelerationAnimation = {{194, 260, 16, 16 * 2}};
         }
         else
         {
@@ -66,8 +71,6 @@ public:
         if (state_ == prevState)
             return;
 
-        std::cout << "Switching to state: " << state_ << std::endl;
-
         switch (state_)
         {
         case STATE_IDLE:
@@ -75,6 +78,9 @@ public:
             break;
         case STATE_WALKING:
             currentAnimation = &walkAnimation;
+            break;
+        case STATE_DECELERATING:
+            currentAnimation = &decelerationAnimation;
             break;
         case STATE_JUMPING:
             currentAnimation = &jumpAnimation;

@@ -5,6 +5,7 @@ enum STATE
 {
     STATE_IDLE,
     STATE_WALKING,
+    STATE_DECELERATING,
     STATE_JUMPING,
     STATE_FALLING,
     STATE_DUCKING,
@@ -24,6 +25,7 @@ enum MARIO_FORM
     FIRE,
     SUPER
 };
+
 #define MARIO_WIDTH 32.0f
 #define MARIO_HEIGHT 32.0f
 #define FRAME_PADDING 2

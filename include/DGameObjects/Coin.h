@@ -14,12 +14,12 @@ class Coin : public Entity
 public:
     CoinSprite coinSprite;
     bool isCollected;
+    float timer = 0.0f; // Timer for coin animation
+    const float lifeTime = 1.0f;
 
-    Coin(Vector2 pos) : Entity(pos, {COIN_SIZE, COIN_SIZE}), isCollected(false) {}
-
-    void OnCollect(Mario &mario)
+    Coin(Vector2 pos) : Entity(pos, {COIN_SIZE, COIN_SIZE}), isCollected(false)
     {
-        std::cout << "Coin collected!" << std::endl;
+        velocity.y = -100.0f; // Initial upward velocity
     }
     void Draw() override
     {
@@ -30,53 +30,18 @@ public:
     {
         float gravity = 900.0f;
         float dt = GetFrameTime();
-        ApplyGravity(velocity, gravity);
-        position.x += velocity.x * dt;
+        timer += dt;
         position.y += velocity.y * dt;
-
-        if (CheckCollision(*this, level))
-        {
-            ResolveCollision(level);
-        }
-        rect.x = position.x;
         rect.y = position.y;
-    }
 
-    void Update(Level &level, Mario &mario)
-    {
-        float gravity = 900.0f;
-        float dt = GetFrameTime();
-        position.x += velocity.x * dt;
-        position.y += velocity.y * dt;
-
-        if (CheckCollision(*this, mario))
+        if (timer >= lifeTime)
         {
-            OnCollect(mario);
-            // Reset coin position or remove it from the level
-            position = {0, 0}; // Example: move coin off-screen
-            rect.x = position.x;
-            rect.y = position.y;
+            isActive = false;
         }
-
-        if (CheckCollision(*this, level))
-        {
-            ResolveCollision(level);
-        }
-        rect.x = position.x;
-        rect.y = position.y;
     }
 
-    void ResolveCollision(Level &level) override
-    {
-        position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
-        velocity.y = 0;
-    };
-
-    void ResolveCollision(Entity &other) override
-    {
-        // Handle collision with other entities if needed
-        std::cout << "Collision with another entity detected!" << std::endl;
-    }
+    void ResolveCollision(Level &level) override {};
+    void ResolveCollision(Entity &other) override {};
 };
 
 #endif // COIN_H
