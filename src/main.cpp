@@ -1,32 +1,40 @@
 #include "raylib.h"
+#include "Mario.h"
+#include "Level.h"
+#include "DGameObjects/Coin.h"
+#include "DGameObjects/Mushroom.h"
+
+#define MARIO_SKYBLUE (Color){68, 145, 190, 255}
 #include "DGameState/GameStateManager.h"
 #include "DGameState/MenuState.h"
 #include "DCore/ResourceManager.h"
 
 int main(void)
 {
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 	InitWindow(800, 512, "Mario");
 	InitAudioDevice();
 	SetTargetFPS(60);
 
-	//No exit key
+	Vector2 CameraPos = {0, 0};
+	// No exit key
 	SetExitKey(KEY_NULL);
 
 	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
 
-    GameStateManager gsm;
-    
-    gsm.changeState(new MenuState(&gsm));
+	GameStateManager gsm;
+
+	gsm.changeState(new MenuState(&gsm));
 
 	while (!WindowShouldClose() && !gsm.isExiting())
 	{
-        gsm.update();
+		gsm.update();
 
 		BeginDrawing();
-		ClearBackground(SKYBLUE);
- 
-        gsm.draw();
+		ClearBackground(MARIO_SKYBLUE);
+		// ClearBackground(SKYBLUE);
 
+		gsm.draw();
 		EndDrawing();
 	}
 	ResourceManager::GetInstance().UnloadResources();
@@ -36,52 +44,3 @@ int main(void)
 
 	return 0;
 }
-
-// int main(void)
-// {
-// 	InitWindow(800, 512, "Mario");
-// 	SetTargetFPS(60);
-
-// 	Texture2D marioTexture = LoadTexture("assets/mario.png");
-// 	Mario *player = new Mario(marioTexture, {float(GetScreenWidth() / 2 - 16), 0.0f});
-
-// 	Level *level = new Level();
-// 	level->LoadFromFile("assets/level1.map");
-
-// 	bool pause = false;
-
-// 	while (!WindowShouldClose())
-// 	{
-// 		/// UPDATE
-// 		if (IsKeyPressed(KEY_P))
-// 		{
-// 			pause = !pause;
-// 		}
-
-// 		player->Update();
-// 		player->CheckCollision(*level);
-
-// 		/// RENDER
-// 		Camera2D camera = {0};
-// 		camera.target = Vector2{float(player->position.x + player->rect.width / 2), 0.0f};
-// 		camera.offset = Vector2{200.0f, float(GetScreenHeight() / 2)};
-// 		camera.zoom = 0.5f;
-
-// 		BeginDrawing();
-// 		ClearBackground(SKYBLUE);
-// 		BeginMode2D(camera);
-
-// 		level->Draw(camera);
-// 		player->Draw();
-
-// 		EndMode2D();
-// 		EndDrawing();
-// 	}
-// 	if (player)
-// 		delete player;
-// 	if (level)
-// 		delete level;
-// 	CloseWindow();
-
-// 	return 0;
-// }

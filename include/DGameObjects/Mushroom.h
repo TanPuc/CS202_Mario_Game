@@ -1,29 +1,27 @@
-#ifndef COIN_H
-#define COIN_H
+#ifndef MUSHROOM_H
+#define MUSHROOM_H
 
 #include <raylib.h>
 #include <iostream>
 #include "Entity.h"
 #include "GlobalVariables.h"
-#include "GameSprite/CoinSprite.h"
+#include "GameSprite/MushroomSprite.h"
 
-#define COIN_SIZE 16
-
-class Coin : public Entity
+class Mushroom : public Entity
 {
 public:
-    CoinSprite coinSprite;
-    bool isCollected;
+    MushroomSprite MushroomSprite;
 
-    Coin(Vector2 pos) : Entity(pos, {COIN_SIZE, COIN_SIZE}), isCollected(false) {}
+    Mushroom(Vector2 pos) : Entity(pos, {16, 16}) {}
 
     void OnCollect(Mario &mario)
     {
-        std::cout << "Coin collected!" << std::endl;
+        std::cout << "Mushroom collected!" << std::endl;
+        mario.Grow();
     }
     void Draw() override
     {
-        coinSprite.Draw(*this);
+        MushroomSprite.Draw(*this);
     }
 
     void Update(Level &level) override
@@ -46,14 +44,15 @@ public:
     {
         float gravity = 900.0f;
         float dt = GetFrameTime();
+        ApplyGravity(velocity, gravity);
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
 
         if (CheckCollision(*this, mario))
         {
             OnCollect(mario);
-            // Reset coin position or remove it from the level
-            position = {0, 0}; // Example: move coin off-screen
+            // Reset Mushroom position or remove it from the level
+            position = {0, 0}; // Example: move Mushroom off-screen
             rect.x = position.x;
             rect.y = position.y;
         }
@@ -79,4 +78,4 @@ public:
     }
 };
 
-#endif // COIN_H
+#endif // Mushroom_H
