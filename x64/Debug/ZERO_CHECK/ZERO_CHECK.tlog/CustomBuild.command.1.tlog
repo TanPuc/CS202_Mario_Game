@@ -1,0 +1,10 @@
+^C:\USERS\DUYEN\DOCUMENTS\GITHUB\CS202_MARIO_GAME\CMAKEFILES\90371B1BB32196F2B18A1A7227C84742\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/DUYEN/Documents/GitHub/CS202_Mario_Game -BC:/Users/DUYEN/Documents/GitHub/CS202_Mario_Game --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/DUYEN/Documents/GitHub/CS202_Mario_Game/Mario.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
