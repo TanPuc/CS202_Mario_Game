@@ -4,6 +4,7 @@
 #include "DCore/ResourceManager.h"
 #include "DGameState/MenuState.h"
 #include "DGameState/GetReadyState.h"
+#include "DGameState/SettingState.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -23,6 +24,7 @@ void PauseState::enter()
     {
         "RESUME",
         "RESTART",
+        "SETTINGS",
         "MAIN MENU"
     };
 
@@ -38,9 +40,9 @@ void PauseState::enter()
     }
 
     Vector2 buttonSize = { maxTextWidth + padding.x * 2, 50.0f };
-    float startX = (GetScreenWidth() - buttonSize.x) / 2.0f;\
-    float gapY = 70.0f;
-    float startY = 200.0f;
+    float startX = (GetScreenWidth() - buttonSize.x) / 2.0f;
+    float gapY = 65.0f;
+    float startY = 180.0f;
 
     guiManager.addElement(new Button({startX, startY}, buttonSize, buttonLabels[0],
         [this]() 
@@ -58,6 +60,13 @@ void PauseState::enter()
     ));
 
     guiManager.addElement(new Button({startX, startY + gapY * 2}, buttonSize, buttonLabels[2],
+        [this]() 
+        { 
+            this->gsm->pushState(new SettingState(this->gsm)); 
+        }
+    ));
+
+    guiManager.addElement(new Button({startX, startY + gapY * 3}, buttonSize, buttonLabels[3],
         [this]() 
         { 
             this->gsm->changeState(new MenuState(this->gsm)); 

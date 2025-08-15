@@ -1,12 +1,16 @@
 #include "DGameState/GetReadyState.h"
 #include "DGameState/PlayingState.h"
 #include "DCore/ResourceManager.h"
+#include "DCore/SoundManager.h"
 
 GetReadyState::GetReadyState(GameStateManager* manager, int world, int level)
     :gsm(manager), targetWorld(world), targetLevel(level) {}
 
 void GetReadyState::enter()
 {
+    SoundManager::getInstance().stopMusic();
+    SoundManager::getInstance().playSound(SoundEffect::LEVEL_START);
+    
     lifeIcon = LoadTexture("assets/mario.png");
     coinIcon = LoadTexture("assets/mario.png");
     hudManager = std::make_unique<HUDManager>(lifeIcon, coinIcon);

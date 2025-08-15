@@ -3,11 +3,14 @@
 #include "DGameState/WinState.h"
 #include "DGameState/GetReadyState.h"
 #include "DGameState/PauseState.h"
+#include "DCore/SoundManager.h"
 
 PlayingState::PlayingState(GameStateManager *manager, int world, int level) : gsm(manager), worldNum(world), levelNum(level) {}
 
 void PlayingState::enter()
 {
+    SoundManager::getInstance().stopMusic();
+    SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
     heartTexture = LoadTexture("assets/mario.png");
     coinIcon = LoadTexture("assets/mario.png");
     marioTexture = LoadTexture("assets/mario.png");
@@ -71,6 +74,7 @@ void PlayingState::update()
                     coin->isCollected = true;
                     player->coins++;
                     player->score += 100;
+                    SoundManager::getInstance().playSound(SoundEffect::COIN);
                 }
             }
         }

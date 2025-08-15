@@ -4,10 +4,11 @@
 #include "DGameObjects/Coin.h"
 #include "DGameObjects/Mushroom.h"
 
-#define MARIO_SKYBLUE (Color){68, 145, 190, 255}
+#define MARIO_SKYBLUE (Color{68, 145, 190, 225})
 #include "DGameState/GameStateManager.h"
 #include "DGameState/MenuState.h"
 #include "DCore/ResourceManager.h"
+#include "DCore/SoundManager.h"
 
 int main(void)
 {
@@ -21,13 +22,17 @@ int main(void)
 	SetExitKey(KEY_NULL);
 
 	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
+	SoundManager::getInstance().load();
 
 	GameStateManager gsm;
+
+	SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
 
 	gsm.changeState(new MenuState(&gsm));
 
 	while (!WindowShouldClose() && !gsm.isExiting())
 	{
+		SoundManager::getInstance().updateMusicStreams();
 		gsm.update();
 
 		BeginDrawing();
@@ -37,6 +42,7 @@ int main(void)
 		gsm.draw();
 		EndDrawing();
 	}
+	SoundManager::getInstance().unload();
 	ResourceManager::GetInstance().UnloadResources();
 
 	CloseAudioDevice();

@@ -10,6 +10,7 @@
 #include "GameSprite/MarioSprite.h"
 #include "DGameObjects/FireBall.h"
 #include "Physics.h"
+#include "DCore/SoundManager.h"
 class Mario : public Entity
 {
 public:
@@ -35,6 +36,7 @@ public:
     {
         if (fireballs.size() < FIREBALL_THRESHOLD)
         {
+            SoundManager::getInstance().playSound(SoundEffect::FIRE_BALL);
             FireBall *fireball = new FireBall({position.x + rect.width, position.y + rect.height / 2}, direction);
             fireball->velocity.x = (direction == RIGHT) ? FIREBALL_SPEED : -FIREBALL_SPEED;
             fireballs.push_back(std::shared_ptr<FireBall>(fireball));

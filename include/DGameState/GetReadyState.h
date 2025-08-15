@@ -7,7 +7,7 @@ class GetReadyState: public GameState
 {
     private:
         GameStateManager* gsm;
-        float timer = 3.0f;
+        float timer = 5.2f;
         int targetWorld;
         int targetLevel;
         std::unique_ptr<HUDManager> hudManager;

@@ -1,4 +1,5 @@
 #include "MarioState.h"
+#include "DCore/SoundManager.h"
 
 // ---------------- IdleState ----------------
 std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprite)
@@ -15,6 +16,7 @@ std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprit
         if (jump_time >= JUMP_TIME_THRESHOLD) // If jump button held for too long,
         {
             player.velocity.y = -JUMP_FORCE; // Apply jump force
+            SoundManager::getInstance().playSound(SoundEffect::JUMP);
             std::cout << "Jump button held too long, staying in Idle state." << std::endl;
             jump_time = 0; // Reset jump time
             return std::make_unique<JumpingState>();
@@ -27,6 +29,7 @@ std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprit
     {
         // std::cout << "Jump button released, applying jump force. " << jump_time << " Jump power: " << -JUMP_FORCE * (HALF + float(0.03f * jump_time)) << std::endl;
         player.velocity.y = -JUMP_FORCE * (HALF + float(0.05f * jump_time)); // Apply half jump force
+        SoundManager::getInstance().playSound(SoundEffect::JUMP);
         jump_time = 0;                                                       // Reset jump time
         return std::make_unique<JumpingState>();
     }
@@ -112,6 +115,7 @@ std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &player, Sprite &sp
         if (jump_time >= JUMP_TIME_THRESHOLD) // If jump button held for too long,
         {
             player.velocity.y = -JUMP_FORCE; // Apply jump force
+            SoundManager::getInstance().playSound(SoundEffect::JUMP);
             std::cout << "Jump button held too long, staying in Idle state." << std::endl;
             jump_time = 0; // Reset jump time
             return std::make_unique<JumpingState>();
@@ -124,6 +128,7 @@ std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &player, Sprite &sp
     {
         // std::cout << "Jump button released, applying jump force. " << jump_time << " Jump power: " << -JUMP_FORCE * (HALF + float(0.03f * jump_time)) << std::endl;
         player.velocity.y = -JUMP_FORCE * (HALF + float(0.05f * jump_time)); // Apply half jump force
+        SoundManager::getInstance().playSound(SoundEffect::JUMP);
         jump_time = 0;                                                       // Reset jump time
         return std::make_unique<JumpingState>();
     }

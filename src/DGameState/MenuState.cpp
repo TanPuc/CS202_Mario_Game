@@ -6,6 +6,7 @@
 #include "DGameState/LevelState.h"
 #include "DGameState/GetReadyState.h"
 #include "DCore/ResourceManager.h"
+#include "DGameState/SettingState.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -23,6 +24,7 @@ void MenuState::enter()
         "PLAY",
         "LEVEL SELECT",
         "CHARACTERS",
+        "SETTINGS",
         "QUIT"
     };
 
@@ -49,8 +51,8 @@ void MenuState::enter()
     background = LoadTexture("assets/menu_background.png"); 
 
     //Button
-    float startY = 150.0f;
-    float gapY = 70.0f;
+    float startY = 120.0f;
+    float gapY = 60.0f;
     float startX = GetScreenHeight() / 2.0f - buttonSize.x / 2.0f;
 
     guiManager.addElement(new Button({startX, startY}, buttonSize, buttonLabels[0],
@@ -75,6 +77,13 @@ void MenuState::enter()
     ));
 
     guiManager.addElement(new Button({startX, startY + gapY * 3}, buttonSize, buttonLabels[3],
+        [this]()
+        {
+            this->gsm->pushState(new SettingState(this->gsm));
+        }
+    ));
+
+    guiManager.addElement(new Button({startX, startY + gapY * 4}, buttonSize, buttonLabels[4],
         [this]()
         {
             this->gsm->requestExit();
