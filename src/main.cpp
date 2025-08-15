@@ -2,20 +2,18 @@
 #include <iostream>
 #include "raylib.h"
 #include "Mario.h"
-#include "Level.h"
-#include "enemyManager.h"
+#include "Tile.h"
 
 #define MARIO_SKYBLUE Color{68, 145, 190, 255}
 
 int main(void)
 {
-	InitWindow(800, 512, "Mario");
+	InitWindow(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "Mario");
 	SetTargetFPS(60);
 
 	Vector2 CameraPos = {0, 0};
 	Mario *player = new Mario({float(GetScreenWidth() / 2 - 16), 0.0f});
-	Level *level = new Level();
-	level->LoadFromFile("assets/level1.map");
+	Level *level = new Level("./assets/tiles/world_1.1.txt");
 
 	enemyAsset::Load();
 	EnemyManager* manager = new EnemyManager(player, level);
@@ -45,18 +43,16 @@ int main(void)
 		{
 			CameraPos.x = playerPos.x;
 		}
-		camera.target = Vector2{float(CameraPos.x + player->rect.width / 2), 0};
-		camera.offset = Vector2{float(GetScreenWidth() / 4), float(GetScreenHeight() / 2)};
-		// camera.offset = (Vector2){200, 600};
-		camera.zoom = 0.5f;
-
-
+		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), float(GetScreenHeight()/2)};
+		camera.offset = (Vector2){float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
+		camera.zoom = 1.0f;
 
 		BeginDrawing();
 
 		ClearBackground(MARIO_SKYBLUE);
 		BeginMode2D(camera);
 
+		level->run(*player);
 		manager->draw();
 		level->Draw();
 		player->Draw();

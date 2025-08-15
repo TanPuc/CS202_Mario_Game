@@ -8,8 +8,6 @@
 #include <string>
 #include <iostream>
 
-#define FRAME_PADDING 2 
-
 struct Animation
 {
     std::vector<Rectangle> frames;
@@ -35,6 +33,14 @@ struct Animation
         }
         return *this;
     }
+
+    Animation &operator=(const std::vector<Rectangle> &other)
+    {
+        frames = other;
+        totalFrames = static_cast<int>(frames.size());
+        frameCounter = 0;
+        return *this;
+    }
 };
 
 class Sprite
@@ -43,6 +49,81 @@ public:
     virtual void SwitchAnimation(STATE state_) = 0;
     virtual void Draw(Entity &entity) = 0;
     virtual ~Sprite() = default;
+};
+
+class FireBallSprite : public Sprite
+{
+private:
+    Animation fireballAnimation;
+
+public:
+    Texture2D spriteSheet;
+    Animation *currentAnimation;
+    STATE prevState;
+    int frameSpeed = 6; // 6fps
+
+    FireBallSprite()
+        : fireballAnimation({{247, 302, 8, 16},
+                             {247 + 8 + FRAME_PADDING, 302, 8, 16},
+                             {247 + (8 + FRAME_PADDING) * 2, 302, 8, 16},
+                             {247 + (8 + FRAME_PADDING) * 3, 302, 8, 16}}),
+          prevState(STATE_IDLE)
+    {
+        spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
+        currentAnimation = &fireballAnimation;
+    }
+
+    ~FireBallSprite()
+    {
+        UnloadTexture(spriteSheet);
+    }
+
+    void SwitchAnimation(STATE state_) override {}
+
+    void Draw(Entity &entity) override
+    {
+        if (!currentAnimation)
+        {
+            std::cerr << "Current animation is not set!" << std::endl;
+            return;
+        }
+
+        static int animationTimer = 0;
+        animationTimer++;
+
+        if (animationTimer >= frameSpeed)
+        {
+            animationTimer = 0;
+            currentAnimation->frameCounter++;
+            if (currentAnimation->frameCounter >= currentAnimation->totalFrames)
+            {
+                currentAnimation->frameCounter = 0; // Reset frame index
+            }
+        }
+
+        // Get current frame
+        if (currentAnimation->frameCounter < currentAnimation->frames.size())
+        {
+            Rectangle frameRec = currentAnimation->frames[currentAnimation->frameCounter];
+
+            // Handle direction flipping
+            if (entity.direction == LEFT)
+            {
+                frameRec.width = abs(frameRec.width);
+            }
+            else
+            {
+                frameRec.width = -abs(frameRec.width);
+            }
+            DrawTexturePro(spriteSheet, frameRec,
+                           {entity.position.x, entity.position.y, frameRec.width * 1.5f, frameRec.height * 1.5f},
+                           {0, 0}, 0.0f, WHITE);
+        }
+        else
+        {
+            currentAnimation->frameCounter = 0;
+        }
+    }
 };
 
 class MarioSprite : public Sprite
@@ -56,7 +137,10 @@ public:
     Texture2D spriteSheet;
     Animation *currentAnimation;
     STATE prevState;
-    int frameSpeed = 6; // 6fps
+    Rectangle frameRec;
+    int animationTimer = 0;
+    int frameCounter = 0;
+    int frameSpeed = 12; // 12fps
 
     MarioSprite()
         : idleAnimation({{0, 16, 16, 16}}),
@@ -66,11 +150,38 @@ public:
     {
         spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
         currentAnimation = &idleAnimation;
+        frameRec = currentAnimation->frames[0];
     }
 
     ~MarioSprite()
     {
         UnloadTexture(spriteSheet);
+    }
+
+    void SwitchForm(MARIO_FORM newForm)
+    {
+        if (newForm == SMALL)
+        {
+            idleAnimation = {{0, 16, 16, 16}};
+            walkAnimation = {{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}};
+            jumpAnimation = {{32 + FRAME_PADDING * 2, 16, 16, 16}};
+        }
+        else if (newForm == BIG)
+        {
+            idleAnimation = {{0, 88, 16, 16 * 2}};
+            walkAnimation = {{(16 + FRAME_PADDING) * 2, 88, 16, 16 * 2}, {16 + FRAME_PADDING, 88, 16, 16 * 2}, {0, 88, 16, 16 * 2}};
+            jumpAnimation = {{(16 + FRAME_PADDING) * 4, 88, 16, 16 * 2}};
+        }
+        else if (newForm == FIRE)
+        {
+            idleAnimation = {{0, 260, 16, 16 * 2}};
+            walkAnimation = {{(16 + FRAME_PADDING) * 2, 260, 16, 16 * 2}, {16 + FRAME_PADDING, 260, 16, 16 * 2}, {0, 260, 16, 16 * 2}};
+            jumpAnimation = {{(16 + FRAME_PADDING) * 4, 260, 16, 16 * 2}};
+        }
+        else
+        {
+            std::cerr << "Unknown Mario form!" << std::endl;
+        }
     }
 
     void SwitchAnimation(STATE state_) override
@@ -118,43 +229,34 @@ public:
             return;
         }
 
-        static int animationTimer = 0;
         animationTimer++;
 
         if (animationTimer >= frameSpeed)
         {
             animationTimer = 0;
-            currentAnimation->frameCounter++;
-            if (currentAnimation->frameCounter >= currentAnimation->totalFrames)
+
+            // Update Frame Rectangle
+            frameCounter++;
+            if (frameCounter >= currentAnimation->totalFrames)
             {
-                currentAnimation->frameCounter = 0; // Reset frame index
+                frameCounter = 0; // Reset frame index
             }
+            frameRec = currentAnimation->frames[frameCounter];
         }
 
-        // Get current frame
-        if (currentAnimation->frameCounter < currentAnimation->frames.size())
+        // Handle direction flipping
+        if (entity.direction == LEFT)
         {
-            Rectangle frameRec = currentAnimation->frames[currentAnimation->frameCounter];
-
-            // Handle direction flipping
-            if (entity.direction == LEFT)
-            {
-                frameRec.width = abs(frameRec.width);
-            }
-            else
-            {
-                frameRec.width = -abs(frameRec.width);
-            }
-            // DrawTextureRec(spriteSheet, frameRec, entity.position, WHITE);
-            DrawTexturePro(spriteSheet, frameRec,
-                           {entity.position.x, entity.position.y, frameRec.width * 2, frameRec.height * 2},
-                           {0, 0}, 0.0f, WHITE);
+            frameRec.width = abs(frameRec.width);
         }
         else
         {
-            currentAnimation->frameCounter = 0;
+            frameRec.width = -abs(frameRec.width);
         }
-        // DrawTexture(spriteSheet, entity.position.x, entity.position.y, WHITE);
+        // DrawTextureRec(spriteSheet, frameRec, entity.position, WHITE);
+        DrawTexturePro(spriteSheet, frameRec,
+                       {entity.position.x, entity.position.y, entity.rect.width, entity.rect.height},
+                       {0, 0}, 0.0f, WHITE);
     }
 };
 
