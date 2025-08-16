@@ -77,18 +77,6 @@ public:
         // DrawTexture(texture, position.x, position.y, WHITE); // Draw fireball texture
         sprite->Draw(*this);
     }
-
-    void ResolveCollision(Entity &other) override
-    {
-        // Handle collision with other entities if needed
-        std::cout << "Fireball collided with another entity!" << std::endl;
-    }
-
-    void ResolveCollision(Level &level) override
-    {
-        // Handle collision with level tiles if needed
-        std::cout << "Fireball collided with level!" << std::endl;
-    }
 };
 
 #endif // FIREBALL_H

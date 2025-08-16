@@ -1,22 +1,22 @@
-#ifndef MUSHROOM_H
-#define MUSHROOM_H
+#ifndef FIREFLOWER_H
+#define FIREFLOWER_H
 
 #include <raylib.h>
 #include <iostream>
 #include "Item.h"
 #include "GlobalVariables.h"
-#include "GameSprite/MushroomSprite.h"
+#include "GameSprite/FireFlowerSprite.h"
 
-class Mushroom : public Item
+class FireFlower : public Item
 {
 public:
-    MushroomSprite mushroomSprite;
+    FireFlowerSprite fireFlowerSprite;
 
-    Mushroom(Vector2 pos) : Item(pos, {16, 16}) {}
+    FireFlower(Vector2 pos) : Item(pos, {16, 16}) {}
 
     void Draw() override
     {
-        mushroomSprite.Draw(*this);
+        fireFlowerSprite.Draw(*this);
     }
 
     void Update(Level &level) override
@@ -44,10 +44,11 @@ public:
 
     void Collect(Mario &mario) override
     {
-        std::cout << "Mushroom collected!" << std::endl;
-        if (isCollected || mario.form != MARIO_FORM::SMALL)
+        if (isCollected || mario.form != MARIO_FORM::BIG)
             return;
-        mario.Grow();
+        mario.ChangeToFire();
+        mario.position.y = position.y - 32.0f;
+        mario.rect.y = mario.position.y;
         isCollected = true;
         // Handle collision with other entities if needed
     }

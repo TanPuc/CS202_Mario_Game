@@ -24,9 +24,6 @@ public:
     virtual void Update(Level &level) = 0;
     virtual void Draw() = 0;
 
-    virtual void ResolveCollision(Entity &other) = 0;
-    virtual void ResolveCollision(Level &level) = 0;
-
     Rectangle GetBounds() const
     {
         return rect;

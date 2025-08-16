@@ -3,45 +3,58 @@
 
 #include <raylib.h>
 #include <iostream>
-#include "Entity.h"
+#include "Item.h"
 #include "GlobalVariables.h"
 #include "GameSprite/CoinSprite.h"
 
 #define COIN_SIZE 16
 
-class Coin : public Entity
+class Coin : public Item
 {
 public:
     CoinSprite coinSprite;
-    bool isCollected;
     float timer = 0.0f; // Timer for coin animation
     const float lifeTime = 1.0f;
 
-    Coin(Vector2 pos) : Entity(pos, {COIN_SIZE, COIN_SIZE}), isCollected(false)
-    {
-        velocity.y = -100.0f; // Initial upward velocity
-    }
+    Coin(Vector2 pos) : Item(pos, {COIN_SIZE, COIN_SIZE}) {}
+
     void Draw() override
     {
         coinSprite.Draw(*this);
+    }
+
+    void Collect(Mario &mario) override
+    {
+        if (isCollected)
+            return;
+        isCollected = true;
+        mario.coins++;
+        mario.score += 100; // Increment score by 100 for collecting a coin
+        std::cout << "Coin collected! Total coins: " << mario.coins << std::endl;
     }
 
     void Update(Level &level) override
     {
         float gravity = 900.0f;
         float dt = GetFrameTime();
-        timer += dt;
+        ApplyGravity(velocity, gravity);
+        position.x += velocity.x * dt;
         position.y += velocity.y * dt;
+
+        if (CheckCollision(*this, level))
+        {
+            position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
+            velocity.y = 0;
+        }
+
+        rect.x = position.x;
         rect.y = position.y;
 
-        if (timer >= lifeTime)
-        {
-            isActive = false;
-        }
+        // if (timer >= lifeTime)
+        // {
+        //     isActive = false;
+        // }
     }
-
-    void ResolveCollision(Level &level) override {};
-    void ResolveCollision(Entity &other) override {};
 };
 
 #endif // COIN_H

@@ -20,8 +20,9 @@ void PlayingState::enter()
     // Items
     // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
     // entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
-    entityManager.AddEntity(std::make_unique<Coin>(Vector2{200, 100}));
-    entityManager.AddEntity(std::make_unique<Mushroom>(Vector2{300, 100}));
+    itemManager.AddItem(std::make_unique<Coin>(Vector2{200, 100}));
+    itemManager.AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
+    itemManager.AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
 
     player->lives = gsm->getContext().lives;
     player->coins = 0;
@@ -61,7 +62,7 @@ void PlayingState::update()
     playerAdapter->update();
     hudManager->updateTime();
 
-    entityManager.UpdateEntities(*level); // Update all entities
+    itemManager.UpdateItems(*level, *player); // Update all entities
 
     // for (auto it = entities.begin(); it != entities.end();)
     // {
@@ -126,7 +127,7 @@ void PlayingState::draw()
     player->Draw();
     level->Draw();
 
-    entityManager.DrawEntities();
+    itemManager.DrawItems();
 
     level->Draw();
     EndMode2D();

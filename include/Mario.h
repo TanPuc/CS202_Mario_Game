@@ -43,11 +43,34 @@ public:
 
     void Grow()
     {
+        if (form != SMALL)
+            return;
+        form = BIG;
+        rect.height = MARIO_HEIGHT * 2.0f;
+    }
+
+    void ChangeToFire()
+    {
+        if (form != BIG)
+            return;
+        form = FIRE;
+        rect.height = MARIO_HEIGHT * 2.0f;
+    }
+
+    void ChangeToSuper()
+    {
+        if (form != BIG)
+            return;
+        form = SUPER;
+        rect.height = MARIO_HEIGHT * 2.0f;
+    }
+
+    void Shrink()
+    {
         if (form == SMALL)
-        {
-            form = BIG;
-            rect.height = MARIO_HEIGHT * 2.0f; // Increase height for big Mario
-        }
+            return;
+        form = SMALL;
+        rect.height = MARIO_HEIGHT;
     }
 
     void ChangeForm()
@@ -157,17 +180,11 @@ public:
         }
     }
 
-    void ResolveCollision(Level &level) override
+    void ResolveCollision(Level &level)
     {
         position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
         velocity.y = 0;
     };
-
-    void ResolveCollision(Entity &other) override
-    {
-        // Handle collision with other entities if needed
-        std::cout << "Collision with another entity detected!" << std::endl;
-    }
 };
 
 #endif

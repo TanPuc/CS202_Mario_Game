@@ -8,7 +8,8 @@
 #include "DGameObjects/PlayerAdapter.h"
 #include "DGameObjects/Coin.h"
 #include "DGameObjects/Mushroom.h"
-#include "EntityManager.h"
+#include "DGameObjects/FireFlower.h"
+#include "ItemManager.h"
 #include <vector>
 #include <memory>
 
@@ -16,7 +17,7 @@ class PlayingState : public GameState
 {
 private:
     GameStateManager *gsm;
-    EntityManager entityManager;
+    ItemManager itemManager;
     std::unique_ptr<Mario> player;
     std::unique_ptr<Level> level;
     std::unique_ptr<PlayerAdapter> playerAdapter;
