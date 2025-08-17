@@ -17,9 +17,14 @@ public:
     Vector2 velocity;
     Texture2D texture;
 
-    BrickPiece ( char const *filePath, Vector2 position, Vector2 size, Rectangle source, Vector2 velocity )
-        : Entity(position, size), source(source), velocity(velocity) {
-        texture = LoadTexture(filePath);
+    BrickPiece ( Vector2 position, Vector2 size, Rectangle source, Vector2 velocity )
+        : Entity(position, size), source(source), velocity(velocity) 
+    {
+        texture = LoadTexture("./assets/Tiles/Overworld/brick.png");
+    }
+    ~BrickPiece() 
+    {
+        UnloadTexture(texture);
     }
 
     void Update(Level& level) override {}
@@ -43,7 +48,8 @@ public:
         if ( position.y > SCREEN_HEIGHT * SCALE ) isOutOfScreen = true;
     }
 
-    void Draw() override {
+    void Draw() override 
+    {
         rect.x = position.x; rect.y = position.y;
         DrawTexturePro(texture, source, rect, Vector2{0, 0}, 0.0f, WHITE);
     }

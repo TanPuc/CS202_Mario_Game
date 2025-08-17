@@ -15,6 +15,7 @@ public:
     Vector2 velocity;
     DIRECTION direction = RIGHT; // Default direction
 
+    Entity() {}
     Entity(Vector2 position, Vector2 size)
         : position(position), velocity({0.0f, 0.0f})
     {
@@ -36,6 +37,7 @@ public:
     {
         return position;
     }
+    ~Entity() = default;
 };
 
 #endif // ENTITY_H

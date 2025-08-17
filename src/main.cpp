@@ -2,24 +2,27 @@
 #include <iostream>
 #include "raylib.h"
 #include "Mario.h"
-#include "Tile.h"
+#include "Level.h"
 
-#define MARIO_SKYBLUE (Color){68, 145, 190, 255}
+// #define MARIO_SKYBLUE (Color){68, 145, 190, 255}
+#define MARIO_SKYBLUE (Color){148, 148, 255, 255}
 
 int main(void)
 {
 	InitWindow(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "Mario");
 	SetTargetFPS(60);
 
+	float initialPosX = 0.0f;
 	Vector2 CameraPos = {0, 0};
-	Mario *player = new Mario({float(GetScreenWidth() / 2 - 16), 0.0f});
-	Level *level = new Level("./assets/tiles/world_1.1.txt");
+	Mario* player = new Mario({initialPosX, 0.0f});
+	Level level("./assets/Levels/world_1.1.txt");
 
 	while (!WindowShouldClose())
 	{
 		/// UPDATE GAME
 		player->HandleInput();
-		player->Update(*level); // Handling player collision and movement
+		player->Update(level); // Handling player collision and movement
+		level.update(*player);
 
 		/// RENDER GAME
 		Camera2D camera = {0};
@@ -37,7 +40,7 @@ int main(void)
 		ClearBackground(MARIO_SKYBLUE);
 		BeginMode2D(camera);
 
-		level->run(*player);
+		level.render();
 		player->Draw();
 
 		EndMode2D();
@@ -46,8 +49,8 @@ int main(void)
 
 	if (player)
 		delete player;
-	if (level)
-		delete level;
+	// if (level)
+	// 	delete level;
 	CloseWindow();
 
 	return 0;

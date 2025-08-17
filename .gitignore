@@ -66,4 +66,5 @@ Thumbs.db
 build.ninja
 
 # VSCode folder
-**/.vscode/
+.vscode/settings.json
+/.vscode

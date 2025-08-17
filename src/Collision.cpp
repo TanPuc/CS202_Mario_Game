@@ -1,4 +1,6 @@
 #include "Collision.h"
+#include "Level.h"
+#include "Tile.h"
 
 namespace aabb {
     bool CheckCollisionRecLine( Vector2& start, Vector2& direction, Rectangle& rect,
@@ -70,4 +72,39 @@ namespace aabb {
         }
         return false;
     }
+}
+
+void Collision::CheckCollision(Vector2& position, Rectangle& bbox, Vector2& velocity, Level& level)
+{
+    float dt = GetFrameTime();
+    Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
+    int minX = std::floor(std::min(position.x, nextPos.x) / 64.0f);
+    int minY = std::floor(std::min(position.y, nextPos.y) / 64.0f);
+    int maxX = std::floor(std::max(position.x + bbox.width, nextPos.x + bbox.width) / 64.0f);
+    int maxY = std::floor(std::max(position.y + bbox.height, nextPos.y + bbox.height) / 64.0f);
+
+    for ( int y = minY; y <= maxY; y++ ) {
+        for ( int x = minX; x <= maxX; x++ ) {
+            // Assume that player will never go out of grid map in x-direction
+            if ( x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT ) continue; 
+            if ( level.tileInstancesGrid[y][x] ) {
+                if ( aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity, 
+                    level.tileInstancesGrid[y][x]->bbox, contact_point, contact_normal, contact_time, dt) ) {
+                        std::array<int, 2> temp = {y, x};
+                        z.push_back({temp, contact_time});
+                }
+            }
+        }
+    }
+}
+
+void Collision::ResolveCollision(Vector2& position, Rectangle& bbox, Vector2& velocity, Level& level) 
+{
+    float dt = GetFrameTime();
+    std::sort(z.begin(), z.end(), compare);
+    for ( auto j : z ) {
+        aabb::ResolveStaticRectDynamicRect(bbox, velocity, dt, level.tileInstancesGrid[j.first[0]][j.first[1]]->bbox);
+    }
+    z.clear();
+
 }

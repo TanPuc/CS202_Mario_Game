@@ -25,11 +25,22 @@ enum MARIO_FORM
     SUPER
 };
 
+enum TileState {
+    STATE_NORMAL,
+    STATE_ACTIVATED,
+    STATE_INTERACTED,
+    STATE_BROKEN
+};
+
 #define MARIO_WIDTH 32.0f
 #define MARIO_HEIGHT 32.0f
 #define FRAME_PADDING 2
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define SCALE 4.0f
+#define GRID_WIDTH 211
+#define GRID_WIDTH_2 163
+#define GRID_HEIGHT 15
+#define TILE_SIZE 16.0f
 
 #endif // GLOBAL_VARIABLES_H
