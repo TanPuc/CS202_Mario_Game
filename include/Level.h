@@ -10,21 +10,22 @@
 // Forward declaration
 class BrickPiece;
 class Tile;
-class TileInstance; 
+class TileInstance;
 class Mario;
 
 // pipe2: 1
 // background: 2
 // fortress: 4
 // goalpole: 7
-// ground: 8 
+// ground: 8
 // hardblock: 9
 // pipe1: 10
 // pipe3: 12
 // question: 13
 // brick: 17
 
-class EntityManager {
+class EntityManager
+{
 public:
     std::vector<std::shared_ptr<BrickPiece>> brickPieces;
     std::vector<int> toRemove;
@@ -34,18 +35,19 @@ public:
     void render();
 };
 
-class Level {
+class Level
+{
 public:
-    // Flyweight pattern 
+    // Flyweight pattern
     std::map<int, std::shared_ptr<Tile>> tileMap;
-    std::shared_ptr<TileInstance> tileInstancesGrid[GRID_HEIGHT][GRID_WIDTH] = { nullptr }; // Fast access to tile instances
+    std::shared_ptr<TileInstance> tileInstancesGrid[GRID_HEIGHT][GRID_WIDTH] = {nullptr}; // Fast access to tile instances
 
-    // Managing broken brick pieces 
+    // Managing broken brick pieces
     EntityManager entityManager;
 
-    Level(const char* filePath);
+    Level(const char *filePath);
     void addTileInstance(Vector2 pos, int tileID, int x, int y);
-    void update(Mario& player);
+    void update(Mario &player);
     void render();
 };
 
@@ -69,6 +71,5 @@ public:
 //     void update(Mario& player);
 //     void render();
 // };
-
 
 #endif // LEVEL_H

@@ -1,130 +1,7 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef MARIOSPRITE_H
+#define MARIOSPRITE_H
 
-#include <raylib.h>
-#include "GlobalVariables.h"
-#include <unordered_map>
-#include <vector>
-#include <string>
-#include <iostream>
-
-struct Animation
-{
-    std::vector<Rectangle> frames;
-    int totalFrames;
-    int frameCounter;
-    Animation() : totalFrames(0), frameCounter(0) {}
-
-    Animation(std::vector<Rectangle> frames_)
-        : frames(std::move(frames_)), frameCounter(0)
-    {
-        totalFrames = static_cast<int>(frames.size());
-    }
-
-    Animation(const Animation &other)
-        : frames(other.frames), totalFrames(other.totalFrames), frameCounter(other.frameCounter) {}
-    Animation &operator=(const Animation &other)
-    {
-        if (this != &other)
-        {
-            frames = other.frames;
-            totalFrames = other.totalFrames;
-            frameCounter = other.frameCounter;
-        }
-        return *this;
-    }
-
-    Animation &operator=(const std::vector<Rectangle> &other)
-    {
-        frames = other;
-        totalFrames = static_cast<int>(frames.size());
-        frameCounter = 0;
-        return *this;
-    }
-};
-
-class Sprite
-{
-public:
-    virtual void SwitchAnimation(STATE state_) = 0;
-    virtual void Draw(Entity &entity) = 0;
-    virtual ~Sprite() = default;
-};
-
-class FireBallSprite : public Sprite
-{
-private:
-    Animation fireballAnimation;
-
-public:
-    Texture2D spriteSheet;
-    Animation *currentAnimation;
-    STATE prevState;
-    int frameSpeed = 6; // 6fps
-
-    FireBallSprite()
-        : fireballAnimation({{247, 302, 8, 16},
-                             {247 + 8 + FRAME_PADDING, 302, 8, 16},
-                             {247 + (8 + FRAME_PADDING) * 2, 302, 8, 16},
-                             {247 + (8 + FRAME_PADDING) * 3, 302, 8, 16}}),
-          prevState(STATE_IDLE)
-    {
-        spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
-        currentAnimation = &fireballAnimation;
-    }
-
-    ~FireBallSprite()
-    {
-        UnloadTexture(spriteSheet);
-    }
-
-    void SwitchAnimation(STATE state_) override {}
-
-    void Draw(Entity &entity) override
-    {
-        if (!currentAnimation)
-        {
-            std::cerr << "Current animation is not set!" << std::endl;
-            return;
-        }
-
-        static int animationTimer = 0;
-        animationTimer++;
-
-        if (animationTimer >= frameSpeed)
-        {
-            animationTimer = 0;
-            currentAnimation->frameCounter++;
-            if (currentAnimation->frameCounter >= currentAnimation->totalFrames)
-            {
-                currentAnimation->frameCounter = 0; // Reset frame index
-            }
-        }
-
-        // Get current frame
-        if (currentAnimation->frameCounter < currentAnimation->frames.size())
-        {
-            Rectangle frameRec = currentAnimation->frames[currentAnimation->frameCounter];
-
-            // Handle direction flipping
-            if (entity.direction == LEFT)
-            {
-                frameRec.width = abs(frameRec.width);
-            }
-            else
-            {
-                frameRec.width = -abs(frameRec.width);
-            }
-            DrawTexturePro(spriteSheet, frameRec,
-                           {entity.position.x, entity.position.y, frameRec.width * 1.5f, frameRec.height * 1.5f},
-                           {0, 0}, 0.0f, WHITE);
-        }
-        else
-        {
-            currentAnimation->frameCounter = 0;
-        }
-    }
-};
+#include "Sprite.h"
 
 class MarioSprite : public Sprite
 {
@@ -132,6 +9,7 @@ private:
     Animation idleAnimation;
     Animation walkAnimation;
     Animation jumpAnimation;
+    Animation decelerationAnimation;
 
 public:
     Texture2D spriteSheet;
@@ -146,6 +24,7 @@ public:
         : idleAnimation({{0, 16, 16, 16}}),
           walkAnimation({{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}}),
           jumpAnimation({{32 + FRAME_PADDING * 2, 16, 16, 16}}),
+          decelerationAnimation({{108, 16, 16, 16}}),
           prevState(STATE_IDLE)
     {
         spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
@@ -165,18 +44,21 @@ public:
             idleAnimation = {{0, 16, 16, 16}};
             walkAnimation = {{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}};
             jumpAnimation = {{32 + FRAME_PADDING * 2, 16, 16, 16}};
+            decelerationAnimation = {{108, 16, 16, 16}};
         }
         else if (newForm == BIG)
         {
             idleAnimation = {{0, 88, 16, 16 * 2}};
             walkAnimation = {{(16 + FRAME_PADDING) * 2, 88, 16, 16 * 2}, {16 + FRAME_PADDING, 88, 16, 16 * 2}, {0, 88, 16, 16 * 2}};
             jumpAnimation = {{(16 + FRAME_PADDING) * 4, 88, 16, 16 * 2}};
+            decelerationAnimation = {{194, 88, 16, 16 * 2}};
         }
         else if (newForm == FIRE)
         {
             idleAnimation = {{0, 260, 16, 16 * 2}};
             walkAnimation = {{(16 + FRAME_PADDING) * 2, 260, 16, 16 * 2}, {16 + FRAME_PADDING, 260, 16, 16 * 2}, {0, 260, 16, 16 * 2}};
             jumpAnimation = {{(16 + FRAME_PADDING) * 4, 260, 16, 16 * 2}};
+            decelerationAnimation = {{194, 260, 16, 16 * 2}};
         }
         else
         {
@@ -196,6 +78,9 @@ public:
             break;
         case STATE_WALKING:
             currentAnimation = &walkAnimation;
+            break;
+        case STATE_DECELERATING:
+            currentAnimation = &decelerationAnimation;
             break;
         case STATE_JUMPING:
             currentAnimation = &jumpAnimation;
@@ -260,4 +145,4 @@ public:
     }
 };
 
-#endif // SPRITE_H
+#endif // MARIOSPRITE_H

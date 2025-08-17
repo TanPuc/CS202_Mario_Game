@@ -1,0 +1,136 @@
+#include "DGameState/PlayingState.h"
+#include "DGameState/GameOverState.h"
+#include "DGameState/WinState.h"
+#include "DGameState/GetReadyState.h"
+#include "DGameState/PauseState.h"
+
+PlayingState::PlayingState(GameStateManager *manager, int world, int level) : gsm(manager), worldNum(world), levelNum(level) {}
+
+void PlayingState::enter()
+{
+    heartTexture = LoadTexture("assets/mario.png");
+    coinIcon = LoadTexture("assets/mario.png");
+    marioTexture = LoadTexture("assets/mario.png");
+
+    player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
+
+    level = std::make_unique<Level>();
+    level->LoadFromFile("assets/level1.map");
+
+    // Items
+    // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
+    // entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
+    itemManager.AddItem(std::make_unique<Coin>(Vector2{200, 100}));
+    itemManager.AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
+    itemManager.AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
+
+    player->lives = gsm->getContext().lives;
+    player->coins = 0;
+    player->score = 0;
+
+    cameraPos = Vector2{0.0f, 0.0f};
+
+    hudManager = std::make_unique<HUDManager>(heartTexture, coinIcon);
+    playerAdapter = std::make_unique<PlayerAdapter>(player.get());
+
+    playerAdapter->attach(hudManager.get());
+    playerAdapter->init();
+
+    hudManager->resetTime(400);
+    hudManager->updateWorld(worldNum, levelNum);
+    playerAdapter->update();
+}
+
+void PlayingState::exit()
+{
+    UnloadTexture(marioTexture);
+    UnloadTexture(heartTexture);
+    UnloadTexture(coinIcon);
+}
+
+void PlayingState::update()
+{
+    // if we press escape, we want to pause the game
+    if (IsKeyPressed(KEY_ESCAPE))
+    {
+        gsm->pushState(new PauseState(gsm, worldNum, levelNum));
+        return;
+    }
+
+    player->HandleInput();
+    player->Update(*level); // Handling player collision and movement
+    playerAdapter->update();
+    hudManager->updateTime();
+
+    itemManager.UpdateItems(*level, *player); // Update all entities
+
+    // for (auto it = entities.begin(); it != entities.end();)
+    // {
+    //     (*it)->Update(*level); // Update each entity
+    //     if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
+    //     {
+    //         if (auto coin = dynamic_cast<Coin *>((*it).get()))
+    //         {
+    //             if (!coin->isCollected)
+    //             {
+    //                 coin->isCollected = true;
+    //                 player->coins++;
+    //                 player->score += 100;
+    //             }
+    //         }
+    //     }
+
+    //     if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
+    //     {
+    //         it = entities.erase(it);
+    //     }
+    //     else
+    //     {
+    //         ++it;
+    //     }
+    // }
+
+    // Check for game over
+    // Time and lives
+    if (hudManager->getTime() <= 0)
+    {
+        player->lives--;
+        gsm->getContext().lives = player->lives;
+
+        if (player->lives <= 0)
+        {
+            gsm->changeState(new GameOverState(gsm));
+        }
+        else
+        {
+            gsm->changeState(new GetReadyState(gsm, worldNum, levelNum));
+        }
+        return;
+    }
+}
+
+void PlayingState::draw()
+{
+    // Camera2D camera = {0};
+    // camera.target = {player->position.x + player->rect.width / 2, float(GetScreenHeight() / 2)};
+    // camera.offset = {float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
+    Camera2D camera = {0};
+    if (player->GetBounds().x > cameraPos.x)
+    {
+        cameraPos.x = player->GetBounds().x;
+    }
+    camera.target = cameraPos;
+    camera.offset = Vector2{float(GetScreenWidth() / 2), 0};
+    camera.zoom = 1.0f;
+
+    BeginMode2D(camera);
+    player->Draw();
+    level->Draw();
+
+    itemManager.DrawItems();
+
+    level->Draw();
+    EndMode2D();
+
+    hudManager->draw();
+}

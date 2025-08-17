@@ -1,56 +1,47 @@
-#include <vector>
-#include <iostream>
 #include "raylib.h"
 #include "Mario.h"
 #include "Level.h"
+#include "DGameObjects/Coin.h"
+#include "DGameObjects/Mushroom.h"
 
 // #define MARIO_SKYBLUE (Color){68, 145, 190, 255}
+#include "DGameState/GameStateManager.h"
+#include "DGameState/MenuState.h"
+#include "DCore/ResourceManager.h"
 #define MARIO_SKYBLUE (Color){148, 148, 255, 255}
 
 int main(void)
 {
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 	InitWindow(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "Mario");
+	InitAudioDevice();
 	SetTargetFPS(60);
 
 	float initialPosX = 0.0f;
 	Vector2 CameraPos = {0, 0};
-	Mario* player = new Mario({initialPosX, 0.0f});
-	Level level("./assets/Levels/world_1.1.txt");
+	// No exit key
+	SetExitKey(KEY_NULL);
 
-	while (!WindowShouldClose())
+	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
+
+	GameStateManager gsm;
+
+	gsm.changeState(new MenuState(&gsm));
+
+	while (!WindowShouldClose() && !gsm.isExiting())
 	{
-		/// UPDATE GAME
-		player->HandleInput();
-		player->Update(level); // Handling player collision and movement
-		level.update(*player);
-
-		/// RENDER GAME
-		Camera2D camera = {0};
-		Vector2 playerPos = player->GetPosition();
-		if (playerPos.x > CameraPos.x)
-		{
-			CameraPos.x = playerPos.x;
-		}
-		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), float(GetScreenHeight()/2)};
-		camera.offset = (Vector2){float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
-		camera.zoom = 1.0f;
+		gsm.update();
 
 		BeginDrawing();
-
 		ClearBackground(MARIO_SKYBLUE);
-		BeginMode2D(camera);
+		// ClearBackground(SKYBLUE);
 
-		level.render();
-		player->Draw();
-
-		EndMode2D();
+		gsm.draw();
 		EndDrawing();
 	}
+	ResourceManager::GetInstance().UnloadResources();
 
-	if (player)
-		delete player;
-	// if (level)
-	// 	delete level;
+	CloseAudioDevice();
 	CloseWindow();
 
 	return 0;

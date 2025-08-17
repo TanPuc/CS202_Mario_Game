@@ -1,15 +1,16 @@
 #ifndef MARIO_H
 #define MARIO_H
 
+#include <iostream>
+#include "GlobalVariables.h"
 #include "Entity.h"
 #include "Tile.h"
 #include "MarioState.h"
-#include "Sprite.h"
-#include "GlobalVariables.h"
-#include "FireBall.h"
+#include "GameSprite/MarioSprite.h"
+#include "DGameObjects/FireBall.h"
 #include "Collision.h"
 #include <raylib.h>
-#include <iostream>
+#include "Physics.h"
 #include <array>
 #include <cmath>
 
@@ -19,8 +20,11 @@ public:
     std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
     MarioSprite *sprite;
     MARIO_FORM form;
-    std::vector<std::unique_ptr<FireBall>> fireballs;
+    std::vector<std::shared_ptr<FireBall>> fireballs;
     Collision collision;
+    int lives;
+    int coins;
+    long long score;
 
     Mario(Vector2 position) : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})), form(SMALL)
     {
@@ -38,8 +42,40 @@ public:
         {
             FireBall *fireball = new FireBall({position.x + rect.width, position.y + rect.height / 2}, direction);
             fireball->velocity.x = (direction == RIGHT) ? FIREBALL_SPEED : -FIREBALL_SPEED;
-            fireballs.push_back(std::unique_ptr<FireBall>(fireball));
+            fireballs.push_back(std::shared_ptr<FireBall>(fireball));
         }
+    }
+
+    void Grow()
+    {
+        if (form != SMALL)
+            return;
+        form = BIG;
+        rect.height = MARIO_HEIGHT * 2.0f;
+    }
+
+    void ChangeToFire()
+    {
+        if (form != BIG)
+            return;
+        form = FIRE;
+        rect.height = MARIO_HEIGHT * 2.0f;
+    }
+
+    void ChangeToSuper()
+    {
+        if (form != BIG)
+            return;
+        form = SUPER;
+        rect.height = MARIO_HEIGHT * 2.0f;
+    }
+
+    void Shrink()
+    {
+        if (form == SMALL)
+            return;
+        form = SMALL;
+        rect.height = MARIO_HEIGHT;
     }
 
     void ChangeForm()
@@ -81,7 +117,7 @@ public:
         if (newState != nullptr)
         {
             currentState = std::move(newState);
-            sprite->SwitchAnimation(currentState->GetType());
+            // sprite->SwitchAnimation(currentState->GetType());
         }
 
         if (IsKeyPressed(KEY_LEFT_SHIFT))
@@ -112,14 +148,16 @@ public:
         if (newState != nullptr)
         {
             currentState = std::move(newState);
-            sprite->SwitchAnimation(currentState->GetType());
+            // sprite->SwitchAnimation(currentState->GetType());
         }
+
         float gravity = 900.0f;
         float dt = GetFrameTime();
         ApplyGravity(velocity, gravity);
-        
-        // Left wall 
-        if ( position.x < 0 ) {
+
+        // Left wall
+        if (position.x < 0)
+        {
             position.x = 0;
             velocity.x = 0;
         }
@@ -151,17 +189,11 @@ public:
         }
     }
 
-    void ResolveCollision(Level &level) override
+    void ResolveCollision(Level &level)
     {
         collision.CheckCollision(position, rect, velocity, level);
         collision.ResolveCollision(position, rect, velocity, level);
     };
-
-    void ResolveCollision(Entity &other) override
-    {
-        // Handle collision with other entities if needed
-        std::cout << "Collision with another entity detected!" << std::endl;
-    }
 };
 
 #endif

@@ -1,11 +1,13 @@
 #ifndef FIREBALL_H
 #define FIREBALL_H
+
 #include <raylib.h>
+#include <iostream>
 #include "Entity.h"
 #include "Tile.h"
 #include "Physics.h"
-#include <iostream>
 #include "GlobalVariables.h"
+#include "GameSprite/FireBallSprite.h"
 
 #define FIREBALL_SPEED 300.0f // Speed of the fireball
 #define FIREBALL_THRESHOLD 3  // Number of maximum fireballs
@@ -27,7 +29,7 @@ public:
         // texture = LoadTexture("assets/brick.png"); // Temporary
         boundBox.x = position.x + rect.width / 2 - boundBox.width / 2;
         boundBox.y = position.y + rect.height;
-        hitBox.x = direction == RIGHT? position.x + rect.width : position.x - hitBox.width;
+        hitBox.x = direction == RIGHT ? position.x + rect.width : position.x - hitBox.width;
         hitBox.y = position.y + rect.height / 2 - hitBox.height / 2;
 
         sprite = new FireBallSprite();
@@ -58,7 +60,7 @@ public:
         rect.y = position.y;
         boundBox.x = position.x + rect.width / 2 - boundBox.width / 2;
         boundBox.y = position.y + rect.height;
-        hitBox.x = direction == RIGHT? position.x + rect.width : position.x - hitBox.width;
+        hitBox.x = direction == RIGHT ? position.x + rect.width : position.x - hitBox.width;
         hitBox.y = position.y + rect.height / 2 - hitBox.height / 2;
     }
 
@@ -74,18 +76,6 @@ public:
         // DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);                 // Draw hitbox for debugging
         // DrawTexture(texture, position.x, position.y, WHITE); // Draw fireball texture
         sprite->Draw(*this);
-    }
-
-    void ResolveCollision(Entity &other) override
-    {
-        // Handle collision with other entities if needed
-        std::cout << "Fireball collided with another entity!" << std::endl;
-    }
-
-    void ResolveCollision(Level &level) override
-    {
-        // Handle collision with level tiles if needed
-        std::cout << "Fireball collided with level!" << std::endl;
     }
 };
 

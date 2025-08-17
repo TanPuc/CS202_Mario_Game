@@ -5,6 +5,7 @@ enum STATE
 {
     STATE_IDLE,
     STATE_WALKING,
+    STATE_DECELERATING,
     STATE_JUMPING,
     STATE_FALLING,
     STATE_DUCKING,
@@ -25,7 +26,8 @@ enum MARIO_FORM
     SUPER
 };
 
-enum TileState {
+enum TileState
+{
     STATE_NORMAL,
     STATE_ACTIVATED,
     STATE_INTERACTED,
