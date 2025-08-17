@@ -135,6 +135,7 @@ public:
                     if ( aabb::CheckCollisionStaticRectDynamicRect(rect, velocity, 
                         level.tileManager.tileInstancesGrid[y][x]->getBBox(), cp, cn, t, et) ) {
                             std::array<int, 2> temp = {y, x};
+                            //std::array<int, 2> temp = { (int)cn.x, (int)cn.y };
                             z.push_back({temp, t});
                     }
                 }

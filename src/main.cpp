@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "Mario.h"
 #include "Tile.h"
+#include "Enemy/enemyManager.h"
 
 #define MARIO_SKYBLUE Color{68, 145, 190, 255}
 
@@ -24,9 +25,11 @@ int main(void)
 	//manager->spawnEnemyAt(EnemyType::beezybettle, posEnemy);
 	//manager->spawnEnemyAt(EnemyType::blooper, posEnemy);
 	//manager->spawnEnemyAt(EnemyType::spiny, posEnemy);
-	manager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
 	//manager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
-
+	//manager->spawnEnemyAt(EnemyType::paratroopa, posEnemy);
+	manager->spawnEnemyAt(EnemyType::hammer, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::piranhaplant, posEnemy);
 
 	while (!WindowShouldClose())
 	{
@@ -43,8 +46,8 @@ int main(void)
 		{
 			CameraPos.x = playerPos.x;
 		}
-		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), float(GetScreenHeight()/2)};
-		camera.offset = (Vector2){float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
+		camera.target = Vector2{float(CameraPos.x + player->rect.width / 2), float(GetScreenHeight()/2)};
+		camera.offset = Vector2{float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
 		camera.zoom = 1.0f;
 
 		BeginDrawing();
@@ -54,7 +57,6 @@ int main(void)
 
 		level->run(*player);
 		manager->draw();
-		level->Draw();
 		player->Draw();
 		
 

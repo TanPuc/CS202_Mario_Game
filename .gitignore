@@ -36,8 +36,8 @@
 /build/
 /bin/
 /_deps/
-x64/
-Debug/
+
+
 
 # CMake files
 CMakeFiles/

@@ -6,6 +6,7 @@
 #include "Physics.h"
 #include <iostream>
 #include "GlobalVariables.h"
+#include "Sprite.h"
 
 #define FIREBALL_SPEED 300.0f // Speed of the fireball
 #define FIREBALL_THRESHOLD 3  // Number of maximum fireballs
