@@ -14,8 +14,7 @@ void PlayingState::enter()
 
     player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
 
-    level = std::make_unique<Level>();
-    level->LoadFromFile("assets/level1.map");
+    level = std::make_unique<Level>("./assets/Levels/world_1.1.txt");
 
     // Items
     // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
@@ -59,6 +58,9 @@ void PlayingState::update()
 
     player->HandleInput();
     player->Update(*level); // Handling player collision and movement
+
+    level->update(*player);
+
     playerAdapter->update();
     hudManager->updateTime();
 
@@ -124,12 +126,11 @@ void PlayingState::draw()
     camera.zoom = 1.0f;
 
     BeginMode2D(camera);
+    level->render();
     player->Draw();
-    level->Draw();
 
     itemManager.DrawItems();
 
-    level->Draw();
     EndMode2D();
 
     hudManager->draw();

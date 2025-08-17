@@ -4,40 +4,41 @@
 #include <raylib.h>
 #include "Entity.h"
 
-class FortressFlag : public Entity {
+class FortressFlag : public Entity
+{
 private:
     float velY = -200.0f;
     Vector2 destPos;
     Texture2D texture;
+
 public:
-    FortressFlag(Vector2 position) : Entity(position, {32, 32}), destPos({position.x, position.y - 76.0f}) 
+    FortressFlag(Vector2 position) : Entity(position, {32, 32}), destPos({position.x, position.y - 76.0f})
     {
         texture = LoadTexture("./assets/Tiles/Overworld/fortressflag.png");
     }
-    ~FortressFlag() 
+    ~FortressFlag()
     {
         UnloadTexture(texture);
     }
 
-    void Update() 
+    void Update()
     {
         // If GAMESTATE == WON
         float ft = GetFrameTime();
         position.y += velY * ft;
-        if (position.y <= destPos.y) {
+        if (position.y <= destPos.y)
+        {
             position.y = destPos.y;
             velY = 0;
             // Change GAMESTATE
         }
     }
-    void Draw() override 
+    void Draw() override
     {
         DrawTextureEx(texture, position, 0.0f, SCALE, WHITE);
     }
-    
-    void Update(Level &level) {}
-    void ResolveCollision(Entity &other) {}
-    void ResolveCollision(Level &level) {}
+
+    void Update(Level &level) override {}
 };
 
 #endif // FORTRESS_FLAG_H

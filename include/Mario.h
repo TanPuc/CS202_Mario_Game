@@ -2,17 +2,14 @@
 #define MARIO_H
 
 #include <iostream>
+#include <raylib.h>
+#include <array>
+#include <cmath>
 #include "GlobalVariables.h"
 #include "Entity.h"
-#include "Tile.h"
 #include "MarioState.h"
 #include "GameSprite/MarioSprite.h"
 #include "DGameObjects/FireBall.h"
-#include "Collision.h"
-#include <raylib.h>
-#include "Physics.h"
-#include <array>
-#include <cmath>
 
 class Mario : public Entity
 {
@@ -21,7 +18,6 @@ public:
     MarioSprite *sprite;
     MARIO_FORM form;
     std::vector<std::shared_ptr<FireBall>> fireballs;
-    Collision collision;
     int lives;
     int coins;
     long long score;
@@ -161,6 +157,7 @@ public:
             position.x = 0;
             velocity.x = 0;
         }
+
         ResolveCollision(level);
 
         position.x += velocity.x * dt;

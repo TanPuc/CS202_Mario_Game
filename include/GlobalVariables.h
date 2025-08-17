@@ -39,7 +39,7 @@ enum TileState
 #define FRAME_PADDING 2
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
-#define SCALE 4.0f
+#define SCALE 2.0f
 #define GRID_WIDTH 211
 #define GRID_WIDTH_2 163
 #define GRID_HEIGHT 15

@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include "GlobalVariables.h"
+#include "Collision.h"
 
 // Forward declaration
 class Level;
@@ -13,6 +14,7 @@ public:
     Rectangle rect;
     Vector2 position;
     Vector2 velocity;
+    Collision collision;
     DIRECTION direction = RIGHT; // Default direction
     bool isActive;
 
@@ -36,7 +38,6 @@ public:
     {
         return position;
     }
-    ~Entity() = default;
 };
 
 #endif // ENTITY_H

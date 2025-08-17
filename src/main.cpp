@@ -4,10 +4,11 @@
 #include "DGameObjects/Coin.h"
 #include "DGameObjects/Mushroom.h"
 
-// #define MARIO_SKYBLUE (Color){68, 145, 190, 255}
 #include "DGameState/GameStateManager.h"
 #include "DGameState/MenuState.h"
 #include "DCore/ResourceManager.h"
+
+// #define MARIO_SKYBLUE (Color){68, 145, 190, 255}
 #define MARIO_SKYBLUE (Color){148, 148, 255, 255}
 
 int main(void)
