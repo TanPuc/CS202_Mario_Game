@@ -75,7 +75,6 @@ namespace aabb
 
         if (CheckCollisionRecLine(sourceCenPos, dir, expanded_target, contact_point, contact_normal, contact_time))
         {
-            std::cout << "Collision detected!" << std::endl;
             return (contact_time >= 0.0f && contact_time < 1.0f);
         }
         else
@@ -114,7 +113,6 @@ void Collision::CheckCollision(Vector2 &position, Rectangle &bbox, Vector2 &velo
                 continue;
             if (level.tileInstancesGrid[y][x])
             {
-                std::cout << "Checking collision with tile at (" << x << ", " << y << ")" << std::endl;
                 if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity,
                                                               level.tileInstancesGrid[y][x]->bbox, contact_point, contact_normal, contact_time, dt))
                 {

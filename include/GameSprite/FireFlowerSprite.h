@@ -65,7 +65,7 @@ public:
                 frameRec.width = -abs(frameRec.width);
             }
             DrawTexturePro(spriteSheet, frameRec,
-                           {entity.position.x, entity.position.y, frameRec.width * 1.5f, frameRec.height * 1.5f},
+                           {entity.position.x, entity.position.y, frameRec.width * SCALE, frameRec.height * SCALE},
                            {0, 0}, 0.0f, WHITE);
         }
         else
