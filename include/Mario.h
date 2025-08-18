@@ -9,7 +9,6 @@
 #include "Entity.h"
 #include "MarioState.h"
 #include "GameSprite/MarioSprite.h"
-#include "DGameObjects/FireBall.h"
 
 class Mario : public Entity
 {
@@ -17,7 +16,7 @@ public:
     std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
     MarioSprite *sprite;
     MARIO_FORM form;
-    std::vector<std::shared_ptr<FireBall>> fireballs;
+    // std::vector<std::shared_ptr<FireBall>> fireballs;
     int lives;
     int coins;
     long long score;
@@ -32,22 +31,14 @@ public:
         delete sprite;
     }
 
-    void ShootFireBall()
-    {
-        if (fireballs.size() < FIREBALL_THRESHOLD)
-        {
-            FireBall *fireball = new FireBall({position.x + rect.width, position.y + rect.height / 2}, direction);
-            fireball->velocity.x = (direction == RIGHT) ? FIREBALL_SPEED : -FIREBALL_SPEED;
-            fireballs.push_back(std::shared_ptr<FireBall>(fireball));
-        }
-    }
-
     void Grow()
     {
         if (form != SMALL)
             return;
         form = BIG;
         rect.height = MARIO_HEIGHT * 2.0f;
+
+        sprite->SwitchForm(form);
     }
 
     void ChangeToFire()
@@ -56,6 +47,8 @@ public:
             return;
         form = FIRE;
         rect.height = MARIO_HEIGHT * 2.0f;
+
+        sprite->SwitchForm(form);
     }
 
     void ChangeToSuper()
@@ -64,6 +57,8 @@ public:
             return;
         form = SUPER;
         rect.height = MARIO_HEIGHT * 2.0f;
+
+        sprite->SwitchForm(form);
     }
 
     void Shrink()
@@ -72,6 +67,8 @@ public:
             return;
         form = SMALL;
         rect.height = MARIO_HEIGHT;
+
+        sprite->SwitchForm(form);
     }
 
     void ChangeForm()
@@ -116,26 +113,13 @@ public:
             // sprite->SwitchAnimation(currentState->GetType());
         }
 
-        if (IsKeyPressed(KEY_LEFT_SHIFT))
-        {
-            ShootFireBall();
-        }
-
-        ChangeForm();
+        // ChangeForm();
     }
 
     void Draw() override
     {
         DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED); // Draw hitbox for debugging
         currentState->Draw(*this, *sprite);
-        if (!fireballs.empty())
-        {
-            for (auto &fireball : fireballs)
-            {
-                fireball->Draw();
-            }
-        }
-        // Draw fireballs
     }
 
     void Update(Level &level) override
@@ -164,26 +148,6 @@ public:
         position.y += velocity.y * dt;
         rect.x = position.x;
         rect.y = position.y;
-
-        // Update fireballs
-        for (auto it = fireballs.begin(); it != fireballs.end();)
-        {
-            if ((*it)->isOverLifeTime())
-            {
-                std::cout << "Fireball expired!" << std::endl;
-                it = fireballs.erase(it); // Remove expired fireball
-                continue;
-            }
-            (*it)->Update(level);
-            if ((*it)->GetPosition().y < 0 || (*it)->GetPosition().y > GetScreenHeight())
-            {
-                it = fireballs.erase(it); // Remove fireball if it goes out of bounds
-            }
-            else
-            {
-                ++it; // Move to the next fireball
-            }
-        }
     }
 
     void ResolveCollision(Level &level)
@@ -191,6 +155,22 @@ public:
         collision.CheckCollision(position, rect, velocity, level);
         collision.ResolveCollision(position, rect, velocity, level);
     };
+
+    // Helper
+    DIRECTION GetDirection() const
+    {
+        return direction;
+    }
+
+    MARIO_FORM GetForm() const
+    {
+        return form;
+    }
+
+    Vector2 GetPosition() const
+    {
+        return position;
+    }
 };
 
 #endif

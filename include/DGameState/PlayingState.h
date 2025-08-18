@@ -10,6 +10,7 @@
 #include "DGameObjects/Mushroom.h"
 #include "DGameObjects/FireFlower.h"
 #include "ItemManager.h"
+#include "FireBallManager.h"
 #include <vector>
 #include <memory>
 
@@ -18,6 +19,7 @@ class PlayingState : public GameState
 private:
     GameStateManager *gsm;
     ItemManager itemManager;
+    FireBallManager fireBallManager;
     std::unique_ptr<Mario> player;
     std::unique_ptr<Level> level;
     std::unique_ptr<PlayerAdapter> playerAdapter;

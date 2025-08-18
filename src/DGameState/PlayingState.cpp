@@ -57,6 +57,13 @@ void PlayingState::update()
     }
 
     player->HandleInput();
+    if (player->GetForm() == FIRE)
+    {
+        if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT))
+        {
+            fireBallManager.ShootFireBall(player->GetPosition(), player->GetDirection());
+        }
+    }
     player->Update(*level); // Handling player collision and movement
 
     level->update(*player);
@@ -64,33 +71,8 @@ void PlayingState::update()
     playerAdapter->update();
     hudManager->updateTime();
 
+    fireBallManager.Update(*level);
     itemManager.UpdateItems(*level, *player); // Update all entities
-
-    // for (auto it = entities.begin(); it != entities.end();)
-    // {
-    //     (*it)->Update(*level); // Update each entity
-    //     if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
-    //     {
-    //         if (auto coin = dynamic_cast<Coin *>((*it).get()))
-    //         {
-    //             if (!coin->isCollected)
-    //             {
-    //                 coin->isCollected = true;
-    //                 player->coins++;
-    //                 player->score += 100;
-    //             }
-    //         }
-    //     }
-
-    //     if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
-    //     {
-    //         it = entities.erase(it);
-    //     }
-    //     else
-    //     {
-    //         ++it;
-    //     }
-    // }
 
     // Check for game over
     // Time and lives
@@ -129,6 +111,7 @@ void PlayingState::draw()
     level->render();
     player->Draw();
 
+    fireBallManager.Draw();
     itemManager.DrawItems();
 
     EndMode2D();
