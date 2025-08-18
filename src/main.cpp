@@ -17,12 +17,13 @@ int main(void)
 	InitAudioDevice();
 	SetTargetFPS(60);
 
+	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
+	ResourceManager::GetInstance().LoadBackgroundTexture("assets/menu_background.png");
+	SoundManager::getInstance().load();
+	
 	Vector2 CameraPos = {0, 0};
 	// No exit key
 	SetExitKey(KEY_NULL);
-
-	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
-	SoundManager::getInstance().load();
 
 	GameStateManager gsm;
 
@@ -38,6 +39,17 @@ int main(void)
 		BeginDrawing();
 		ClearBackground(MARIO_SKYBLUE);
 		// ClearBackground(SKYBLUE);
+		Texture2D background = ResourceManager::GetInstance().GetBackgroundTexture();
+		float bgAspectRatio = (float)background.width / (float)background.height;
+		float bgScreenWidth = (float)GetScreenWidth() + 15; 
+		float bgScreenHeight = bgScreenWidth / bgAspectRatio;
+
+		Rectangle sourceRec = { 0.0f, 0.0f, (float)background.width, (float)background.height };
+		Rectangle destRec = { 0.0f, 0.0f, bgScreenWidth, bgScreenHeight };
+		Vector2 origin = { 0, 0 };
+
+		DrawTexturePro(background, sourceRec, destRec, origin, 0.0f, WHITE);
+
 
 		gsm.draw();
 		EndDrawing();
