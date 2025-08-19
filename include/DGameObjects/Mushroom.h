@@ -3,25 +3,26 @@
 
 #include <raylib.h>
 #include <iostream>
-#include "Entity.h"
+#include "Item.h"
+#include "Collision.h"
 #include "GlobalVariables.h"
 #include "GameSprite/MushroomSprite.h"
 
-class Mushroom : public Entity
+#define MUSHROOM_SIZE 16
+
+class Mushroom : public Item
 {
 public:
-    MushroomSprite MushroomSprite;
+    MushroomSprite mushroomSprite;
+    Collision collision;
 
-    Mushroom(Vector2 pos) : Entity(pos, {16, 16}) {}
+    Mushroom(Vector2 pos) : Item(pos, {MUSHROOM_SIZE * SCALE, MUSHROOM_SIZE * SCALE}) {}
+    Mushroom(Vector2 pos, Vector2 vel, DIRECTION dir) : Item(pos, {MUSHROOM_SIZE * SCALE, MUSHROOM_SIZE * SCALE}, vel, dir) {}
 
-    void OnCollect(Mario &mario)
-    {
-        std::cout << "Mushroom collected!" << std::endl;
-        mario.Grow();
-    }
     void Draw() override
     {
-        MushroomSprite.Draw(*this);
+        DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);
+        mushroomSprite.Draw(*this);
     }
 
     void Update(Level &level) override
@@ -29,52 +30,28 @@ public:
         float gravity = 900.0f;
         float dt = GetFrameTime();
         ApplyGravity(velocity, gravity);
+        ResolveCollision(level);
+
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
-
-        if (CheckCollision(*this, level))
-        {
-            ResolveCollision(level);
-        }
         rect.x = position.x;
         rect.y = position.y;
     }
 
-    void Update(Level &level, Mario &mario)
+    void Collect(Mario &mario) override
     {
-        float gravity = 900.0f;
-        float dt = GetFrameTime();
-        ApplyGravity(velocity, gravity);
-        position.x += velocity.x * dt;
-        position.y += velocity.y * dt;
-
-        if (CheckCollision(*this, mario))
-        {
-            OnCollect(mario);
-            // Reset Mushroom position or remove it from the level
-            position = {0, 0}; // Example: move Mushroom off-screen
-            rect.x = position.x;
-            rect.y = position.y;
-        }
-
-        if (CheckCollision(*this, level))
-        {
-            ResolveCollision(level);
-        }
-        rect.x = position.x;
-        rect.y = position.y;
-    }
-
-    void ResolveCollision(Level &level) override
-    {
-        position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
-        velocity.y = 0;
-    };
-
-    void ResolveCollision(Entity &other) override
-    {
+        std::cout << "Mushroom collected!" << std::endl;
+        if (isCollected || mario.form != MARIO_FORM::SMALL)
+            return;
+        mario.Grow();
+        isCollected = true;
         // Handle collision with other entities if needed
-        std::cout << "Collision with another entity detected!" << std::endl;
+    }
+
+    void ResolveCollision(Level &level)
+    {
+        collision.CheckCollision(position, rect, velocity, level);
+        collision.ResolveCollision(position, rect, velocity, level);
     }
 };
 

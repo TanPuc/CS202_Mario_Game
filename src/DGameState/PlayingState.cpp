@@ -6,7 +6,7 @@
 #include "DCore/SoundManager.h"
 #include "DCore/SaveManager.h"
 
-PlayingState::PlayingState(GameStateManager *manager, const GameData& initialData) : gsm(manager), currentData(initialData) {}
+PlayingState::PlayingState(GameStateManager *manager, const GameData &initialData) : gsm(manager), currentData(initialData) {}
 
 void PlayingState::enter()
 {
@@ -16,20 +16,20 @@ void PlayingState::enter()
     coinIcon = LoadTexture("assets/mario.png");
     marioTexture = LoadTexture("assets/mario.png");
     pauseIconTexture = LoadTexture("assets/pause.png");
-    pauseButton  =std::make_unique<ImageButton>(
-        Vector2{(float)GetScreenWidth() - 60, 20}, 
-        Vector2{40, 40}, 
+    pauseButton = std::make_unique<ImageButton>(
+        Vector2{(float)GetScreenWidth() - 60, 20},
+        Vector2{40, 40},
         pauseIconTexture,
         "",
-        [this]() {
+        [this]()
+        {
             gsm->pushState(new PauseState(gsm, worldNum, levelNum));
-        }
-    );
+        });
 
     // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
+    // player = std::make_unique<Mario>(START_POS_WORLD_1_1);
 
-    level = std::make_unique<Level>();
-    level->LoadFromFile("assets/level1.map");
+    level = std::make_unique<Level>("./assets/Levels/world_1.1.txt");
 
     player = std::make_unique<Mario>(currentData.playerPosition);
     player->lives = currentData.lives;
@@ -40,8 +40,15 @@ void PlayingState::enter()
     levelNum = currentData.levelNum;
 
     // Items
-    entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
-    entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
+    // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
+    // entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
+    itemManager.AddItem(std::make_unique<Coin>(Vector2{200, 100}));
+    itemManager.AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
+    itemManager.AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
+
+    player->lives = gsm->getContext().lives;
+    player->coins = 0;
+    player->score = 0;
 
     cameraPos = Vector2{0.0f, 0.0f};
 
@@ -87,42 +94,55 @@ void PlayingState::update()
     currentData.timeRemaining = hudManager->getTime();
 
     player->HandleInput();
+    if (player->GetForm() == FIRE)
+    {
+        if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT))
+        {
+            fireBallManager.ShootFireBall(player->GetPosition(), player->GetDirection());
+        }
+    }
     player->Update(*level); // Handling player collision and movement
+
+    // Handle Mario's death
+    level->update(*player);
+
     playerAdapter->update();
     hudManager->updateTime();
 
-    for (auto it = entities.begin(); it != entities.end();)
-    {
-        (*it)->Update(*level); // Update each entity
-        if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
-        {
-            if (auto coin = dynamic_cast<Coin *>((*it).get()))
-            {
-                if (!coin->isCollected)
-                {
-                    coin->isCollected = true;
-                    player->coins++;
-                    player->score += 100;
-                    SoundManager::getInstance().playSound(SoundEffect::COIN);
-                }
-            }
-        }
+    // for (auto it = entities.begin(); it != entities.end();)
+    // {
+    //     (*it)->Update(*level); // Update each entity
+    //     if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
+    //     {
+    //         if (auto coin = dynamic_cast<Coin *>((*it).get()))
+    //         {
+    //             if (!coin->isCollected)
+    //             {
+    //                 coin->isCollected = true;
+    //                 player->coins++;
+    //                 player->score += 100;
+    //             }
+    //         }
+    //     }
 
-        if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
-        {
-            it = entities.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
+    //     if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
+    //     {
+    //         it = entities.erase(it);
+    //     }
+    //     else
+    //     {
+    //         ++it;
+    //     }
+    // }
+
+    fireBallManager.Update(*level);
+    itemManager.UpdateItems(*level, *player); // Update all entities
 
     // Check for game over
     // Time and lives
-    if (hudManager->getTime() <= 0)
+    if (hudManager->getTime() <= 0 || player->GetPosition().y > HEIGHT_BOUNDARY)
     {
-        player->lives--;
+        player->Die();
         gsm->getContext().lives = player->lives;
 
         if (player->lives <= 0)
@@ -152,13 +172,12 @@ void PlayingState::draw()
     camera.zoom = 1.0f;
 
     BeginMode2D(camera);
+    level->render();
     player->Draw();
-    level->Draw();
-    for (const auto &entity : entities)
-    {
-        entity->Draw();
-    }
-    level->Draw();
+
+    fireBallManager.Draw();
+    itemManager.DrawItems();
+
     EndMode2D();
 
     hudManager->draw();

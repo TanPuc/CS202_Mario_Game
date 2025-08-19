@@ -64,3 +64,7 @@ Thumbs.db
 .ninja_deps
 .ninja_log
 build.ninja
+
+# VSCode folder
+.vscode/settings.json
+/.vscode

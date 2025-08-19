@@ -1,12 +1,12 @@
-#ifndef FIREBALLSPRITE_H
-#define FIREBALLSPRITE_H
+#ifndef FIREFLOWERSPRITE_H
+#define FIREFLOWERSPRITE_H
 
 #include "Sprite.h"
 
-class FireBallSprite : public Sprite
+class FireFlowerSprite : public Sprite
 {
 private:
-    Animation fireballAnimation;
+    Animation fireflowerAnimation;
 
 public:
     Texture2D spriteSheet;
@@ -14,18 +14,15 @@ public:
     STATE prevState;
     int frameSpeed = 6; // 6fps
 
-    FireBallSprite()
-        : fireballAnimation({{247, 302 + 4, 8, 8},
-                             {247 + 8 + FRAME_PADDING, 302 + 4, 8, 8},
-                             {247 + (8 + FRAME_PADDING) * 2, 302 + 4, 8, 8},
-                             {247 + (8 + FRAME_PADDING) * 3, 302 + 4, 8, 8}}),
+    FireFlowerSprite()
+        : fireflowerAnimation({{68, 8, 16, 16}}),
           prevState(STATE_IDLE)
     {
-        spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
-        currentAnimation = &fireballAnimation;
+        spriteSheet = LoadTexture("assets/SMB_Items_And_Objects.png");
+        currentAnimation = &fireflowerAnimation;
     }
 
-    ~FireBallSprite()
+    ~FireFlowerSprite()
     {
         UnloadTexture(spriteSheet);
     }

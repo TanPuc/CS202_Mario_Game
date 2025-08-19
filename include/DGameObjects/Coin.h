@@ -3,27 +3,38 @@
 
 #include <raylib.h>
 #include <iostream>
-#include "Entity.h"
+#include "Item.h"
+#include "Collision.h"
 #include "GlobalVariables.h"
 #include "GameSprite/CoinSprite.h"
+#include "DCore/SoundManager.h"
 
 #define COIN_SIZE 16
 
-class Coin : public Entity
+class Coin : public Item
 {
 public:
     CoinSprite coinSprite;
-    bool isCollected;
+    float timer = 0.0f; // Timer for coin animation
+    const float lifeTime = 1.0f;
+    Collision collision;
 
-    Coin(Vector2 pos) : Entity(pos, {COIN_SIZE, COIN_SIZE}), isCollected(false) {}
+    Coin(Vector2 pos) : Item(pos, {COIN_SIZE * SCALE, COIN_SIZE * SCALE}) {}
 
-    void OnCollect(Mario &mario)
-    {
-        std::cout << "Coin collected!" << std::endl;
-    }
     void Draw() override
     {
         coinSprite.Draw(*this);
+    }
+
+    void Collect(Mario &mario) override
+    {
+        if (isCollected)
+            return;
+        isCollected = true;
+        mario.coins++;
+        mario.score += 100; // Increment score by 100 for collecting a coin
+        std::cout << "Coin collected! Total coins: " << mario.coins << std::endl;
+        SoundManager::getInstance().playSound(SoundEffect::COIN);
     }
 
     void Update(Level &level) override
@@ -31,52 +42,25 @@ public:
         float gravity = 900.0f;
         float dt = GetFrameTime();
         ApplyGravity(velocity, gravity);
+
+        ResolveCollision(level);
+
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
-
-        if (CheckCollision(*this, level))
-        {
-            ResolveCollision(level);
-        }
         rect.x = position.x;
         rect.y = position.y;
+
+        // if (timer >= lifeTime)
+        // {
+        //     isActive = false;
+        // }
     }
 
-    void Update(Level &level, Mario &mario)
+    void ResolveCollision(Level &level)
     {
-        float gravity = 900.0f;
-        float dt = GetFrameTime();
-        position.x += velocity.x * dt;
-        position.y += velocity.y * dt;
-
-        if (CheckCollision(*this, mario))
-        {
-            OnCollect(mario);
-            // Reset coin position or remove it from the level
-            position = {0, 0}; // Example: move coin off-screen
-            rect.x = position.x;
-            rect.y = position.y;
-        }
-
-        if (CheckCollision(*this, level))
-        {
-            ResolveCollision(level);
-        }
-        rect.x = position.x;
-        rect.y = position.y;
-    }
-
-    void ResolveCollision(Level &level) override
-    {
-        position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
-        velocity.y = 0;
+        collision.CheckCollision(position, rect, velocity, level);
+        collision.ResolveCollision(position, rect, velocity, level);
     };
-
-    void ResolveCollision(Entity &other) override
-    {
-        // Handle collision with other entities if needed
-        std::cout << "Collision with another entity detected!" << std::endl;
-    }
 };
 
 #endif // COIN_H

@@ -8,6 +8,9 @@
 #include "DGameObjects/PlayerAdapter.h"
 #include "DGameObjects/Coin.h"
 #include "DGameObjects/Mushroom.h"
+#include "DGameObjects/FireFlower.h"
+#include "ItemManager.h"
+#include "FireBallManager.h"
 #include "DGUI/ImageButton.h"
 #include "DCore/GameData.h"
 #include "raylib.h"
@@ -18,11 +21,13 @@ class PlayingState : public GameState
 {
 private:
     GameStateManager *gsm;
+    ItemManager itemManager;
+    FireBallManager fireBallManager;
     std::unique_ptr<Mario> player;
     std::unique_ptr<Level> level;
     std::unique_ptr<PlayerAdapter> playerAdapter;
     std::unique_ptr<HUDManager> hudManager;
-    std::vector<std::unique_ptr<Entity>> entities; // This counts for items and enemies
+    // std::vector<std::unique_ptr<Entity>> entities; // This counts for items and enemies
 
     int worldNum;
     int levelNum;
@@ -30,14 +35,14 @@ private:
 
     Vector2 cameraPos;
 
-    //PAUSE BUTTON
+    // PAUSE BUTTON
     std::unique_ptr<ImageButton> pauseButton;
     Texture2D pauseIconTexture;
 
     GameData currentData;
 
 public:
-    PlayingState(GameStateManager *manager, const GameData& initialData);
+    PlayingState(GameStateManager *manager, const GameData &initialData);
     void enter() override;
     void exit() override;
     void update() override;
