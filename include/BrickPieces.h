@@ -7,56 +7,58 @@
 // Forward declaration
 class Level;
 
-class BrickPiece : public Entity {
+class BrickPiece : public Entity
+{
 public:
     bool isOutOfScreen = false;
     int frameCounter = 0;
     const int frameSpeed = 12;
     const float gravity = 1000.0f;
-    Rectangle source; 
+    Rectangle source;
     Vector2 velocity;
     Texture2D texture;
 
-    BrickPiece ( Vector2 position, Vector2 size, Rectangle source, Vector2 velocity )
-        : Entity(position, size), source(source), velocity(velocity) 
+    BrickPiece(Vector2 position, Vector2 size, Rectangle source, Vector2 velocity)
+        : Entity(position, size), source(source), velocity(velocity)
     {
         texture = LoadTexture("./assets/Tiles/Overworld/brick.png");
     }
-    ~BrickPiece() 
+    ~BrickPiece()
     {
         UnloadTexture(texture);
     }
 
-    void Update(Level& level) override {}
+    void Update(Level &level) override {}
 
-    void Update(){
-        // Position 
+    void Update()
+    {
+        // Position
         float deltaTime = GetFrameTime();
         velocity.y += gravity * deltaTime;
         position.x += velocity.x * deltaTime;
         position.y += velocity.y * deltaTime;
 
-        // Animation 
+        // Animation
         frameCounter++;
-        if (frameCounter >= frameSpeed) {
+        if (frameCounter >= frameSpeed)
+        {
             frameCounter = 0;
             source.x += 8;
-            if (source.x > 24) source.x = 16;
+            if (source.x > 24)
+                source.x = 16;
         }
 
         // IsOutOfBound
-        if ( position.y > SCREEN_HEIGHT * SCALE ) isOutOfScreen = true;
+        if (position.y > SCREEN_HEIGHT * SCALE)
+            isOutOfScreen = true;
     }
 
-    void Draw() override 
+    void Draw() override
     {
-        rect.x = position.x; rect.y = position.y;
+        rect.x = position.x;
+        rect.y = position.y;
         DrawTexturePro(texture, source, rect, Vector2{0, 0}, 0.0f, WHITE);
     }
-
-    void ResolveCollision(Entity &other) override {}
-    void ResolveCollision(Level &level) override {}
-
 };
 
 #endif // BRICK_PIECES_H

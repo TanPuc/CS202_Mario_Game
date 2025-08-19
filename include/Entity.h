@@ -3,6 +3,7 @@
 
 #include <raylib.h>
 #include "GlobalVariables.h"
+#include "Collision.h"
 
 // Forward declaration
 class Level;
@@ -13,20 +14,25 @@ public:
     Rectangle rect;
     Vector2 position;
     Vector2 velocity;
+    Collision collision;
     DIRECTION direction = RIGHT; // Default direction
+    bool isActive;
 
     Entity() {}
     Entity(Vector2 position, Vector2 size)
-        : position(position), velocity({0.0f, 0.0f})
+        : position(position), velocity({0.0f, 0.0f}), isActive(true)
     {
         rect = {position.x, position.y, size.x, size.y};
     }
+    Entity(Vector2 position, Vector2 size, Vector2 velocity, DIRECTION direction)
+        : position(position), velocity(velocity), direction(direction), isActive(true)
+    {
+        rect = {position.x, position.y, size.x, size.y};
+    }
+    virtual ~Entity() = default;
 
     virtual void Update(Level &level) = 0;
     virtual void Draw() = 0;
-
-    virtual void ResolveCollision(Entity &other) = 0;
-    virtual void ResolveCollision(Level &level) = 0;
 
     Rectangle GetBounds() const
     {
@@ -37,7 +43,6 @@ public:
     {
         return position;
     }
-    ~Entity() = default;
 };
 
 #endif // ENTITY_H

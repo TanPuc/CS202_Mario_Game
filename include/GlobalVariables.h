@@ -5,10 +5,11 @@ enum STATE
 {
     STATE_IDLE,
     STATE_WALKING,
+    STATE_DECELERATING,
     STATE_JUMPING,
     STATE_FALLING,
     STATE_DUCKING,
-    STATE_SWIMMING
+    STATE_DEAD,
 };
 
 enum DIRECTION
@@ -25,7 +26,8 @@ enum MARIO_FORM
     SUPER
 };
 
-enum TileState {
+enum TileState
+{
     STATE_NORMAL,
     STATE_ACTIVATED,
     STATE_INTERACTED,
@@ -37,7 +39,10 @@ enum TileState {
 #define FRAME_PADDING 2
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
-#define SCALE 4.0f
+#define SCALE 2.0f
 #define TILE_SIZE 16.0f
+#define HEIGHT_BOUNDARY GRID_HEIGHT *TILE_SIZE *SCALE
+
+#define START_POS_WORLD_1_1 Vector2({6 * TILE_SIZE * SCALE, 13 * TILE_SIZE * SCALE})
 
 #endif // GLOBAL_VARIABLES_H

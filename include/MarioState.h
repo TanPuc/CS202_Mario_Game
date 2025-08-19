@@ -6,7 +6,7 @@
 #include "Tile.h"
 #include "GlobalVariables.h"
 #include "Physics.h"
-#include "Sprite.h"
+#include "GameSprite/MarioSprite.h"
 #include <iostream>
 #include <memory>
 

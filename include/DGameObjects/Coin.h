@@ -1,0 +1,66 @@
+#ifndef COIN_H
+#define COIN_H
+
+#include <raylib.h>
+#include <iostream>
+#include "Item.h"
+#include "Collision.h"
+#include "GlobalVariables.h"
+#include "GameSprite/CoinSprite.h"
+#include "DCore/SoundManager.h"
+
+#define COIN_SIZE 16
+
+class Coin : public Item
+{
+public:
+    CoinSprite coinSprite;
+    float timer = 0.0f; // Timer for coin animation
+    const float lifeTime = 1.0f;
+    Collision collision;
+
+    Coin(Vector2 pos) : Item(pos, {COIN_SIZE * SCALE, COIN_SIZE * SCALE}) {}
+
+    void Draw() override
+    {
+        coinSprite.Draw(*this);
+    }
+
+    void Collect(Mario &mario) override
+    {
+        if (isCollected)
+            return;
+        isCollected = true;
+        mario.coins++;
+        mario.score += 100; // Increment score by 100 for collecting a coin
+        std::cout << "Coin collected! Total coins: " << mario.coins << std::endl;
+        SoundManager::getInstance().playSound(SoundEffect::COIN);
+    }
+
+    void Update(Level &level) override
+    {
+        float gravity = 900.0f;
+        float dt = GetFrameTime();
+        ApplyGravity(velocity, gravity);
+
+        ResolveCollision(level);
+
+        position.x += velocity.x * dt;
+        position.y += velocity.y * dt;
+        rect.x = position.x;
+        rect.y = position.y;
+
+        // if (timer >= lifeTime)
+        // {
+        //     isActive = false;
+        // }
+    }
+
+    void ResolveCollision(Level &level)
+    {
+        collision.CheckCollision(position, rect, velocity, level);
+        collision.ResolveCollision(position, rect, velocity, level);
+    };
+};
+
+#endif // COIN_H

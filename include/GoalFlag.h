@@ -8,48 +8,49 @@
 // Forward declaration
 class Level;
 
-class GoalFlag : public Entity {
+class GoalFlag : public Entity
+{
 private:
     float velY = 0.0f;
     Vector2 destPos;
     Texture2D texture;
+
 public:
-    GoalFlag(Vector2 position) : Entity(position, {32, 32}), destPos(Vector2{position.x, position.y + 492.0f}) 
+    GoalFlag(Vector2 position) : Entity(position, {32, 32}), destPos(Vector2{position.x, position.y + 492.0f})
     {
-        texture = LoadTexture("./assets/Tiles/Overworld/goalflag.png"); 
+        texture = LoadTexture("./assets/Tiles/Overworld/goalflag.png");
     }
-    ~GoalFlag() 
+    ~GoalFlag()
     {
         UnloadTexture(texture);
     }
-    void iniVelY() 
+    void iniVelY()
     {
         velY = 200.0f;
     }
 
-
-    void Draw() override 
+    void Draw() override
     {
         DrawTextureEx(texture, position, 0.0f, SCALE, WHITE);
     }
-    void Update(TileState& state) 
+    void Update(TileState &state)
     {
-        if ( state == STATE_ACTIVATED ) {
+        if (state == STATE_ACTIVATED)
+        {
             float ft = GetFrameTime();
             position.y += velY * ft;
             // Mario slides simultaneously with the flag
-            if ( position.y >= destPos.y ) {
+            if (position.y >= destPos.y)
+            {
                 position.y = destPos.y;
                 velY = 0.0f;
-                // Mario stops sliding, goes toward the fortress 
-                // The fortress's flag raises 
+                // Mario stops sliding, goes toward the fortress
+                // The fortress's flag raises
             }
         }
     }
 
-    void Update(Level& level) override{}
-    void ResolveCollision(Entity& other) override {}
-    void ResolveCollision(Level& level) override {}
+    void Update(Level &level) override {}
 };
 
 #endif // GOALFLAG_H
