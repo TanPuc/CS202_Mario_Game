@@ -24,4 +24,18 @@ class GameStateManager
         void changeState(GameState* newState);
         void update();
         void draw();   
+    
+    public:
+    template<typename T>
+    T* findState()
+    {
+        for (auto it = states.rbegin(); it != states.rend(); ++it) 
+        {
+            if (auto ptr = dynamic_cast<T*>(it->get())) 
+            {
+                return ptr;
+            }
+        }
+        return nullptr;
+    }
 };

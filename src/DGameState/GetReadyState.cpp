@@ -1,12 +1,20 @@
 #include "DGameState/GetReadyState.h"
 #include "DGameState/PlayingState.h"
 #include "DCore/ResourceManager.h"
+#include "DCore/SoundManager.h"
+#include "DCore/GameData.h"
 
-GetReadyState::GetReadyState(GameStateManager* manager, int world, int level)
-    :gsm(manager), targetWorld(world), targetLevel(level) {}
+GetReadyState::GetReadyState(GameStateManager* manager, int world, int level, GetReadyReason reason)
+    :gsm(manager), targetWorld(world), targetLevel(level), reason(reason) {}
 
 void GetReadyState::enter()
 {
+    SoundManager::getInstance().stopMusic();
+    if(reason == GetReadyReason::NEW_GAME)
+        SoundManager::getInstance().playSound(SoundEffect::LEVEL_START);
+    else if(reason == GetReadyReason::RESPAWN)
+        SoundManager::getInstance().playSound(SoundEffect::PLAYER_DOWN);
+
     lifeIcon = LoadTexture("assets/mario.png");
     coinIcon = LoadTexture("assets/mario.png");
     hudManager = std::make_unique<HUDManager>(lifeIcon, coinIcon);
@@ -25,7 +33,13 @@ void GetReadyState::update()
     timer -= GetFrameTime();
     if (timer <= 0.0f) 
     {
-        gsm->changeState(new PlayingState(gsm, targetWorld, targetLevel));
+        GameData dataToLoad;
+        
+        dataToLoad.worldNum = this->targetWorld;
+        dataToLoad.levelNum = this->targetLevel;
+        dataToLoad.lives = gsm->getContext().lives;
+
+        gsm->changeState(new PlayingState(gsm, dataToLoad));
     }
 }
 

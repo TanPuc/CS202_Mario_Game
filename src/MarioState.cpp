@@ -1,4 +1,5 @@
 #include "MarioState.h"
+#include "DCore/SoundManager.h"
 
 // ---------------- IdleState ----------------
 std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprite)
@@ -14,7 +15,8 @@ std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprit
         if (jump_time >= JUMP_TIME_THRESHOLD) // If jump button held for too long,
         {
             player.velocity.y = -JUMP_FORCE; // Apply jump force
-            jump_time = 0;                   // Reset jump time
+            SoundManager::getInstance().playSound(SoundEffect::JUMP);
+            jump_time = 0; // Reset jump time
 
             sprite.SwitchAnimation(STATE_JUMPING);
             return std::make_unique<JumpingState>();
@@ -26,7 +28,8 @@ std::unique_ptr<MarioState> IdleState::HandleInput(Entity &player, Sprite &sprit
     if (jump_time > 0 && (IsKeyUp(KEY_SPACE) || IsKeyUp(KEY_UP) || IsKeyUp(KEY_W))) // Half Jump
     {
         player.velocity.y = -JUMP_FORCE * (HALF + float(0.05f * jump_time)); // Apply half jump force
-        jump_time = 0;                                                       // Reset jump time
+        SoundManager::getInstance().playSound(SoundEffect::JUMP);
+        jump_time = 0; // Reset jump time
         sprite.SwitchAnimation(STATE_JUMPING);
         return std::make_unique<JumpingState>();
     }
@@ -110,7 +113,8 @@ std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &player, Sprite &sp
         if (jump_time >= JUMP_TIME_THRESHOLD) // If jump button held for too long,
         {
             player.velocity.y = -JUMP_FORCE; // Apply jump force
-            jump_time = 0;                   // Reset jump time
+            SoundManager::getInstance().playSound(SoundEffect::JUMP);
+            jump_time = 0; // Reset jump time
             sprite.SwitchAnimation(STATE_JUMPING);
             return std::make_unique<JumpingState>();
         }
@@ -121,7 +125,8 @@ std::unique_ptr<MarioState> WalkingState::HandleInput(Entity &player, Sprite &sp
     if (jump_time > 0 && (IsKeyUp(KEY_SPACE) || IsKeyUp(KEY_UP) || IsKeyUp(KEY_W))) // Half Jump
     {
         player.velocity.y = -JUMP_FORCE * (HALF + float(0.05f * jump_time)); // Apply half jump force
-        jump_time = 0;                                                       // Reset jump time
+        SoundManager::getInstance().playSound(SoundEffect::JUMP);
+        jump_time = 0; // Reset jump time
         sprite.SwitchAnimation(STATE_JUMPING);
         return std::make_unique<JumpingState>();
     }

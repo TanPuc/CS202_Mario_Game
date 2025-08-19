@@ -10,6 +10,7 @@
 #include "MarioState.h"
 #include "GameSprite/MarioSprite.h"
 
+#include "DCore/SoundManager.h"
 class Mario : public Entity
 {
 public:

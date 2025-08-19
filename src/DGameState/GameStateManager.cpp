@@ -28,6 +28,11 @@ void GameStateManager::popState()
         states.back()->exit();
         states.pop_back();
     }
+
+    if(!states.empty())
+    {
+        states.back()->resume();
+    }
 }
 
 void GameStateManager::changeState(GameState* state) 
@@ -48,8 +53,21 @@ void GameStateManager::update()
 
 void GameStateManager::draw() 
 {
-    for (const auto& state : states) 
+    if (states.empty()) return;
+
+    size_t first_state_to_draw = 0;
+    for (int i = states.size() - 1; i >= 0; --i)
     {
-        state->draw();
+        if (states[i]->isOpaque())
+        {
+            first_state_to_draw = i;
+            break;
+        }
     }
+
+    for (size_t i = first_state_to_draw; i < states.size(); ++i)
+    {
+        states[i]->draw();
+    }
+
 }

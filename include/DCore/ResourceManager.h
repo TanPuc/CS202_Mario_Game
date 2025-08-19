@@ -7,6 +7,7 @@ class ResourceManager
     private:
         Font gameFont;
         ResourceManager() = default;
+        Texture2D backgroundTexture;
     
     public:
         //Delete copy constructor to ensure singleton
@@ -37,11 +38,33 @@ class ResourceManager
             return gameFont;
         }
 
+        void LoadBackgroundTexture(const char* filePath)
+        {
+            backgroundTexture = LoadTexture(filePath);
+            if (backgroundTexture.id == 0)
+            {
+                std::cerr << "Failed to load background texture: " << filePath << std::endl;
+            }
+            else
+            {
+                std::cout << "Successfully loaded background texture\n";
+            }
+        }
+
+        Texture2D& GetBackgroundTexture()
+        {
+            return backgroundTexture;
+        }
+
         void UnloadResources()
         {
             if (IsFontValid(gameFont))
             {
                 UnloadFont(gameFont);
+            }
+            if (backgroundTexture.id > 0)
+            {
+                UnloadTexture(backgroundTexture);
             }
         }
 };

@@ -11,6 +11,9 @@
 #include "DGameObjects/FireFlower.h"
 #include "ItemManager.h"
 #include "FireBallManager.h"
+#include "DGUI/ImageButton.h"
+#include "DCore/GameData.h"
+#include "raylib.h"
 #include <vector>
 #include <memory>
 
@@ -32,10 +35,17 @@ private:
 
     Vector2 cameraPos;
 
+    // PAUSE BUTTON
+    std::unique_ptr<ImageButton> pauseButton;
+    Texture2D pauseIconTexture;
+
+    GameData currentData;
+
 public:
-    PlayingState(GameStateManager *manager, int world, int level);
+    PlayingState(GameStateManager *manager, const GameData &initialData);
     void enter() override;
     void exit() override;
     void update() override;
     void draw() override;
+    void saveGameData();
 };
