@@ -26,8 +26,8 @@ void PlayingState::enter()
             gsm->pushState(new PauseState(gsm, worldNum, levelNum));
         });
 
-    // // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
-    player = std::make_unique<Mario>(START_POS_WORLD_1_1);
+    // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
+    // player = std::make_unique<Mario>(START_POS_WORLD_1_1);
 
     level = std::make_unique<Level>("./assets/Levels/world_1.1.txt");
 
@@ -109,32 +109,31 @@ void PlayingState::update()
     playerAdapter->update();
     hudManager->updateTime();
 
-    for (auto it = entities.begin(); it != entities.end();)
-    {
-        (*it)->Update(*level); // Update each entity
-        if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
-        {
-            if (auto coin = dynamic_cast<Coin *>((*it).get()))
-            {
-                if (!coin->isCollected)
-                {
-                    coin->isCollected = true;
-                    player->coins++;
-                    player->score += 100;
-                    SoundManager::getInstance().playSound(SoundEffect::COIN);
-                }
-            }
-        }
+    // for (auto it = entities.begin(); it != entities.end();)
+    // {
+    //     (*it)->Update(*level); // Update each entity
+    //     if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
+    //     {
+    //         if (auto coin = dynamic_cast<Coin *>((*it).get()))
+    //         {
+    //             if (!coin->isCollected)
+    //             {
+    //                 coin->isCollected = true;
+    //                 player->coins++;
+    //                 player->score += 100;
+    //             }
+    //         }
+    //     }
 
-        if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
-        {
-            it = entities.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
+    //     if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
+    //     {
+    //         it = entities.erase(it);
+    //     }
+    //     else
+    //     {
+    //         ++it;
+    //     }
+    // }
 
     fireBallManager.Update(*level);
     itemManager.UpdateItems(*level, *player); // Update all entities

@@ -7,6 +7,7 @@
 #include "Collision.h"
 #include "GlobalVariables.h"
 #include "GameSprite/CoinSprite.h"
+#include "DCore/SoundManager.h"
 
 #define COIN_SIZE 16
 
@@ -33,6 +34,7 @@ public:
         mario.coins++;
         mario.score += 100; // Increment score by 100 for collecting a coin
         std::cout << "Coin collected! Total coins: " << mario.coins << std::endl;
+        SoundManager::getInstance().playSound(SoundEffect::COIN);
     }
 
     void Update(Level &level) override
