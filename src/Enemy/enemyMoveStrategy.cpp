@@ -10,7 +10,7 @@ using namespace std;
 MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e, const Mario& mario) :
 	speed(value)
 {
-	if (e.GetPosition().x >= mario.GetPosition().x)
+	if (e.GetPosition().x + e.getHurtBox().width/2 >= mario.GetPosition().x + mario.rect.width/2)
 	{
 		e.setVelocityX(-speed);
 	}
@@ -74,39 +74,29 @@ void MoveStrategyChase::move(Enemy& e)
 
 MoveStrategyRandom::MoveStrategyRandom(float b, float s, Vector2* m):
 	m_boundary(b),m_speed(s), m_mark(m)
-{}
+{
+	randomTarget = *m_mark;
+}
 void MoveStrategyRandom::move(Enemy& e)
 {
 	Vector2 direction = Vector2Subtract(randomTarget, e.GetPosition());
-	float distance = Vector2Length(direction);
+	float distance = Vector2Length({ direction.x,0 });
 	
 	Vector2 temp;
 
-	if (distance < 1.0f || distance > m_boundary)
+	if (distance < 10.0f || distance > m_boundary)
 	{
-		temp = Vector2Normalize(direction) * m_speed;
-		e.setVelocityX(temp.x);
+		temp = Vector2{ m_mark->x, e.GetPosition().y };
+		temp.x = (float)GetRandomValue(temp.x - m_boundary, temp.x + m_boundary);
+		randomTarget = temp;
 	}
 	else
 	{
-		temp = *m_mark;
-		temp.x = (float)GetRandomValue(temp.x - m_boundary,temp.x);
-		randomTarget = temp;
+		//if (distance < 1) { direction = { -1,0 }; }
+		temp = Vector2Normalize({ direction.x,0 }) * m_speed;
+		e.setVelocityX(temp.x);
 	}
 }
-
-//MoveStrategyJump::MoveStrategyJump(int m) :
-//	magnitude(m)
-//{}
-//void MoveStrategyJump::move(Enemy& e)
-//{
-//	if (collisonFloor)
-//	{
-//		Vector2 temp = e.getVelocity();
-//		temp.x = magnitude;
-//		e.setVelocity(temp);
-//	}
-//}
 
 void MoveStrategyCombined::move(Enemy& e)
 {

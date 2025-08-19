@@ -13,7 +13,7 @@
 const float WALKSPEED = 50;
 const float SHELLSPEED = 200;
 const float RANDOMSPEED = 20;
-const float RANDOMBOUNDARY = 200;
+const float RANDOMBOUNDARY = 150;
 const float DISTANCESPEED = 50;
 const float CHASESPEED = 300;
 const float SWIMSPEED = 20;
@@ -29,8 +29,11 @@ const Vector2 OFFSET = { 500, 600};
 vector<FireBall*> FIREBALLS = {};
 
 const float CHASETIMER = 1.0f;
-const float ATTACKTIMER = 1;
-const float COOLDOWNTIMER = 3;
+const float ATTACKTIMER = 0.75f;
+const float HAMMERCOOLDOWNTIMER = 1;
+const float FIREBALLCOOLDOWNTIMER = 3;
+const float JUMPCOOLDOWNTIMER = 2;
+const float SPINYCOOLDOWNTIMER = 2;
 
 EnemyManager::EnemyManager(Mario* mario, Level* level) :
 	m_player(mario), m_level(level) {}
@@ -70,85 +73,91 @@ void EnemyManager::spawnEnemyAt(EnemyType type, Vector2 position)
 	{
 	case EnemyType::goopa:
 	{
-		e = spawnGooba();
+		e = spawnGooba(position);
 		break;
 	}
 
 	case EnemyType::koopa:
 	{
-		e = spawnKoopa();
+		e = spawnKoopa(position);
 		break;
 	}
 
 	case EnemyType::spiny:
 	{
-		e = spawnSpiny();
+		e = spawnSpiny(position);
 		break;
 	}
 
 	case EnemyType::lakitu:
 	{
-		e = spawnLakitu();
+		e = spawnLakitu(position);
 		break;
 	}
 
 	case EnemyType::paratroopa:
 	{
-		e = spawnParatroopa();
+		e = spawnParatroopa(position);
 		break;
 	}
 
 	case EnemyType::beezybettle:
 	{
-		e = spawnBeezyBettle();
+		e = spawnBeezyBettle(position);
 		break;
 	}
 
 	case EnemyType::cheepcheep:
 	{
-		e = spawnCheepCheep();
+		e = spawnCheepCheep(position);
 		break;
 	}
 
 	case EnemyType::blooper:
 	{
-		e = spawnBlooper();
+		e = spawnBlooper(position);
 		break;
 	}
 
 	case EnemyType::hammerbro:
 	{
-		e = spawnHammerBro();
+		e = spawnHammerBro(position);
 		break;
 	}
 
 	case EnemyType::bowser:
 	{
-		e = spawnBowser();
+		e = spawnBowser(position);
 		break;
 	}
 
 	case EnemyType::hammer:
 	{
-		e = spawnHammer();
+		e = spawnHammer(position);
 		break;
 	}
 
 	case EnemyType::piranhaplant:
 	{
-		e = spawnPiranhaPlant();
+		e = spawnPiranhaPlant(position);
+		break;
+	}
+
+	case EnemyType::fireball:
+	{
+		e = spawnFireBall(position);
 		break;
 	}
 	default:
 		break;
 	}
 
-	e->setPosition(position);
+	//e->setPosition(position);
 
 	m_toSpawn.push_back(e);
 }
 
-Enemy* EnemyManager::spawnGooba()
+Enemy* EnemyManager::spawnGooba(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
@@ -161,16 +170,15 @@ Enemy* EnemyManager::spawnGooba()
 		.build();
 
 	Texture2D text = enemyAsset::GetTexture(EnemyType::goopa);
-
 	SpriteEnemy* sprite = new SpriteEnemy();
 	sprite->addSpriteConfig(StateType::Walk, {text, {0,0,16,16}, 0, 2 , 1.0f});
 	sprite->addSpriteConfig(StateType::DeadStomp, {text, {32,0,16,16}, 32, 1 , 1.0f} );
 
 	Vector2 size = { 16,16 };
 
-	return new Enemy(EnemyType::goopa, fsm, sprite, size, {0,0});
+	return new Enemy(EnemyType::goopa, fsm, sprite, size, pos);
 }
-Enemy* EnemyManager::spawnKoopa()
+Enemy* EnemyManager::spawnKoopa(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
@@ -197,9 +205,9 @@ Enemy* EnemyManager::spawnKoopa()
 
 	Vector2 size = { 16,24 };
 
-	return new Enemy(EnemyType::koopa, fsm, sprite, size, {});
+	return new Enemy(EnemyType::koopa, fsm, sprite, size, pos);
 }
-Enemy* EnemyManager::spawnSpiny()
+Enemy* EnemyManager::spawnSpiny(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
@@ -222,20 +230,20 @@ Enemy* EnemyManager::spawnSpiny()
 
 	Vector2 size = { 16,16 };
 
-	Enemy* emmy = new Enemy(EnemyType::spiny, fsm, sprite, size, {});
+	Enemy* emmy = new Enemy(EnemyType::spiny, fsm, sprite, size, pos);
 	return emmy;
 }
 
-Enemy* EnemyManager::spawnLakitu()
+Enemy* EnemyManager::spawnLakitu(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
 
 	fsm = builder
 		.addState(new HoverState(RANDOMSPEED, RANDOMBOUNDARY, DISTANCESPEED, OFFSET, m_player))
-		.addState(new AttackState(this,new AttackSpiny(this)))
+		.addState(new AttackState(this,new AttackStrat(this, EnemyType::spiny)))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
-		.addTransition(StateType::Hover, new ConditionTimer(COOLDOWNTIMER), StateType::Attack)
+		.addTransition(StateType::Hover, new ConditionTimer(SPINYCOOLDOWNTIMER), StateType::Attack)
 		.addTransition(StateType::Attack, new ConditionTimer(ATTACKTIMER), StateType::Hover)
 		.addTransition(StateType::Attack, new ConditionStomped(*m_player), StateType::DeadElse)
 		.addTransition(StateType::Hover, new ConditionStomped(*m_player), StateType::DeadElse)
@@ -253,10 +261,10 @@ Enemy* EnemyManager::spawnLakitu()
 
 	Vector2 size = { 16,24 };
 
-	return new Enemy(EnemyType::lakitu, fsm, sprite, size, {});
+	return new Enemy(EnemyType::lakitu, fsm, sprite, size, pos);
 }
 
-Enemy* EnemyManager::spawnParatroopa()
+Enemy* EnemyManager::spawnParatroopa(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
@@ -290,9 +298,9 @@ Enemy* EnemyManager::spawnParatroopa()
 
 	Vector2 size = { 16,24 };
 
-	return new Enemy(EnemyType::paratroopa, fsm, sprite, size, {});
+	return new Enemy(EnemyType::paratroopa, fsm, sprite, size, pos);
 }
-Enemy* EnemyManager::spawnBeezyBettle()
+Enemy* EnemyManager::spawnBeezyBettle(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
@@ -319,16 +327,16 @@ Enemy* EnemyManager::spawnBeezyBettle()
 
 	Vector2 size = { 16,16 };
 
-	return new Enemy(EnemyType::beezybettle, fsm, sprite, size, {});
+	return new Enemy(EnemyType::beezybettle, fsm, sprite, size, pos);
 }
 
-Enemy* EnemyManager::spawnCheepCheep()
+Enemy* EnemyManager::spawnCheepCheep(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new SwimState(SWIMSPEED, FREQUENCY, MAGNITUDE))
+		.addState(new SwimState(SWIMSPEED, FREQUENCY, MAGNITUDE, m_player))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Swim, new ConditionFireBall(FIREBALLS), StateType::DeadElse)
 		.setInitialState(StateType::Swim)
@@ -342,9 +350,9 @@ Enemy* EnemyManager::spawnCheepCheep()
 
 	Vector2 size = { 16,16 };
 
-	return new Enemy(EnemyType::beezybettle, fsm, sprite, size, {});
+	return new Enemy(EnemyType::beezybettle, fsm, sprite, size, pos);
 }
-Enemy* EnemyManager::spawnBlooper()
+Enemy* EnemyManager::spawnBlooper(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
@@ -365,44 +373,47 @@ Enemy* EnemyManager::spawnBlooper()
 	SpriteEnemy* sprite = new SpriteEnemy();
 	sprite->addSpriteConfig(StateType::Fall, { text, {16,0,16,24}, 16, 1 , 1.0f });
 	sprite->addSpriteConfig(StateType::Chase, { text, {0,0,16,24}, 0, 1 , 1.0f });
-	sprite->addSpriteConfig(StateType::DeadElse, { text, {16,0,16,-24}, 16, 16 , 1.0f });
+	sprite->addSpriteConfig(StateType::DeadElse, { text, {16,0,16,-24}, 16, 1 , 1.0f });
 
 	Vector2 size = { 16,24 };
 
-	return new Enemy(EnemyType::blooper, fsm, sprite, size, {});
+	return new Enemy(EnemyType::blooper, fsm, sprite, size, pos);
 }
-Enemy* EnemyManager::spawnHammerBro()
+Enemy* EnemyManager::spawnHammerBro(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new PatrolState(RANDOMBOUNDARY, WALKSPEED))
-		.addState(new AttackState(this, new AttackThrowHammer(this)))
+		.addState(new PatrolState(RANDOMBOUNDARY, WALKSPEED, HOPPOWER, JUMPCOOLDOWNTIMER))
+		.addState(new AttackState(this, new AttackStrat(this, EnemyType::hammer)))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
+		.addTransition(StateType::Patrol, new ConditionTimer(HAMMERCOOLDOWNTIMER), StateType::Attack)
+		.addTransition(StateType::Attack, new ConditionTimer(ATTACKTIMER), StateType::Patrol)
 		.addTransition(StateType::Patrol, new ConditionFireBall(FIREBALLS), StateType::DeadElse)
 		.addTransition(StateType::Attack, new ConditionFireBall(FIREBALLS), StateType::DeadElse)
-		.setInitialState(StateType::Patrol)
+		.setInitialState(StateType::Attack)
 		.build();
 
 	Texture2D text = enemyAsset::GetTexture(EnemyType::hammerbro);
 
-	SpriteEnemy* sprite = new SpriteEnemy();
-	sprite->addSpriteConfig(StateType::Patrol, { text, {0,0,16,24}, 0, 2 , 1.0f });
+	SpriteEnemy* sprite = new SpriteEnemy(m_player);
+	sprite->setOffSetPosition({ 0,-8 ,1,1});
+	sprite->addSpriteConfig(StateType::Patrol, { text, {0,0,16,32}, 0, 2 , 1.0f });
 	sprite->addSpriteConfig(StateType::Attack, { text, {64,0,16,32}, 64, 2 , 1.0f });
-	sprite->addSpriteConfig(StateType::DeadElse, { text, {0,0,16,-24}, 0, 1 , 1.0f });
+	sprite->addSpriteConfig(StateType::DeadElse, { text, {0,0,16,-32}, 0, 1 , 1.0f });
 
 	Vector2 size = { 16,24 };
 
-	return new Enemy(EnemyType::hammerbro, fsm, sprite, size, {});
+	return new Enemy(EnemyType::hammerbro, fsm, sprite, size, pos);
 }
-Enemy* EnemyManager::spawnHammer()
+Enemy* EnemyManager::spawnHammer(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new WalkState(ATTACKSPEED,GRAVITY))
+		.addState(new WalkState(ATTACKSPEED,GRAVITY, m_player))
 		.addState(new DeadStateStomp())
 		.addTransition(StateType::Walk ,new ConditionGrounded(*m_level), StateType::DeadStomp)
 		.setInitialState(StateType::Walk)
@@ -411,16 +422,17 @@ Enemy* EnemyManager::spawnHammer()
 	Texture2D text = enemyAsset::GetTexture(EnemyType::hammer);
 
 	SpriteEnemy* sprite = new SpriteEnemy();
+	sprite->setOffSetPosition({-4,-4,2,2});
 	sprite->addSpriteConfig(StateType::Walk, { text, { 0,0,16,16 }, 0, 4, 0.5f });
 	sprite->addSpriteConfig(StateType::DeadStomp, { text, { 0,0,0,0 }, 0, 1, 0.5f });
 
-	Vector2 size = { 16,16 };
+	Vector2 size = { 8,8 };
 
-	Enemy* hemmer = new Enemy(EnemyType::hammer, fsm, sprite, size, {});
+	Enemy* hemmer = new Enemy(EnemyType::hammer, fsm, sprite, size, pos);
 	hemmer->setVelocityY(-HOPPOWER);
 	return hemmer;
 }
-Enemy* EnemyManager::spawnPiranhaPlant()
+Enemy* EnemyManager::spawnPiranhaPlant(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
@@ -440,24 +452,82 @@ Enemy* EnemyManager::spawnPiranhaPlant()
 
 	Vector2 size = { 16,24 };
 
-	Enemy* hemmer = new Enemy(EnemyType::piranhaplant, fsm, sprite, size, {});
+	Enemy* hemmer = new Enemy(EnemyType::piranhaplant, fsm, sprite, size, pos);
 	return hemmer;
 }
 
-Enemy* EnemyManager::spawnBowser()
+Enemy* EnemyManager::spawnBowser(Vector2 pos)
 {
 	FiniteStateMachine* fsm;
 	FSMBuilder			builder;
 
-	fsm = builder
+	ConditionFireBall* condiFire = new ConditionFireBall(FIREBALLS, 10);
 
+	fsm = builder
+		.addState(new PatrolState(RANDOMBOUNDARY,RANDOMSPEED, HOPPOWER, JUMPCOOLDOWNTIMER))
+		.addState(new AttackState(this,new AttackStrat(this, EnemyType::hammer), 5 , 0.5f))
+		.addState(new AttackOffState(this, new AttackStrat(this, EnemyType::fireball)))
+		.addState(new DeadStateElse(GRAVITYPREMIUM))
+		.addTransition(StateType::Patrol, new ConditionTimer(HAMMERCOOLDOWNTIMER), StateType::Attack)
+		.addTransition(StateType::Attack, new ConditionTimer(ATTACKTIMER), StateType::Patrol)
+		.addTransition(StateType::Patrol, new ConditionTimer(FIREBALLCOOLDOWNTIMER), StateType::attackOff)
+		.addTransition(StateType::attackOff, new ConditionTimer(ATTACKTIMER), StateType::Patrol)
+		.addTransition(StateType::Patrol, condiFire,StateType::DeadElse)
+		.addTransition(StateType::attackOff, condiFire, StateType::Patrol)
+		.addTransition(StateType::Attack, condiFire, StateType::Patrol)
+		.setInitialState(StateType::attackOff)
 		.build();
 
 	Texture2D text = enemyAsset::GetTexture(EnemyType::bowser);
 
+	SpriteEnemy* sprite = new SpriteEnemy(m_player);
+	sprite->setOffSetPosition({0,-10,1,1});
+	sprite->addSpriteConfig(StateType::Patrol, { text, { 64,0,32,42 }, 64, 2, 1.0f });
+	sprite->addSpriteConfig(StateType::Attack, { text, {128,0,32,42 }, 128, 1, 1.0f });
+	sprite->addSpriteConfig(StateType::attackOff, { text, { 0,0,32,42 }, 0, 2, 1.0f });
+	sprite->addSpriteConfig(StateType::DeadElse, { text, { 0,0,32,-42 }, 0, 2, 1.0f });
+
+	Vector2 hitbox = {32,32};
+
+	return new Enemy(EnemyType::bowser, fsm, sprite, hitbox, pos);
+}
+
+Enemy* EnemyManager::spawnFireBall(Vector2 pos)
+{
+	FiniteStateMachine* fsm;
+	FSMBuilder			builder;
+
+	Vector2 random = { 0,0 };
+
+	switch (GetRandomValue(1,2))
+	{
+	case 1:
+	{
+		random.x = 2.0f;
+		random.y = TILEFACTOR * 32;
+	}
+	case 2:
+		break;
+	default:
+		break;
+	}
+
+	fsm = builder
+		.addState(new SwimState(ATTACKSPEED, random.x,random.y, m_player))
+		.addState(new DeadStateStomp())
+		.addTransition(StateType::Swim, new ConditionTimer(15), StateType::DeadStomp)
+		.setInitialState(StateType::Swim)
+		.build();
+
+	Texture2D text = enemyAsset::GetTexture(EnemyType::fireball);
+
 	SpriteEnemy* sprite = new SpriteEnemy();
+	//sprite->setOffSetPosition({ -4,-4,2,2 });
+	sprite->addSpriteConfig(StateType::Swim, { text, { 0,0,-24,8 }, 0, 2, 0.5f });
+	sprite->addSpriteConfig(StateType::DeadStomp, { text, { 0,0,0,0 }, 0, 1, 0.5f });
 
-	Vector2 hitbox = {};
+	Vector2 size = { 24,8 };
 
-	return new Enemy(EnemyType::bowser, fsm, sprite, hitbox, {});
+	Enemy* hemmer = new Enemy(EnemyType::fireball, fsm, sprite, size, pos);
+	return hemmer;
 }

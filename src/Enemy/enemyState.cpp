@@ -33,12 +33,13 @@ StateType WalkState::getName() const
 	return StateType::Walk;
 }
 
-SwimState::SwimState(float speed, float freq, float magni) :
-	m_speed(speed), m_frequency(freq), m_magnitude(magni) {}
+SwimState::SwimState(float speed, float freq, float magni, Mario* mario) :
+	m_speed(speed), m_frequency(freq), m_magnitude(magni), m_player(mario) {}
 void SwimState::enter(Enemy& e)
 {
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
-	compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
+	if (m_player) compoMove->addStrategy(new MoveStrategyBasic(m_speed, e, *m_player));
+	else compoMove->addStrategy(new MoveStrategyBasic(m_speed, e));
 	compoMove->addStrategy(new MoveStrategySwayUpDown(m_magnitude, m_frequency));
 	e.setMoveStrategy(compoMove);
 
@@ -56,7 +57,7 @@ HoverState::HoverState(float speedRandom, float boundary, float speedDistace, Ve
 void HoverState::enter(Enemy& e)
 {
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
-	compoMove->addStrategy(new MoveStrategyRandom(m_boundary, m_speedRandom, &m_player->position));
+	//compoMove->addStrategy(new MoveStrategyRandom(m_boundary, m_speedRandom, &m_player->position));
 	compoMove->addStrategy(new MoveStrategyKeepDistance(m_speedDistance, m_offset , m_player));
 	e.setMoveStrategy(compoMove);
 
@@ -69,10 +70,10 @@ StateType HoverState::getName() const
 	return StateType::Hover;
 }
 
-AttackState::AttackState(EnemyManager* manager, IAttackStrategy* attack, int number):
-	m_manager(manager), m_attack(attack), m_amount(number) {}
-AttackState::AttackState(EnemyManager* manager, IAttackStrategy* attack) :
+AttackState::AttackState(EnemyManager* manager, AttackStrat* attack) :
 	m_manager(manager), m_attack(attack) {}
+AttackState::AttackState(EnemyManager* manager, AttackStrat* attack, int amount, float durat) :
+	m_manager(manager), m_attack(attack), m_amout(amount) , duration(durat){}
 AttackState::~AttackState() { delete m_attack; }
 void AttackState::enter(Enemy& e)
 {
@@ -83,27 +84,56 @@ void AttackState::enter(Enemy& e)
 void AttackState::exit(Enemy& e)
 {	
 	m_attack->attack(e);
-
-	while (m_counter < m_amount)
-	{
-		timer += GetFrameTime();
-		if (timer >= threshold)
-		{
-			m_attack->attack(e);
-			timer = 0;
-			m_counter++;
-		}
-	}
 	//e.setAttackStrategy(nullptr);
 }
 void AttackState::update(Enemy& e)
 {
+	timer += GetFrameTime();
+	if (timer <= threshold) return;
 
+	//m_attack->attack(e);
+	
+	timer2 += GetFrameTime();
+
+	if (timer2 >= duration / m_amout)
+	{
+		m_attack->attack(e);
+		counter++;
+		timer2 = 0;
+	}
+
+	//float times = threshold + duration / m_amout * counter;
+	//if (timer  >= times)
+	//{
+	//	m_attack->attack(e);
+	//	counter++;
+	//}
 }
 StateType AttackState::getName() const
 {
 	return StateType::Attack;
 }
+
+AttackOffState::AttackOffState(EnemyManager* manager, AttackStrat* attack) :
+	m_manager(manager), m_attack(attack){}
+void AttackOffState::enter(Enemy& e)
+{
+	e.setSprite(getName());
+}
+void AttackOffState::exit(Enemy& e)
+{
+	m_attack->attack(e);
+}
+void AttackOffState::update(Enemy& e)
+{
+
+}
+StateType AttackOffState::getName() const
+{
+	return StateType::attackOff;
+}
+
+
 
 FallState::FallState(float gravity):
 	m_gravity(gravity) {}
@@ -214,12 +244,17 @@ StateType ChaseState::getName() const
 	return StateType::Chase;
 }
 
-PatrolState::PatrolState(float boundary, float speed) :
-	m_boundary(boundary), m_speed(speed) {}
+PatrolState::PatrolState(float boundary, float speed, float JumpPower, float timer) :
+	m_boundary(boundary), m_speed(speed), m_JumpPower(JumpPower), m_threshold(timer) {}
 void PatrolState::enter(Enemy& e)
 {
-	Vector2* mark = new Vector2(e.GetPosition());
-	e.setMoveStrategy(new MoveStrategyRandom(m_boundary,m_speed,mark));
+	if (!m_mark && (e.GetPosition() != Vector2{0,0})) m_mark = new Vector2(e.GetPosition());
+	MoveStrategyCombined* combined = new MoveStrategyCombined();
+	combined->addStrategy(new MoveStrategyRandom(m_boundary, m_speed, m_mark));
+	combined->addStrategy(new MoveStrategyFall(GRAVITY));
+	e.setMoveStrategy(combined);
+
+	e.setCollisionMap(new CollisionMap(nullptr, nullptr));
 
 	e.setSprite(getName());
 }
@@ -229,7 +264,12 @@ void PatrolState::exit(Enemy& enemy)
 }
 void PatrolState::update(Enemy& enemy)
 {
-
+	timer += GetFrameTime();
+	if (timer >= m_threshold)
+	{
+		timer = 0;
+		enemy.addVelocityY(-m_JumpPower);
+	}
 }
 StateType PatrolState::getName() const
 {

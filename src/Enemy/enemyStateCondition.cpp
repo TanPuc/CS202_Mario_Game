@@ -31,12 +31,16 @@ bool ConditionShell::evaluate(Enemy& e)
 
 ConditionFireBall::ConditionFireBall(const vector<FireBall*>& balls) :
 	m_fireballs(balls) {}
+ConditionFireBall::ConditionFireBall(const vector<FireBall*>& balls, int amount) :
+    m_fireballs(balls) , m_amount(amount) {}
 bool ConditionFireBall::evaluate(Enemy& e)
 {
 	for (auto& s : m_fireballs)
 	{
         if (CheckCollisionRecs(e.getHurtBox(), s->GetBounds()))
         {
+            m_counter++;
+            if (m_counter >= m_amount)
             return true;
         }
 	}

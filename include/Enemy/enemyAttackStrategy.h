@@ -10,51 +10,68 @@ class Enemy;
 
 class EnemyManager;
 
-
-class IAttackStrategy
+class AttackStrat
 {
 public:
-	virtual void attack(Enemy&) const = 0;
-	virtual ~IAttackStrategy() = default;
-};
+	AttackStrat(EnemyManager*, EnemyType);
+	AttackStrat(EnemyManager*, EnemyType, int);
+	AttackStrat(EnemyManager*, EnemyType, int , float);
+	~AttackStrat() = default;
+	void attack(Enemy& e) const;
 
-class AttackThrowHammer : public IAttackStrategy
-{
-public:
-	AttackThrowHammer(EnemyManager*);
-	void attack(Enemy&) const override;
 private:
 	EnemyManager* m_manager;
-	EnemyType m_type = EnemyType::hammer;
+	EnemyType m_type = EnemyType::nothing;
+	int m_amount = 1;
+	float m_threshold = 0.25f;
 };
 
-class AttackFireBall : public IAttackStrategy
-{
-public:
-	AttackFireBall(EnemyManager*);
-	void attack(Enemy&) const override;
-private:
-	EnemyManager* m_manager;
-	EnemyType m_type = EnemyType::fireball;
-};
-
-class AttackSpiny : public IAttackStrategy
-{
-public:
-	AttackSpiny(EnemyManager*);
-	void attack(Enemy& e) const override;
-private:
-	EnemyManager* m_manager;
-	EnemyType m_type = EnemyType::spiny;
-};
-
-class AttackCombined : public IAttackStrategy
-{
-public:
-	void attack(Enemy&) const override;
-	void addStrategy(IAttackStrategy*);
-	~AttackCombined();
-
-private:
-	vector<IAttackStrategy*> m_Strategies;
-};
+//
+//
+//class IAttackStrategy
+//{
+//public:
+//	virtual void attack(Enemy&) const = 0;
+//	virtual ~IAttackStrategy() = default;
+//};
+//
+//class AttackThrowHammer : public IAttackStrategy
+//{
+//public:
+//	AttackThrowHammer(EnemyManager*);
+//	void attack(Enemy&) const override;
+//private:
+//	EnemyManager* m_manager;
+//	EnemyType m_type = EnemyType::hammer;
+//};
+//
+//class AttackFireBall : public IAttackStrategy
+//{
+//public:
+//	AttackFireBall(EnemyManager*);
+//	void attack(Enemy&) const override;
+//private:
+//	EnemyManager* m_manager;
+//	EnemyType m_type = EnemyType::fireball;
+//};
+//
+//class AttackSpiny : public IAttackStrategy
+//{
+//public:
+//	AttackSpiny(EnemyManager*);
+//	void attack(Enemy& e) const override;
+//private:
+//	EnemyManager* m_manager;
+//	EnemyType m_type = EnemyType::spiny;
+//};
+//
+//class AttackCombined : public IAttackStrategy
+//{
+//public:
+//	void attack(Enemy&) const override;
+//	void addStrategy(IAttackStrategy*);
+//	~AttackCombined();
+//
+//private:
+//	vector<IAttackStrategy*> m_Strategies;
+//};

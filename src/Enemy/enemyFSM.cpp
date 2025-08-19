@@ -45,8 +45,11 @@ FiniteStateMachine::~FiniteStateMachine()
 {
     for (auto& e : m_transitions)
     {
-        delete e.m_condition;
-        e.m_condition = nullptr;
+        if (e.m_condition)
+        {
+            delete e.m_condition;
+            e.m_condition = nullptr;
+        }
     }
     for (auto& pair : m_stateMap) {
         delete pair.second;  

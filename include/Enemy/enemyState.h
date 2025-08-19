@@ -8,6 +8,7 @@ class Enemy;
 class EnemyStateChangeStrategy;
 class IAttackStrategy;
 class EnemyManager;
+class AttackStrat;
 
 class Mario;
 
@@ -47,7 +48,7 @@ private:
 class SwimState : public EnemyState
 {
 public:
-	SwimState(float speed, float freq, float magnitude);
+	SwimState(float speed, float freq, float magnitude, Mario* mario);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
@@ -56,6 +57,7 @@ private:
 	float	m_speed;
 	float m_frequency;
 	float m_magnitude;
+	Mario* m_player = nullptr;
 };
 
 class HoverState : public EnemyState
@@ -72,11 +74,14 @@ private:
 	Vector2 m_offset;
 	Mario* m_player;
 };
+
+
+
 class AttackState : public EnemyState
 {
 public:
-	AttackState(EnemyManager*, IAttackStrategy*, int);
-	AttackState(EnemyManager*, IAttackStrategy*);
+	AttackState(EnemyManager*, AttackStrat*);
+	AttackState(EnemyManager*, AttackStrat*, int, float);
 	~AttackState();
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
@@ -84,12 +89,32 @@ public:
 	StateType getName() const override;
 private:
 	EnemyManager* m_manager;
-	IAttackStrategy* m_attack;
-	float timer = 0;
+	AttackStrat* m_attack;
+	int m_amout = 1;
+	int counter = 1;
 	float threshold = 0.25f;
-	int m_counter = 1;
-	int m_amount = 1;
+	float timer = 0;
+	float timer2 = 0;
+	float duration = 0.5f;
+
 };
+class AttackOffState : public EnemyState
+{
+public:
+	AttackOffState(EnemyManager*, AttackStrat*);
+	~AttackOffState() { delete m_attack; }
+	void enter(Enemy& e) override;
+	void exit(Enemy& enemy) override;
+	void update(Enemy& enemy) override;
+	StateType getName() const override;
+private:
+	EnemyManager* m_manager = nullptr;
+	AttackStrat* m_attack;
+};
+
+
+
+
 class FallState : public EnemyState
 {
 public:
@@ -165,7 +190,8 @@ private:
 class PatrolState : public EnemyState
 {
 public:
-	PatrolState(float boundary, float speed);
+	PatrolState(float boundary, float speed, float jumppower, float timer);
+	~PatrolState() { delete m_mark; }
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
@@ -173,6 +199,10 @@ public:
 private:
 	float m_boundary;
 	float m_speed;
+	float m_JumpPower;
+	Vector2* m_mark = nullptr;
+	float timer = 0;
+	float m_threshold = 3;
 };
 
 class DeadStateStomp : public EnemyState

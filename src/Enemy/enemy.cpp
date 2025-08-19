@@ -113,7 +113,7 @@ Vector2 Enemy::getVelocity() const
 	return m_velocity;
 }
 
-int Enemy::getDirection() const
+int Enemy::getDirectionSelf() const
 {
 	if (m_velocity.x <= 0)
 	{
@@ -149,7 +149,6 @@ void Enemy::setHitBox()
 	m_HitBox.width = m_HurtBox.width + 2 * offset;
 	m_HitBox.height = m_HurtBox.height - offset;
 }
-
 
 void Enemy::setIsCollidedMap()
 {

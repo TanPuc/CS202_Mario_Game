@@ -18,7 +18,7 @@ int main(void)
 
 	enemyAsset::Load();
 	EnemyManager* manager = new EnemyManager(player, level);
-	Vector2 posEnemy = { 300, 300};
+	Vector2 posEnemy = { 700, 300};
 	//manager->spawnEnemyAt(EnemyType::goopa, posEnemy);
 	//manager->spawnEnemyAt(EnemyType::koopa, posEnemy);
 	//manager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
@@ -28,8 +28,10 @@ int main(void)
 	//manager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
 	//manager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
 	//manager->spawnEnemyAt(EnemyType::paratroopa, posEnemy);
-	manager->spawnEnemyAt(EnemyType::hammer, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::hammer, posEnemy);
 	//manager->spawnEnemyAt(EnemyType::piranhaplant, posEnemy);
+	//manager->spawnEnemyAt(EnemyType::hammerbro, posEnemy);
+	manager->spawnEnemyAt(EnemyType::bowser, posEnemy);
 
 	while (!WindowShouldClose())
 	{

@@ -37,9 +37,12 @@ class ConditionFireBall : public EnemyStateCondition
 {
 public:
 	ConditionFireBall(const vector<FireBall*>& balls);
+	ConditionFireBall(const vector<FireBall*>& balls, int amount);
 	bool evaluate(Enemy& e) override;
 private:
 	const vector<FireBall*>& m_fireballs;
+	int m_amount = 1;
+	int m_counter = 0;
 };
 class ConditionStomped : public EnemyStateCondition
 {

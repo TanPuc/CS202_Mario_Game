@@ -22,7 +22,10 @@ struct Transition
 		other.m_to = nullptr;
 	}
 	~Transition() {
-		delete m_condition;
-		m_condition = nullptr;
+		if (m_condition)
+		{
+			delete m_condition;
+			m_condition = nullptr;
+		}
 	}
 };

@@ -38,7 +38,6 @@ public:
 
 	void handleInput(int input);
 	void Update(Level& level) override;
-	//void Update(Mario& mario);
 	void Draw() override;
 
 	void destroy();
@@ -48,17 +47,17 @@ public:
 	void addVelocityY(float Y);
 	Vector2 getVelocity() const;
 
-	int getDirection() const;
+	int getDirectionSelf() const;
 	void reverseDirection();
+	int getDirectionPlayer() const;
 
-	//Vector2 getPositon() const;
 	void setPosition(Vector2);
 
 	Rectangle getHurtBox() const;
 	void setHurtBox();
 
 	Rectangle getHitBox() const;
-	void setHitBox();		//unfinished
+	void setHitBox();		
 
 	void setIsCollidedMap();
 	bool getIsCollidedMap();
