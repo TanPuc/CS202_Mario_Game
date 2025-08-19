@@ -15,7 +15,6 @@
 #include "Collision.h"
 #include "BrickPieces.h"
 #include "GoalFlag.h"
-#include "FortressFlag.h"
 
 // Forward declaration
 class Mario;
@@ -27,10 +26,6 @@ class Tile {
 private:
     Texture2D texture;
 public:
-    // Tile() 
-    // {
-    //     texture = LoadTexture("./assets/Tiles/Overworld.png");
-    // }
     Tile(const char* filePath) 
     {
         texture = LoadTexture(filePath);
@@ -80,8 +75,15 @@ public:
     TileState getState() const { return state; }
 
     TileInstance(Vector2 pos, std::shared_ptr<Tile> tile);
-    virtual void update(Mario& player) = 0;
-    virtual void render() = 0;
+    virtual void update(Mario& player) {}
+    virtual void render() 
+    {
+        if ( tile )
+        {
+            DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+        }
+        DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw boundingbox
+    }
 };
 
 class DummyInstance : public TileInstance {
@@ -186,15 +188,19 @@ public:
 class FortressInstance : public TileInstance {
 private:
     Rectangle hbox;
-    FortressFlag fortressFlag;
+    // FortressFlag fortressFlag;
+    // , fortressFlag({pos.x + fortress->getTexture().width * SCALE / 2 - TILE_SIZE * SCALE / 2, pos.y + 16.0f })
 public:
     FortressInstance(Vector2 pos, std::shared_ptr<Tile> fortress)
-        : TileInstance(pos, fortress), fortressFlag({pos.x + fortress->getTexture().width * SCALE / 2 - TILE_SIZE * SCALE / 2, pos.y + 16.0f })
+        : TileInstance(pos, fortress)
     {
         bbox = Rectangle{0, 0, 0, 0};
     }
-    void update(Mario& player) override;
-    void render() override;
+    void update(Mario& player) override {}
+    void render() override
+    {
+        DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+    }
 };
 
 class BigFortressInstance : public TileInstance 
@@ -228,12 +234,71 @@ class GrassBrickInstance : public TileInstance
 {
 public:
     GrassBrickInstance(Vector2 pos, std::shared_ptr<Tile> grass ) 
-        : TileInstance(pos, grass) {}
+        : TileInstance(pos, grass) 
+    {
+        bbox = Rectangle{0, 0, 0, 0};
+    }
     void update(Mario& player) override {}
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
     }
+};
+
+class PlatformInstance : public TileInstance 
+{
+public:
+    std::shared_ptr<Vector2> topPos = nullptr;
+    std::shared_ptr<Vector2> bottomPos = nullptr;
+    std::shared_ptr<Vector2> leftPos = nullptr;
+    std::shared_ptr<Vector2> rightPos = nullptr;
+    // Vector2 velocity = {0.0f, 100.0f};
+
+    PlatformInstance(Vector2 pos_1, Vector2 pos_2, std::shared_ptr<Tile> platform, int direction ) : TileInstance(pos_1, platform)
+    {
+        if ( direction == 0 ) // Up and down
+        {
+            topPos = std::make_shared<Vector2>(pos_1);
+            bottomPos = std::make_shared<Vector2>(pos_2);
+            bbox = Rectangle{topPos->x, topPos->y, platform->getTexture().width * SCALE, platform->getTexture().height * SCALE};
+        }
+        else if ( direction == 1 ) // Left and right
+        {
+            leftPos = std::make_shared<Vector2>(pos_1);
+            rightPos = std::make_shared<Vector2>(pos_2);
+            bbox = Rectangle{leftPos->x, leftPos->y, platform->getTexture().width * SCALE, platform->getTexture().height * SCALE};
+        }
+    }
+    void render() override
+    {
+        DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+        DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw bounding box 
+    }
+    void update(Mario& player) override 
+    {
+
+    }
+};
+
+class LavaSurfaceInstance : public TileInstance
+{
+public:
+    Rectangle hbox;
+    LavaSurfaceInstance(Vector2 pos, std::shared_ptr<Tile> lavaSurface )
+        : TileInstance ( pos, lavaSurface ), hbox({pos.x, pos.y + 0.25f * TILE_SIZE * SCALE, TILE_SIZE * SCALE, 0.75f * TILE_SIZE * SCALE}) 
+        {
+            bbox = Rectangle{0, 0, 0, 0};
+        }
+    void update(Mario& player) override;
+    void render() override;
+};
+
+class UsedBlockInstance : public TileInstance
+{
+public:
+    UsedBlockInstance(Vector2 pos, std::shared_ptr<Tile> usedBlock)
+        : TileInstance(pos, usedBlock) {}
+    void update(Mario& player) override {}
 };
 
 #endif // TILE_H

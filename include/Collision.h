@@ -31,7 +31,6 @@ public:
     // Dedicated to resolve collision between player and tiles map
     void CheckCollision(Vector2& position, Rectangle& bbox, Vector2& velocity, Level& level);
     void ResolveCollision(Vector2& position, Rectangle& bbox, Vector2& velocity, Level& level);
-    
 };
 
 #endif // COLLISION_H

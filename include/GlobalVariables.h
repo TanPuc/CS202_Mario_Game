@@ -38,9 +38,6 @@ enum TileState {
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define SCALE 4.0f
-#define GRID_WIDTH 211
-#define GRID_WIDTH_2 163
-#define GRID_HEIGHT 15
 #define TILE_SIZE 16.0f
 
 #endif // GLOBAL_VARIABLES_H
