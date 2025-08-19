@@ -10,6 +10,7 @@ private:
     Animation walkAnimation;
     Animation jumpAnimation;
     Animation decelerationAnimation;
+    Animation deadAnimation;
 
 public:
     Texture2D spriteSheet;
@@ -25,6 +26,7 @@ public:
           walkAnimation({{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}}),
           jumpAnimation({{32 + FRAME_PADDING * 2, 16, 16, 16}}),
           decelerationAnimation({{108, 16, 16, 16}}),
+          deadAnimation({{306, 16, 16, 16}}),
           prevState(STATE_IDLE)
     {
         spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
@@ -86,12 +88,9 @@ public:
             currentAnimation = &jumpAnimation;
             break;
         case STATE_DUCKING:
-            // Handle ducking state if needed
-            currentAnimation = &idleAnimation; // Fallback to idle
             break;
-        case STATE_SWIMMING:
-            // Handle swimming state if needed
-            currentAnimation = &idleAnimation; // Fallback to idle
+        case STATE_DEAD:
+            currentAnimation = &deadAnimation;
             break;
         default:
             std::cerr << "Unknown state: " << state_ << std::endl;

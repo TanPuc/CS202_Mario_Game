@@ -17,6 +17,7 @@ public:
     Collision collision;
 
     Mushroom(Vector2 pos) : Item(pos, {MUSHROOM_SIZE * SCALE, MUSHROOM_SIZE * SCALE}) {}
+    Mushroom(Vector2 pos, Vector2 vel, DIRECTION dir) : Item(pos, {MUSHROOM_SIZE * SCALE, MUSHROOM_SIZE * SCALE}, vel, dir) {}
 
     void Draw() override
     {

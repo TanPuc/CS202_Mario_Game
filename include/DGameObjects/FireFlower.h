@@ -17,6 +17,7 @@ public:
     Collision collision;
 
     FireFlower(Vector2 pos) : Item(pos, {FIREFLOWER_SIZE * SCALE, FIREFLOWER_SIZE * SCALE}) {}
+    FireFlower(Vector2 pos, Vector2 vel, DIRECTION dir) : Item(pos, {FIREFLOWER_SIZE * SCALE, FIREFLOWER_SIZE * SCALE}, vel, dir) {}
 
     void Draw() override
     {

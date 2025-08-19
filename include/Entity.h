@@ -24,6 +24,11 @@ public:
     {
         rect = {position.x, position.y, size.x, size.y};
     }
+    Entity(Vector2 position, Vector2 size, Vector2 velocity, DIRECTION direction)
+        : position(position), velocity(velocity), direction(direction), isActive(true)
+    {
+        rect = {position.x, position.y, size.x, size.y};
+    }
     virtual ~Entity() = default;
 
     virtual void Update(Level &level) = 0;

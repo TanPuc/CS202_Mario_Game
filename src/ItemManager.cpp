@@ -48,3 +48,13 @@ void ItemManager::DrawItems()
         }
     }
 }
+
+void ItemManager::SpawnMushroom(Vector2 position, Vector2 velocity, DIRECTION direction)
+{
+    items.push_back(std::make_unique<Mushroom>(position, velocity, direction));
+}
+
+void ItemManager::SpawnFireFlower(Vector2 position, Vector2 velocity, DIRECTION direction)
+{
+    items.push_back(std::make_unique<FireFlower>(position, velocity, direction));
+}

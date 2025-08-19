@@ -14,7 +14,7 @@ class Mario : public Entity
 {
 public:
     std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
-    MarioSprite *sprite;
+    std::unique_ptr<MarioSprite> sprite;
     MARIO_FORM form;
     // std::vector<std::shared_ptr<FireBall>> fireballs;
     int lives;
@@ -24,11 +24,12 @@ public:
     Mario(Vector2 position) : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})), form(SMALL)
     {
         rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
-        sprite = new MarioSprite();
+        sprite = std::make_unique<MarioSprite>();
     }
-    ~Mario()
+
+    void Die()
     {
-        delete sprite;
+        lives--;
     }
 
     void Grow()
@@ -112,8 +113,6 @@ public:
             currentState = std::move(newState);
             // sprite->SwitchAnimation(currentState->GetType());
         }
-
-        // ChangeForm();
     }
 
     void Draw() override

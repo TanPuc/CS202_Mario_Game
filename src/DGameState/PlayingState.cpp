@@ -12,7 +12,8 @@ void PlayingState::enter()
     coinIcon = LoadTexture("assets/mario.png");
     marioTexture = LoadTexture("assets/mario.png");
 
-    player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
+    // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
+    player = std::make_unique<Mario>(START_POS_WORLD_1_1);
 
     level = std::make_unique<Level>("./assets/Levels/world_1.1.txt");
 
@@ -66,6 +67,7 @@ void PlayingState::update()
     }
     player->Update(*level); // Handling player collision and movement
 
+    // Handle Mario's death
     level->update(*player);
 
     playerAdapter->update();
@@ -76,9 +78,9 @@ void PlayingState::update()
 
     // Check for game over
     // Time and lives
-    if (hudManager->getTime() <= 0)
+    if (hudManager->getTime() <= 0 || player->GetPosition().y > HEIGHT_BOUNDARY)
     {
-        player->lives--;
+        player->Die();
         gsm->getContext().lives = player->lives;
 
         if (player->lives <= 0)
