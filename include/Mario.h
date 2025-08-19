@@ -1,43 +1,76 @@
 #ifndef MARIO_H
 #define MARIO_H
 
-#include "Entity.h"
-#include "Tile.h"
-#include "MarioState.h"
-#include "Sprite.h"
-#include "GlobalVariables.h"
-#include "FireBall.h"
-#include <raylib.h>
 #include <iostream>
+#include <raylib.h>
 #include <array>
 #include <cmath>
+#include "GlobalVariables.h"
+#include "Entity.h"
+#include "MarioState.h"
+#include "GameSprite/MarioSprite.h"
 
+#include "DCore/SoundManager.h"
 class Mario : public Entity
 {
 public:
     std::unique_ptr<MarioState> currentState = std::make_unique<IdleState>();
-    MarioSprite *sprite;
+    std::unique_ptr<MarioSprite> sprite;
     MARIO_FORM form;
-    std::vector<std::unique_ptr<FireBall>> fireballs;
+    // std::vector<std::shared_ptr<FireBall>> fireballs;
+    int lives;
+    int coins;
+    long long score;
 
     Mario(Vector2 position) : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})), form(SMALL)
     {
         rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
-        sprite = new MarioSprite();
-    }
-    ~Mario()
-    {
-        delete sprite;
+        sprite = std::make_unique<MarioSprite>();
     }
 
-    void ShootFireBall()
+    void Die()
     {
-        if (fireballs.size() < FIREBALL_THRESHOLD)
-        {
-            FireBall *fireball = new FireBall({position.x + rect.width, position.y + rect.height / 2}, direction);
-            fireball->velocity.x = (direction == RIGHT) ? FIREBALL_SPEED : -FIREBALL_SPEED;
-            fireballs.push_back(std::unique_ptr<FireBall>(fireball));
-        }
+        lives--;
+    }
+
+    void Grow()
+    {
+        if (form != SMALL)
+            return;
+        form = BIG;
+        rect.height = MARIO_HEIGHT * 2.0f;
+
+        sprite->SwitchForm(form);
+    }
+
+    void ChangeToFire()
+    {
+        if (form != BIG)
+            return;
+        form = FIRE;
+        rect.height = MARIO_HEIGHT * 2.0f;
+
+        sprite->SwitchForm(form);
+    }
+
+    void ChangeToSuper()
+    {
+        if (form != BIG)
+            return;
+        form = SUPER;
+        rect.height = MARIO_HEIGHT * 2.0f;
+
+        sprite->SwitchForm(form);
+    }
+
+    void Shrink()
+    {
+        if (form == SMALL)
+            return;
+        form = SMALL;
+        rect.height = MARIO_HEIGHT;
+
+        sprite->SwitchForm(form);
     }
 
     void ChangeForm()
@@ -79,29 +112,14 @@ public:
         if (newState != nullptr)
         {
             currentState = std::move(newState);
-            sprite->SwitchAnimation(currentState->GetType());
+            // sprite->SwitchAnimation(currentState->GetType());
         }
-
-        if (IsKeyPressed(KEY_LEFT_SHIFT))
-        {
-            ShootFireBall();
-        }
-
-        ChangeForm();
     }
 
     void Draw() override
     {
         DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED); // Draw hitbox for debugging
         currentState->Draw(*this, *sprite);
-        if (!fireballs.empty())
-        {
-            for (auto &fireball : fireballs)
-            {
-                fireball->Draw();
-            }
-        }
-        // Draw fireballs
     }
 
     void Update(Level &level) override
@@ -110,81 +128,48 @@ public:
         if (newState != nullptr)
         {
             currentState = std::move(newState);
-            sprite->SwitchAnimation(currentState->GetType());
+            // sprite->SwitchAnimation(currentState->GetType());
         }
+
         float gravity = 900.0f;
         float dt = GetFrameTime();
         ApplyGravity(velocity, gravity);
-        
 
-        //==================================
-        // CHECK COLLISION
-        Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
-        int minX = std::floor(std::min(position.x, nextPos.x) / 64.0f);
-        int minY = std::floor(std::min(position.y, nextPos.y) / 64.0f);
-        int maxX = std::floor(std::max(position.x + rect.width, nextPos.x + rect.width) / 64.0f);
-        int maxY = std::floor(std::max(position.y + rect.height, nextPos.y + rect.height) / 64.0f);
-        Vector2 cp, cn; float t;
-        float et = GetFrameTime();
-        std::vector<std::pair<std::array<int, 2>, float>> z;
+        // Left wall
+        if (position.x < 0)
+        {
+            position.x = 0;
+            velocity.x = 0;
+        }
 
-        for ( int y = minY; y <= maxY; y++ ) {
-            for ( int x = minX; x <= maxX; x++ ) {
-                if ( x < 0 || y < 0 || x >= GRID_WIDTH || y >= GRID_HEIGHT ) continue;
-                if ( level.tileManager.tileInstancesGrid[y][x] ) {
-                    if ( aabb::CheckCollisionStaticRectDynamicRect(rect, velocity, 
-                        level.tileManager.tileInstancesGrid[y][x]->getBBox(), cp, cn, t, et) ) {
-                            std::array<int, 2> temp = {y, x};
-                            //std::array<int, 2> temp = { (int)cn.x, (int)cn.y };
-                            z.push_back({temp, t});
-                    }
-                }
-            }
-        }
-        // RESOLVE COLLISION
-        std::sort(z.begin(), z.end(), compare);
-        for ( auto j : z ) {
-            aabb::ResolveStaticRectDynamicRect(rect, velocity, et, level.tileManager.tileInstancesGrid[j.first[0]][j.first[1]]->getBBox());
-        }
-        z.clear();
-        //==================================
+        ResolveCollision(level);
 
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
         rect.x = position.x;
         rect.y = position.y;
-
-        // Update fireballs
-        for (auto it = fireballs.begin(); it != fireballs.end();)
-        {
-            if ((*it)->isOverLifeTime())
-            {
-                std::cout << "Fireball expired!" << std::endl;
-                it = fireballs.erase(it); // Remove expired fireball
-                continue;
-            }
-            (*it)->Update(level);
-            if ((*it)->GetPosition().y < 0 || (*it)->GetPosition().y > GetScreenHeight())
-            {
-                it = fireballs.erase(it); // Remove fireball if it goes out of bounds
-            }
-            else
-            {
-                ++it; // Move to the next fireball
-            }
-        }
     }
 
-    void ResolveCollision(Level &level) override
+    void ResolveCollision(Level &level)
     {
-        // position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
-        // velocity.y = 0;
+        collision.CheckCollision(position, rect, velocity, level);
+        collision.ResolveCollision(position, rect, velocity, level);
     };
 
-    void ResolveCollision(Entity &other) override
+    // Helper
+    DIRECTION GetDirection() const
     {
-        // Handle collision with other entities if needed
-        std::cout << "Collision with another entity detected!" << std::endl;
+        return direction;
+    }
+
+    MARIO_FORM GetForm() const
+    {
+        return form;
+    }
+
+    Vector2 GetPosition() const
+    {
+        return position;
     }
 };
 

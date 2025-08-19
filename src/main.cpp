@@ -1,7 +1,12 @@
-#include <vector>
-#include <iostream>
 #include "raylib.h"
 #include "Mario.h"
+#include "Level.h"
+#include "DGameObjects/Coin.h"
+#include "DGameObjects/Mushroom.h"
+#include "DGameState/GameStateManager.h"
+#include "DGameState/MenuState.h"
+#include "DCore/ResourceManager.h"
+#include "DCore/SoundManager.h"
 #include "Tile.h"
 #include "Enemy/enemyManager.h"
 
@@ -9,12 +14,19 @@
 
 int main(void)
 {
+	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 	InitWindow(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "Mario");
+	InitAudioDevice();
 	SetTargetFPS(60);
 
+	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
+	ResourceManager::GetInstance().LoadBackgroundTexture("assets/menu_background.png");
+	SoundManager::getInstance().load();
+
+	float initialPosX = 0.0f;
 	Vector2 CameraPos = {0, 0};
-	Mario *player = new Mario({float(GetScreenWidth() / 2 - 16), 0.0f});
-	Level *level = new Level("./assets/tiles/world_1.1.txt");
+	// No exit key
+	SetExitKey(KEY_NULL);
 
 	enemyAsset::Load();
 	EnemyManager* manager = new EnemyManager(player, level);
@@ -40,36 +52,38 @@ int main(void)
 		player->Update(*level); // Handling player collision and movement
 		///ENEMY
 		manager->update();
+	GameStateManager gsm;
 
-		/// RENDER GAME
-		Camera2D camera = {0};
-		Vector2 playerPos = player->GetPosition();
-		if (playerPos.x > CameraPos.x)
-		{
-			CameraPos.x = playerPos.x;
-		}
-		camera.target = Vector2{float(CameraPos.x + player->rect.width / 2), float(GetScreenHeight()/2)};
-		camera.offset = Vector2{float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
-		camera.zoom = 1.0f;
+	SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
+
+	gsm.changeState(new MenuState(&gsm));
+
+	while (!WindowShouldClose() && !gsm.isExiting())
+	{
+		SoundManager::getInstance().updateMusicStreams();
+		gsm.update();
 
 		BeginDrawing();
-
 		ClearBackground(MARIO_SKYBLUE);
-		BeginMode2D(camera);
+		// ClearBackground(SKYBLUE);
+		Texture2D background = ResourceManager::GetInstance().GetBackgroundTexture();
+		float bgAspectRatio = (float)background.width / (float)background.height;
+		float bgScreenWidth = (float)GetScreenWidth() + 15;
+		float bgScreenHeight = bgScreenWidth / bgAspectRatio;
 
-		level->run(*player);
-		manager->draw();
-		player->Draw();
-		
+		Rectangle sourceRec = {0.0f, 0.0f, (float)background.width, (float)background.height};
+		Rectangle destRec = {0.0f, 0.0f, bgScreenWidth, bgScreenHeight};
+		Vector2 origin = {0, 0};
 
-		EndMode2D();
+		DrawTexturePro(background, sourceRec, destRec, origin, 0.0f, WHITE);
+
+		gsm.draw();
 		EndDrawing();
 	}
+	SoundManager::getInstance().unload();
+	ResourceManager::GetInstance().UnloadResources();
 
-	if (player)
-		delete player;
-	if (level)
-		delete level;
+	CloseAudioDevice();
 	CloseWindow();
 
 	return 0;

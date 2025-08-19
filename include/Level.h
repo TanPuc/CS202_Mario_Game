@@ -2,84 +2,74 @@
 #define LEVEL_H
 
 #include <vector>
+#include <memory>
+#include <map>
 #include <raylib.h>
-#include <fstream>
-#include <sstream>
-#include <iostream>
+#include "GlobalVariables.h"
 
-// #define TILE_SIZE 32.0f // Size of each tile in pixels
+// Forward declaration
+class BrickPiece;
+class Tile;
+class TileInstance;
+class Mario;
 
-// class Level
-// {
+// pipe2: 1
+// background: 2
+// fortress: 4
+// goalpole: 7
+// ground: 8
+// hardblock: 9
+// pipe1: 10
+// pipe3: 12
+// question: 13
+// brick: 17
+
+class EntityManager
+{
+public:
+    std::vector<std::shared_ptr<BrickPiece>> brickPieces;
+    std::vector<int> toRemove;
+
+    void addBrickPieces(Vector2 position);
+    void update();
+    void render();
+};
+
+class Level
+{
+public:
+    // Flyweight pattern
+    std::map<int, std::shared_ptr<Tile>> tileMap;
+    std::shared_ptr<TileInstance> tileInstancesGrid[GRID_HEIGHT][GRID_WIDTH] = {nullptr}; // Fast access to tile instances
+
+    // Managing broken brick pieces
+    EntityManager entityManager;
+
+    Level(const char *filePath);
+    void addTileInstance(Vector2 pos, int tileID, int x, int y);
+    void update(Mario &player);
+    void render();
+};
+
+// 2: bigfortress
+// 3: fortress
+// 4: ground
+// 5: grassleft
+// 6: grassmiddle
+// 7: grassright
+// 9: hardblock
+// 10: goalpole
+// 11: grassbrick
+
+// class Level_2 {
 // public:
-//     std::vector<std::vector<int>> tiles;
-//     Texture2D tileset;
+//     std::map<int, std::shared_ptr<Tile>> tileMap;
+//     std::shared_ptr<TileInstance> tileInstancesGrid[GRID_HEIGHT][GRID_WIDTH_2] = { nullptr }; // Fast access to tile instances
 
-//     Level()
-//     {
-//         tileset = LoadTexture("assets/brick.png");
-//     }
-
-//     ~Level()
-//     {
-//         UnloadTexture(tileset);
-//     }
-
-//     bool LoadFromFile(const std::string &mapFile)
-//     {
-//         std::ifstream file(mapFile);
-//         if (!file.is_open())
-//             return false;
-
-//         tiles.clear();
-//         std::string line;
-//         while (std::getline(file, line))
-//         {
-//             std::istringstream ss(line);
-//             int tile;
-//             std::vector<int> row;
-//             while (ss >> tile)
-//                 row.push_back(tile);
-//             tiles.push_back(row);
-//         }
-//         return true;
-//     }
-//     void Draw() const
-//     {
-//         for (int y = 0; y < tiles.size(); y++)
-//         {
-//             for (int x = 0; x < tiles[y].size(); x++)
-//             {
-//                 if (tiles[y][x] > 0)
-//                 {
-//                     DrawTextureEx(tileset, Vector2({(float)x * TILE_SIZE, (float)y * TILE_SIZE}), 0.0f, 2.0f, WHITE); // Draw the tile
-//                     DrawRectangleLines(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, RED); // Draw hitbox for debugging
-//                 }
-//             }
-//         }
-//     }
-//     bool CheckCollision(Rectangle hitbox) const
-//     {
-//         // Check overlap with solid tiles
-//         int minX = floor(hitbox.x / TILE_SIZE);
-//         int maxX = floor((hitbox.x + hitbox.width) / TILE_SIZE);
-//         int minY = floor(hitbox.y / TILE_SIZE);
-//         int maxY = floor((hitbox.y + hitbox.height) / TILE_SIZE);
-
-//         for (int y = minY; y <= maxY; y++)
-//         {
-//             for (int x = minX; x <= maxX; x++)
-//             {
-//                 Rectangle rect = {float(x * TILE_SIZE), float(y * TILE_SIZE), float(TILE_SIZE), float(TILE_SIZE)};
-//                 if (CheckCollisionRecs(hitbox, rect) && tiles[y][x] > 0) // Check if the tile is solid
-//                 {
-//                     std::cout << "Collision detected at tile (" << x << ", " << y << ")" << std::endl;
-//                     return true;
-//                 }
-//             }
-//         }
-//         return false;
-//     }
+//     Level_2(const char* filePath);
+//     void addTileInstance(Vector2& pos, int& tileID, int& x, int& y);
+//     void update(Mario& player);
+//     void render();
 // };
 
 #endif // LEVEL_H
