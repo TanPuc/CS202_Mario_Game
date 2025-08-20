@@ -2,84 +2,136 @@
 #define LEVEL_H
 
 #include <vector>
+#include <memory>
+#include <map>
 #include <raylib.h>
-#include <fstream>
-#include <sstream>
-#include <iostream>
+#include "GlobalVariables.h"
 
-#define TILE_SIZE 32.0f // Size of each tile in pixels
+// Forward declaration
+class PlatformInstance;
+class BrickPiece;
+class FortressFlag;
+class Tile;
+class TileInstance;
+class Mario;
+
+class EntityManager
+{
+public:
+    std::shared_ptr<FortressFlag> fortressFlag;
+    std::vector<std::shared_ptr<PlatformInstance>> platforms;
+    std::vector<std::shared_ptr<BrickPiece>> brickPieces;
+    std::vector<int> toRemove;
+
+    void addBrickPieces(Vector2 position);
+    void initPlatform();
+    void update(Mario &player);
+    void render();
+};
+
+typedef std::vector<std::vector<std::shared_ptr<TileInstance>>> TileInstancesGrid;
 
 class Level
 {
 public:
-    std::vector<std::vector<int>> tiles;
-    Texture2D tileset;
+    std::map<int, std::shared_ptr<Tile>> tileMap;
+    TileInstancesGrid tileInstancesGrid;
+    EntityManager entityManager;
 
-    Level()
+    std::shared_ptr<TileInstance> getTileInstance(int x, int y)
     {
-        tileset = LoadTexture("assets/brick.png");
+        if (x < 0 || x >= tileInstancesGrid.size() || y < 0 || y >= tileInstancesGrid[0].size())
+            return nullptr;
+        return tileInstancesGrid[x][y];
     }
+    int getGridHeight() const { return tileInstancesGrid.size(); }
+    int getGridWidth() const { return tileInstancesGrid[0].size(); }
 
-    ~Level()
-    {
-        UnloadTexture(tileset);
-    }
+    virtual void update(Mario &player) = 0;
+    virtual void render() = 0;
+};
 
-    bool LoadFromFile(const std::string &mapFile)
-    {
-        std::ifstream file(mapFile);
-        if (!file.is_open())
-            return false;
+class Level_1_1 : public Level
+{
+public:
+    Level_1_1(const char *filePath);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y);
+    void update(Mario &player) override;
+    void render() override;
+};
 
-        tiles.clear();
-        std::string line;
-        while (std::getline(file, line))
-        {
-            std::istringstream ss(line);
-            int tile;
-            std::vector<int> row;
-            while (ss >> tile)
-                row.push_back(tile);
-            tiles.push_back(row);
-        }
-        return true;
-    }
-    void Draw() const
-    {
-        for (int y = 0; y < tiles.size(); y++)
-        {
-            for (int x = 0; x < tiles[y].size(); x++)
-            {
-                if (tiles[y][x] > 0)
-                {
-                    DrawTextureEx(tileset, Vector2({(float)x * TILE_SIZE, (float)y * TILE_SIZE}), 0.0f, 2.0f, WHITE); // Draw the tile
-                    DrawRectangleLines(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, RED);                      // Draw hitbox for debugging
-                }
-            }
-        }
-    }
-    bool CheckCollision(Rectangle hitbox) const
-    {
-        // Check overlap with solid tiles
-        int minX = floor(hitbox.x / TILE_SIZE);
-        int maxX = floor((hitbox.x + hitbox.width) / TILE_SIZE);
-        int minY = floor(hitbox.y / TILE_SIZE);
-        int maxY = floor((hitbox.y + hitbox.height) / TILE_SIZE);
+class Level_1_3 : public Level
+{
+public:
+    Level_1_3(const char *filePath);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y);
+    void update(Mario &player) override;
+    void render() override;
+};
 
-        for (int y = minY; y <= maxY; y++)
-        {
-            for (int x = minX; x <= maxX; x++)
-            {
-                Rectangle rect = {float(x * TILE_SIZE), float(y * TILE_SIZE), float(TILE_SIZE), float(TILE_SIZE)};
-                if (CheckCollisionRecs(hitbox, rect) && tiles[y][x] > 0) // Check if the tile is solid
-                {
-                    std::cout << "Collision detected at tile (" << x << ", " << y << ")" << std::endl;
-                    return true;
-                }
-            }
-        }
-        return false;
+class Level_1_4 : public Level
+{
+public:
+    Level_1_4(const char *filePath);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y);
+    void update(Mario &player) override;
+    void render() override;
+};
+
+class LevelFactory
+{
+public:
+    std::shared_ptr<Level> level;
+    void createLevel(const std::string &id, const char *filePath)
+    {
+        // if ( id == "1.1" )
+        // {
+        //     level = std::make_shared<Level_1_1>(filePath);
+        // }
+        // else if ( id == "1.3" )
+        // {
+        //     level = std::make_shared<Level_1_3>(filePath);
+        // }
+        // else if ( id == "1.4" )
+        // {
+        //     level = std::make_shared<Level_1_4>(filePath);
+        // }
     }
 };
+
+// Level 1.1
+// pipe2: 1
+// background: 2
+// fortress: 4
+// goalpole: 7
+// ground: 8
+// hardblock: 9
+// pipe1: 10
+// pipe3: 12
+// question: 13
+// brick: 17
+
+// Level 1.3
+// 2: bigfortress
+// 3: fortress
+// 4: ground
+// 5: grassleft
+// 6: grassmiddle
+// 7: grassright
+// 9: hardblock
+// 10: goalpole
+// 11: grassbrick
+// 12: background_3
+// 13: question
+
+// Level 1.4
+// 3: lava
+// 4: lava_surface // Special
+// 5: axe
+// 7: question // Got
+// 8: used_block // Special
+// 9: castle_brick
+// 10: bridge
+// 11: chain
 
 #endif // LEVEL_H

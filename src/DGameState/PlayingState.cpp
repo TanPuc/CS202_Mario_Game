@@ -3,19 +3,41 @@
 #include "DGameState/WinState.h"
 #include "DGameState/GetReadyState.h"
 #include "DGameState/PauseState.h"
+#include "DCore/SoundManager.h"
+#include "DCore/SaveManager.h"
 
-PlayingState::PlayingState(GameStateManager *manager, int world, int level) : gsm(manager), worldNum(world), levelNum(level) {}
+PlayingState::PlayingState(GameStateManager *manager, const GameData &initialData) : gsm(manager), currentData(initialData) {}
 
 void PlayingState::enter()
 {
+    SoundManager::getInstance().stopMusic();
+    SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
     heartTexture = LoadTexture("assets/mario.png");
     coinIcon = LoadTexture("assets/mario.png");
     marioTexture = LoadTexture("assets/mario.png");
+    pauseIconTexture = LoadTexture("assets/pause.png");
+    pauseButton = std::make_unique<ImageButton>(
+        Vector2{(float)GetScreenWidth() - 60, 20},
+        Vector2{40, 40},
+        pauseIconTexture,
+        "",
+        [this]()
+        {
+            gsm->pushState(new PauseState(gsm, worldNum, levelNum));
+        });
 
-    player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
+    // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
+    // player = std::make_unique<Mario>(START_POS_WORLD_1_1);
 
-    level = std::make_unique<Level>();
-    level->LoadFromFile("assets/level1.map");
+    level = std::make_unique<Level>("./assets/Levels/world_1.1.txt");
+
+    player = std::make_unique<Mario>(currentData.playerPosition);
+    player->lives = currentData.lives;
+    player->coins = currentData.coins;
+    player->score = currentData.score;
+
+    worldNum = currentData.worldNum;
+    levelNum = currentData.levelNum;
 
     // Items
     // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
@@ -36,7 +58,7 @@ void PlayingState::enter()
     playerAdapter->attach(hudManager.get());
     playerAdapter->init();
 
-    hudManager->resetTime(400);
+    hudManager->resetTime(currentData.timeRemaining);
     hudManager->updateWorld(worldNum, levelNum);
     playerAdapter->update();
 }
@@ -46,23 +68,46 @@ void PlayingState::exit()
     UnloadTexture(marioTexture);
     UnloadTexture(heartTexture);
     UnloadTexture(coinIcon);
+    UnloadTexture(pauseIconTexture);
 }
 
 void PlayingState::update()
 {
     // if we press escape, we want to pause the game
-    if (IsKeyPressed(KEY_ESCAPE))
+    // if (IsKeyPressed(KEY_ESCAPE))
+    // {
+    //     gsm->pushState(new PauseState(gsm, worldNum, levelNum));
+    //     return;
+    // }
+
+    pauseButton->update();
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && pauseButton->contains(GetMousePosition()))
     {
-        gsm->pushState(new PauseState(gsm, worldNum, levelNum));
+        pauseButton->onClick();
         return;
     }
 
+    currentData.playerPosition = player->position;
+    currentData.lives = player->lives;
+    currentData.coins = player->coins;
+    currentData.score = player->score;
+    currentData.timeRemaining = hudManager->getTime();
+
     player->HandleInput();
+    if (player->GetForm() == FIRE)
+    {
+        if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT))
+        {
+            fireBallManager.ShootFireBall(player->GetPosition(), player->GetDirection());
+        }
+    }
     player->Update(*level); // Handling player collision and movement
+
+    // Handle Mario's death
+    level->update(*player);
+
     playerAdapter->update();
     hudManager->updateTime();
-
-    itemManager.UpdateItems(*level, *player); // Update all entities
 
     // for (auto it = entities.begin(); it != entities.end();)
     // {
@@ -90,11 +135,14 @@ void PlayingState::update()
     //     }
     // }
 
+    fireBallManager.Update(*level);
+    itemManager.UpdateItems(*level, *player); // Update all entities
+
     // Check for game over
     // Time and lives
-    if (hudManager->getTime() <= 0)
+    if (hudManager->getTime() <= 0 || player->GetPosition().y > HEIGHT_BOUNDARY)
     {
-        player->lives--;
+        player->Die();
         gsm->getContext().lives = player->lives;
 
         if (player->lives <= 0)
@@ -103,7 +151,7 @@ void PlayingState::update()
         }
         else
         {
-            gsm->changeState(new GetReadyState(gsm, worldNum, levelNum));
+            gsm->changeState(new GetReadyState(gsm, worldNum, levelNum, GetReadyReason::RESPAWN));
         }
         return;
     }
@@ -124,13 +172,25 @@ void PlayingState::draw()
     camera.zoom = 1.0f;
 
     BeginMode2D(camera);
+    level->render();
     player->Draw();
-    level->Draw();
 
+    fireBallManager.Draw();
     itemManager.DrawItems();
 
-    level->Draw();
     EndMode2D();
 
     hudManager->draw();
+    pauseButton->draw();
+}
+
+void PlayingState::saveGameData()
+{
+    currentData.playerPosition = player->position;
+    currentData.lives = player->lives;
+    currentData.coins = player->coins;
+    currentData.score = player->score;
+    currentData.timeRemaining = hudManager->getTime();
+
+    SaveManager::saveGame(currentData, "savegame.dat");
 }

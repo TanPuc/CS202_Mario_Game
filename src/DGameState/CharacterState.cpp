@@ -1,43 +1,70 @@
 #include "DGameState/CharacterState.h"
 #include "DGUI/Button.h"
+#include "DGUI/ImageButton.h"
 #include "DGameState/MenuState.h" 
 #include "DGameState/GetReadyState.h"
 #include "DCore/ResourceManager.h"
+#include "DCore/SoundManager.h"
 #include <iostream>
 
 CharacterState::CharacterState(GameStateManager* manager): gsm(manager), guiManager(GUIManager::getInstance()){}
+
+void CharacterState::buildGUI()
+{
+    guiManager.clearElements();
+    //  //Button to choose MARIO
+    // guiManager.addElement(new Button({150,200}, {150, 200}, "MARIO",
+    //     [this] ()
+    //     {
+    //         std::cout<<"Selected Mario\n";
+    //         this->gsm->getContext().selectedCharacter = "mario";
+    //     }
+    // ));
+
+    // //Button to choose Luigi
+    // guiManager.addElement(new Button({500,200}, {150, 200}, "LUIGI",
+    //     [this] ()
+    //     {
+    //         std::cout<<"Selected Luigi\n";
+    //         this->gsm->getContext().selectedCharacter = "luigi";
+    //     }
+    // ));
+
+    //Back
+    float aspectRatio = (float)buttonTexture.width / (float)buttonTexture.height;
+    float buttonWidth = 170.0f;
+    float buttonHeight = buttonWidth / aspectRatio;
+    Vector2 buttonSize = { buttonWidth, buttonHeight };
+    guiManager.addElement(new ImageButton({165, 250}, buttonSize, buttonTexture, "BACK",
+        [this] ()
+        {
+            this->gsm->changeState(new MenuState(this->gsm));
+        }
+    ));
+}
 
 void CharacterState::enter()
 {
     std::cout<<"Entering Character State\n";
     marioChoice = LoadTexture("assets/mario.png");
     luigiChoice = LoadTexture("assets/mario.png");
-    
-    //Button to choose MARIO
-    guiManager.addElement(new Button({150,200}, {150, 200}, "MARIO",
-        [this] ()
-        {
-            std::cout<<"Selected Mario\n";
-            this->gsm->getContext().selectedCharacter = "mario";
-        }
-    ));
+    buttonTexture = LoadTexture("assets/button.png");
+    onButtonTexture = LoadTexture("assets/brightButton.png");
+    characterTexture = LoadTexture("assets/characterBoard.png");
 
-    //Button to choose Luigi
-    guiManager.addElement(new Button({500,200}, {150, 200}, "LUIGI",
-        [this] ()
-        {
-            std::cout<<"Selected Luigi\n";
-            this->gsm->getContext().selectedCharacter = "luigi";
-        }
-    ));
+    if(gsm->getContext().selectedCharacter == "luigi")
+    {
+        selectedCharacter = Character::LUIGI;
+    }
+    else
+    {
+        selectedCharacter = Character::MARIO;
+    }
 
-    //Back
-    guiManager.addElement(new Button({300, 420}, {200, 50}, "BACK",
-        [this] ()
-        {
-            this->gsm->changeState(new MenuState(this->gsm));
-        }
-    ));
+    marioHotspot = { 533, 150, 127, 220 }; 
+    luigiHotspot = { 430, 140, 100, 240 };
+
+    buildGUI();
 }
 
 void CharacterState::exit()
@@ -46,38 +73,125 @@ void CharacterState::exit()
     guiManager.clearElements();
     UnloadTexture(marioChoice);
     UnloadTexture(luigiChoice);
+    UnloadTexture(buttonTexture);
+    UnloadTexture(onButtonTexture);
+    UnloadTexture(characterTexture);
+    SetMouseCursor(MOUSE_CURSOR_DEFAULT);
 }
 
 void CharacterState::update()
 {
+     Vector2 mousePos = GetMousePosition();
+    hoveredCharacter = Character::NONE; 
+
+    if (CheckCollisionPointRec(mousePos, marioHotspot)) {
+        hoveredCharacter = Character::MARIO;
+    }
+    if (CheckCollisionPointRec(mousePos, luigiHotspot)) {
+        hoveredCharacter = Character::LUIGI;
+    }
+
+    if (hoveredCharacter != Character::NONE)
+    {
+        SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+    }
+    else
+    {
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+    }
+
+    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        if (hoveredCharacter == Character::MARIO && selectedCharacter != Character::MARIO) {
+            selectedCharacter = Character::MARIO;
+            gsm->getContext().selectedCharacter = "mario";
+            SoundManager::getInstance().playSound(SoundEffect::COIN);
+        }
+        if (hoveredCharacter == Character::LUIGI && selectedCharacter != Character::LUIGI) {
+            selectedCharacter = Character::LUIGI;
+            gsm->getContext().selectedCharacter = "luigi";
+            SoundManager::getInstance().playSound(SoundEffect::COIN);
+        }
+    }
     guiManager.handleInput();
 }
 
 void CharacterState::draw()
 {
-    ClearBackground(BLACK);
     Font font = ResourceManager::GetInstance().GetGameFont();
-    float fontSize = 39.5f;
-    float spacing = 3.0f;
 
-    const char* title = "CHOOSE YOUR CHARACTER";
+    float ratio = (float)characterTexture.width / (float)characterTexture.height;
+    float boardWidth = 350.0f;
+    float boardHeight = boardWidth / ratio;
+    Vector2 boardSize = { boardWidth, boardHeight };
+    Rectangle sourceRec = { 0.0f, 0.0f, (float)characterTexture.width, (float)characterTexture.height };
+    Rectangle destRec = { 80, -15, boardSize.x, boardSize.y };
+    Vector2 origin = { 0, 0 };
+    DrawTexturePro(characterTexture, sourceRec, destRec, origin, 0.0f, WHITE);
+
+    float fontSize = 25.0f;
+    float spacing = 1.0f;
+
+    const char* title = "CHARACTER";
     Vector2 titleSize = MeasureTextEx(font, title, fontSize, spacing);
 
-    float titleX = (GetScreenWidth() - titleSize.x) / 2.0f;
-    float titleY = 50.0f;
-    DrawTextEx(font, title, {titleX, titleY}, fontSize, spacing, WHITE);
+    DrawTextEx(font, title, {80 + boardWidth/2 - titleSize.x/2 + 3, 123.0f}, fontSize, spacing, Fade(BLACK, 0.5f));
+    DrawTextEx(font, title, {80 + boardWidth/2 - titleSize.x/2, 120.0f}, fontSize, spacing, WHITE);
 
-    DrawTexture(marioChoice, 150, 200, WHITE);
-    DrawTexture(luigiChoice, 150, 200, WHITE);
+    const char* descriptionText ="";
+    Color textColor = GOLD;
+    float descriptionFontSize = 20.0f;
 
-    if(gsm->getContext().selectedCharacter == "mario")
+    if (selectedCharacter == Character::MARIO)
     {
-        DrawRectangleLines(145,195,160,210,YELLOW);
+        descriptionText = "MARIO: \nRUN FASTER!";
     }
-    else
+    else if (selectedCharacter == Character::LUIGI)
     {
-        DrawRectangleLines(495,195,160,210,YELLOW);
+        descriptionText = "LUIGI: \nJUMP HIGHER!";
     }
+
+    Vector2 descriptionSize = MeasureTextEx(font, descriptionText, descriptionFontSize, spacing);
+    DrawTextEx(font, descriptionText, {80 + boardWidth/2 - descriptionSize.x/2 + 3, 173.0f}, descriptionFontSize, 0.7, Fade(BLACK, 0.5f));
+    DrawTextEx(font, descriptionText, {80 + boardWidth/2 - descriptionSize.x/2, 170.0f}, descriptionFontSize, 0.7, textColor);
+
+    Texture2D marioIndicatorToDraw = (selectedCharacter == Character::MARIO) ? onButtonTexture : buttonTexture;
+    Texture2D luigiIndicatorToDraw = (selectedCharacter == Character::LUIGI) ? onButtonTexture : buttonTexture;
+    float aspectRatio = (float)buttonTexture.width / (float)buttonTexture.height;
+    float buttonWidth = 70.0f;
+    float buttonHeight = buttonWidth / aspectRatio;
+    Vector2 buttonSize = { buttonWidth, buttonHeight };
+    Rectangle sourceRec1 = { 0.0f, 0.0f, (float)marioIndicatorToDraw.width, (float)marioIndicatorToDraw.height };
+    Rectangle sourceRec2 = { 0.0f, 0.0f, (float)luigiIndicatorToDraw.width, (float)luigiIndicatorToDraw.height };
+    Rectangle destRec1 = { 570, 370, buttonSize.x, buttonSize.y };
+    Rectangle destRec2 = { 445, 390, buttonSize.x, buttonSize.y };
+    Vector2 origin1 = { 0, 0 };
+    DrawTexturePro(marioIndicatorToDraw, sourceRec1, destRec1, origin1, 0.0f, WHITE);
+    DrawTexturePro(luigiIndicatorToDraw, sourceRec2, destRec2, origin1, 0.0f, WHITE);
+
+    // if (hoveredCharacter == Character::MARIO) {
+    //     DrawRectangleRec(marioHotspot, Fade(YELLOW, 0.2f));
+    // }
+    // if (hoveredCharacter == Character::LUIGI) {
+    //     DrawRectangleRec(luigiHotspot, Fade(YELLOW, 0.2f));
+    // }
+
+    // DrawTexture(marioChoice, 150, 200, WHITE);
+    // DrawTexture(luigiChoice, 150, 200, WHITE);
+
+    // if(gsm->getContext().selectedCharacter == "mario")
+    // {
+    //     DrawRectangleLines(145,195,160,210,YELLOW);
+    // }
+    // else
+    // {
+    //     DrawRectangleLines(495,195,160,210,YELLOW);
+    // }
 
     guiManager.draw();
+}
+
+void CharacterState::resume()
+{
+    std::cout << "Resuming Character State\n";
+    buildGUI();
 }

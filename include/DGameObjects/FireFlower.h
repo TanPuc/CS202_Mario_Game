@@ -4,15 +4,20 @@
 #include <raylib.h>
 #include <iostream>
 #include "Item.h"
+#include "Collision.h"
 #include "GlobalVariables.h"
 #include "GameSprite/FireFlowerSprite.h"
+
+#define FIREFLOWER_SIZE 16
 
 class FireFlower : public Item
 {
 public:
     FireFlowerSprite fireFlowerSprite;
+    Collision collision;
 
-    FireFlower(Vector2 pos) : Item(pos, {16, 16}) {}
+    FireFlower(Vector2 pos) : Item(pos, {FIREFLOWER_SIZE * SCALE, FIREFLOWER_SIZE * SCALE}) {}
+    FireFlower(Vector2 pos, Vector2 vel, DIRECTION dir) : Item(pos, {FIREFLOWER_SIZE * SCALE, FIREFLOWER_SIZE * SCALE}, vel, dir) {}
 
     void Draw() override
     {
@@ -24,22 +29,18 @@ public:
         float gravity = 900.0f;
         float dt = GetFrameTime();
         ApplyGravity(velocity, gravity);
+        ResolveCollision(level);
+
         position.x += velocity.x * dt;
         position.y += velocity.y * dt;
-
-        if (CheckCollision(*this, level))
-        {
-            ResolveCollision(level);
-        }
-
         rect.x = position.x;
         rect.y = position.y;
     }
 
     void ResolveCollision(Level &level)
     {
-        position.y = (int)(position.y / MARIO_HEIGHT) * MARIO_HEIGHT; // Snap to tile grid
-        velocity.y = 0;
+        collision.CheckCollision(position, rect, velocity, level);
+        collision.ResolveCollision(position, rect, velocity, level);
     };
 
     void Collect(Mario &mario) override

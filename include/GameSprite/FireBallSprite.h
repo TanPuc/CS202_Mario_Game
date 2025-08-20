@@ -15,10 +15,10 @@ public:
     int frameSpeed = 6; // 6fps
 
     FireBallSprite()
-        : fireballAnimation({{247, 302, 8, 16},
-                             {247 + 8 + FRAME_PADDING, 302, 8, 16},
-                             {247 + (8 + FRAME_PADDING) * 2, 302, 8, 16},
-                             {247 + (8 + FRAME_PADDING) * 3, 302, 8, 16}}),
+        : fireballAnimation({{247, 302 + 4, 8, 8},
+                             {247 + 8 + FRAME_PADDING, 302 + 4, 8, 8},
+                             {247 + (8 + FRAME_PADDING) * 2, 302 + 4, 8, 8},
+                             {247 + (8 + FRAME_PADDING) * 3, 302 + 4, 8, 8}}),
           prevState(STATE_IDLE)
     {
         spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
@@ -68,7 +68,7 @@ public:
                 frameRec.width = -abs(frameRec.width);
             }
             DrawTexturePro(spriteSheet, frameRec,
-                           {entity.position.x, entity.position.y, frameRec.width * 1.5f, frameRec.height * 1.5f},
+                           {entity.position.x, entity.position.y, frameRec.width * SCALE, frameRec.height * SCALE},
                            {0, 0}, 0.0f, WHITE);
         }
         else

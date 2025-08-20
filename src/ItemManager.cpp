@@ -16,7 +16,7 @@ void ItemManager::UpdateItems(Level &level, Mario &mario)
         if (item)
         {
             item->Update(level);
-            if (CheckCollision(*item, mario))
+            if (CheckCollisionRecs(item->rect, mario.rect))
             {
                 // std::cout << "Collision detected between Mario and item!" << std::endl;
                 item->Collect(mario);
@@ -47,4 +47,14 @@ void ItemManager::DrawItems()
             item->Draw();
         }
     }
+}
+
+void ItemManager::SpawnMushroom(Vector2 position, Vector2 velocity, DIRECTION direction)
+{
+    items.push_back(std::make_unique<Mushroom>(position, velocity, direction));
+}
+
+void ItemManager::SpawnFireFlower(Vector2 position, Vector2 velocity, DIRECTION direction)
+{
+    items.push_back(std::make_unique<FireFlower>(position, velocity, direction));
 }

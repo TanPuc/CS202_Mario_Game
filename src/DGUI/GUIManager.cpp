@@ -1,5 +1,6 @@
 #include "DGUI/GUIManager.h"
 #include "DGUI/Button.h"
+#include "DGUI/ImageButton.h"
 
 
 GUIManager::~GUIManager() 
@@ -36,19 +37,28 @@ void GUIManager::clearElements()
 
 void GUIManager::handleInput()
 {
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
+    Vector2 mousePoint = GetMousePosition();
+    for (GUIElement* element : elements) 
     {
-        Vector2 mousePoint = GetMousePosition();
-        for (GUIElement* element : elements) 
+        if (auto imgBtn = dynamic_cast<ImageButton*>(element))
+        {
+            imgBtn->update();
+        }
         
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
         {
             if (element->contains(mousePoint)) 
             {
-                Button* button = dynamic_cast<Button*>(element);
-                if (button) 
+                if (auto button = dynamic_cast<Button*>(element)) 
                 {
                     button->onClick();
-                    break; // just click one button at a time
+                    break; 
+                }
+                
+                if (auto imgBtn = dynamic_cast<ImageButton*>(element)) 
+                {
+                    imgBtn->onClick();
+                    break;
                 }
             }
         }

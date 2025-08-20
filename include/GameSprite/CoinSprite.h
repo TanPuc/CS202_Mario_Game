@@ -16,9 +16,9 @@ public:
 
     CoinSprite()
         : coinAnimation({{180, 36, 8, 16},
-                             {180 + 8 + FRAME_PADDING, 36, 8, 16},
-                             {180 + (8 + FRAME_PADDING) * 2, 36, 8, 16},
-                             {180 + (8 + FRAME_PADDING) * 3, 36, 8, 16}}),
+                         {180 + 8 + FRAME_PADDING, 36, 8, 16},
+                         {180 + (8 + FRAME_PADDING) * 2, 36, 8, 16},
+                         {180 + (8 + FRAME_PADDING) * 3, 36, 8, 16}}),
           prevState(STATE_IDLE)
     {
         spriteSheet = LoadTexture("assets/SMB_Items_And_Objects.png");
@@ -68,7 +68,7 @@ public:
                 frameRec.width = -abs(frameRec.width);
             }
             DrawTexturePro(spriteSheet, frameRec,
-                           {entity.position.x, entity.position.y, frameRec.width * 1.5f, frameRec.height * 1.5f},
+                           {entity.position.x, entity.position.y, frameRec.width * SCALE, frameRec.height * SCALE},
                            {0, 0}, 0.0f, WHITE);
         }
         else

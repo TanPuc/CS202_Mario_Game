@@ -3,17 +3,24 @@
 #include "DGameState/GameStateManager.h"
 #include "DHUD/HUDManager.h"
 
+
+enum class GetReadyReason
+{
+    NEW_GAME,
+    RESPAWN
+};
 class GetReadyState: public GameState
 {
     private:
         GameStateManager* gsm;
-        float timer = 3.0f;
+        float timer = 5.2f;
         int targetWorld;
         int targetLevel;
+        GetReadyReason reason;
         std::unique_ptr<HUDManager> hudManager;
         Texture2D lifeIcon, coinIcon;
     public:
-        GetReadyState(GameStateManager* manager, int world, int level);
+        GetReadyState(GameStateManager* manager, int world, int level, GetReadyReason reason);
 
         void enter() override;
         void exit() override;
