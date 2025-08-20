@@ -84,6 +84,8 @@ void AttackState::enter(Enemy& e)
 void AttackState::exit(Enemy& e)
 {	
 	m_attack->attack(e);
+	counter = 1;
+	timer = 0;
 	//e.setAttackStrategy(nullptr);
 }
 void AttackState::update(Enemy& e)
@@ -95,7 +97,7 @@ void AttackState::update(Enemy& e)
 	
 	timer2 += GetFrameTime();
 
-	if (timer2 >= duration / m_amout)
+	if (timer2 >= duration / m_amout && counter <= m_amout )
 	{
 		m_attack->attack(e);
 		counter++;
@@ -301,8 +303,10 @@ DeadStateElse::DeadStateElse(float gravity):
 void DeadStateElse::enter(Enemy& e)
 {
 	e.setVelocityX(0);
-	e.setVelocityY(-300);
+	e.setVelocityY(-100);
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
+
+	e.setCollisionMap(nullptr);
 
 	e.setSprite(getName());
 }

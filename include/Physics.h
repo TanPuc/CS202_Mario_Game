@@ -7,7 +7,7 @@
 class Entity;
 class Level;
 
-#define GRAVITY 10.0f
+#define GRAVITY 900.0f
 #define JUMP_FORCE 500.0f
 // #define JUMP_FORCE 1000.0f
 #define SPEED 200.0f

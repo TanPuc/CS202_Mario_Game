@@ -169,15 +169,6 @@ void Enemy::setPosition(Vector2 pos)
 	position = pos;
 }
 
-void Enemy::ResolveCollision(Entity& other)
-{
-
-}
-void Enemy::ResolveCollision(Level& level)
-{
-
-}
-
 //Vector2 Enemy::getPositon() const
 //{
 //	return position;

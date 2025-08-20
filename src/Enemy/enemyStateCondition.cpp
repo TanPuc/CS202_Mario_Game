@@ -1,4 +1,5 @@
 #include "Enemy/enemyStateCondition.h"
+#include "Level.h"
 
 #include "raylib.h"
 
@@ -29,21 +30,35 @@ bool ConditionShell::evaluate(Enemy& e)
 }
 
 
-ConditionFireBall::ConditionFireBall(const vector<FireBall*>& balls) :
+ConditionFireBall::ConditionFireBall(const vector<shared_ptr<FireBall>>& balls) :
 	m_fireballs(balls) {}
-ConditionFireBall::ConditionFireBall(const vector<FireBall*>& balls, int amount) :
+ConditionFireBall::ConditionFireBall(const vector<shared_ptr<FireBall>>& balls, int amount) :
     m_fireballs(balls) , m_amount(amount) {}
 bool ConditionFireBall::evaluate(Enemy& e)
 {
-	for (auto& s : m_fireballs)
-	{
-        if (CheckCollisionRecs(e.getHurtBox(), s->GetBounds()))
+    if (isImmune)
+    {
+        timer += GetFrameTime();
+        if (timer >= immuneDuration)
         {
-            m_counter++;
-            if (m_counter >= m_amount)
-            return true;
+            timer = 0;
+            isImmune = false;
         }
-	}
+    }
+    else
+    {
+        for (auto& s : m_fireballs)
+        {
+            if (CheckCollisionRecs(e.getHurtBox(), s->GetBounds()))
+            {
+                isImmune = true;
+                m_counter++;
+                if (m_counter >= m_amount)
+                    return true;
+            }
+        }
+    }
+  
 	return false;
 }
 
@@ -77,40 +92,24 @@ bool ConditionGrounded::evaluate(Enemy& e)
     Vector2 cp, cn;
     float et = GetFrameTime();
     Vector2 nextPos = e.GetPosition() + e.getVelocity() * et;
-    int minX = std::floor(std::min(e.position.x, nextPos.x) / 64.0f);
-    int minY = std::floor(std::min(e.position.y, nextPos.y) / 64.0f);
-    int maxX = std::floor(std::max(e.position.x + e.getHurtBox().width, nextPos.x + e.getHurtBox().width) / 64.0f);
-    int maxY = std::floor(std::max(e.position.y + e.getHurtBox().height, nextPos.y + e.getHurtBox().height) / 64.0f);
+    int minX = std::floor(std::min(e.position.x, nextPos.x) / (TILE_SIZE * SCALE));
+    int minY = std::floor(std::min(e.position.y, nextPos.y) / (TILE_SIZE * SCALE));
+    int maxX = std::floor(std::max(e.position.x + e.getHurtBox().width, nextPos.x + e.getHurtBox().width) / (TILE_SIZE * SCALE));
+    int maxY = std::floor(std::max(e.position.y + e.getHurtBox().height, nextPos.y + e.getHurtBox().height) / (TILE_SIZE * SCALE));
     float t;
 
     for (int y = minY; y <= maxY; y++) {
         for (int x = minX; x <= maxX; x++) {
             if (x < 0 || y < 0 || x >= GRID_WIDTH || y >= GRID_HEIGHT) continue;
-            if (m_level.tileManager.tileInstancesGrid[y][x]) {
+            if (m_level.tileInstancesGrid[y][x]) {
                 if (aabb::CheckCollisionStaticRectDynamicRect(e.getHurtBox(), e.getVelocity(),
-                    m_level.tileManager.tileInstancesGrid[y][x]->getBBox(), cp, cn, t, et)) {
-                    array<int, 2> temp = { y , x };
-                    unresolvedtile.push_back({ temp , t });
+                    m_level.tileInstancesGrid[y][x]->bbox, cp, cn, t, et)) {
+                    return true;
                 }
             }
         }
     }
 
-    bool result = false;
-
-    std::sort(unresolvedtile.begin(), unresolvedtile.end(), compare);
-    for (auto j : unresolvedtile) {
-        Vector2 cp, cn;
-        float ct = 0.0f;
-        if (aabb::CheckCollisionStaticRectDynamicRect(e.getHurtBox(), e.getVelocity(),
-            m_level.tileManager.tileInstancesGrid[j.first[0]][j.first[1]]->getBBox(), cp, cn, ct, GetFrameTime())) {
-            e.setVelocityX(e.getVelocity().x + cn.x * abs(e.getVelocity().x) * (1 - ct));
-            e.setVelocityY(e.getVelocity().y + cn.y * abs(e.getVelocity().y) * (1 - ct));
-            result = true;
-        }
-    }
-    unresolvedtile.clear();
-
-    return result;
+    return false;
 }
 

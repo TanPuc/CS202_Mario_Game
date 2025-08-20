@@ -1,21 +1,24 @@
 #pragma once
 
-#include "vector"
+#include <vector>
+#include <memory>
 #include "raylib.h"
 
 #include "enemyEnum.h"
 #include "enemyAsset.h"
 
-using std::vector;
+using namespace std;
 
 class Mario;
 class Enemy;
 class Level;
+class FireBall;
+
 
 class EnemyManager
 {
 public:
-	EnemyManager(Mario* player, Level* level);
+	EnemyManager(Mario* player, Level* level, const vector<shared_ptr<FireBall>>& fireballs);
 	void spawnEnemyAt(EnemyType type, Vector2 position);
 	void update();
 	void draw();
@@ -23,6 +26,7 @@ private:
 
 	Level* m_level;
 	Mario* m_player;
+	const vector<shared_ptr<FireBall>>& m_fireballs;
 	vector<Enemy*> m_enemies;
 	vector<Enemy*> m_toSpawn;
 	vector<Enemy*> m_shells;

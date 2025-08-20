@@ -13,6 +13,7 @@
 #include "FireBallManager.h"
 #include "DGUI/ImageButton.h"
 #include "DCore/GameData.h"
+#include "Enemy/enemyManager.h"
 #include "raylib.h"
 #include <vector>
 #include <memory>
@@ -27,6 +28,8 @@ private:
     std::unique_ptr<Level> level;
     std::unique_ptr<PlayerAdapter> playerAdapter;
     std::unique_ptr<HUDManager> hudManager;
+    EnemyManager* enemyManager;
+
     // std::vector<std::unique_ptr<Entity>> entities; // This counts for items and enemies
 
     int worldNum;

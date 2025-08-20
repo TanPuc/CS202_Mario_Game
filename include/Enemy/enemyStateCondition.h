@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "enemy.h"
-#include "FireBall.h"
+#include "DGameObjects/FireBall.h"
 #include "Mario.h"
 
 
@@ -36,13 +36,16 @@ private:
 class ConditionFireBall : public EnemyStateCondition
 {
 public:
-	ConditionFireBall(const vector<FireBall*>& balls);
-	ConditionFireBall(const vector<FireBall*>& balls, int amount);
+	ConditionFireBall(const vector<shared_ptr<FireBall>>& balls);
+	ConditionFireBall(const vector<shared_ptr<FireBall>>& balls, int amount);
 	bool evaluate(Enemy& e) override;
 private:
-	const vector<FireBall*>& m_fireballs;
+	const vector<shared_ptr<FireBall>>& m_fireballs;
 	int m_amount = 1;
 	int m_counter = 0;
+	float timer = 0;
+	float immuneDuration = 0.5f;
+	bool isImmune = false;
 };
 class ConditionStomped : public EnemyStateCondition
 {

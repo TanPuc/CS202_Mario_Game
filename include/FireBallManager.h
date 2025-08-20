@@ -8,6 +8,7 @@
 
 class FireBallManager
 {
+    
 private:
     std::vector<std::shared_ptr<FireBall>> fireballs;
 
@@ -17,6 +18,8 @@ public:
     void Update(Level &level);
     void Draw();
     void ShootFireBall(Vector2 position, DIRECTION direction);
+    const std::vector<std::shared_ptr<FireBall>>& GetFireBalls() const;
+    
 };
 
 #endif // FIREBALLMANAGER_H

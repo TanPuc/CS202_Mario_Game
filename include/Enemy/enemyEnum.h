@@ -1,6 +1,6 @@
 #pragma once
 
-const float TILEFACTOR = 4;
+const float TILEFACTOR = 2;
 
 enum StateType
 {

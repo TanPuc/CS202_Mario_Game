@@ -49,7 +49,6 @@ public:
 
 	int getDirectionSelf() const;
 	void reverseDirection();
-	int getDirectionPlayer() const;
 
 	void setPosition(Vector2);
 
@@ -61,10 +60,6 @@ public:
 
 	void setIsCollidedMap();
 	bool getIsCollidedMap();
-
-
-	void ResolveCollision(Entity& other) override;
-	void ResolveCollision(Level& level) override;
 
 private:
 	EnemyType					m_Type					;
