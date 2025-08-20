@@ -51,6 +51,7 @@ void PlayingState::enter()
     player->score = 0;
 
     cameraPos = Vector2{0.0f, 0.0f};
+    camera.setTarget(cameraPos);
 
     hudManager = std::make_unique<HUDManager>(heartTexture, coinIcon);
     playerAdapter = std::make_unique<PlayerAdapter>(player.get());
@@ -102,6 +103,12 @@ void PlayingState::update()
         }
     }
     player->Update(*level); // Handling player collision and movement
+    Vector2 playerPos = player->GetPosition();
+
+    if (player->GetBounds().x > cameraPos.x)
+    {
+        cameraPos.x = player->GetBounds().x;
+    }
 
     // Handle Mario's death
     level->update(*player);
@@ -138,9 +145,32 @@ void PlayingState::update()
     fireBallManager.Update(*level);
     itemManager.UpdateItems(*level, *player); // Update all entities
 
+    // Check for player horizontal bounding
+    if (playerPos.x < cameraPos.x - (camera.bounds.width / 2) || playerPos.x + player->GetBounds().width > cameraPos.x + camera.bounds.width)
+    {
+        player->SetPosition({cameraPos.x - (camera.bounds.width / 2), playerPos.y});
+        player->velocity.x = 0; // Stop horizontal movement
+    }
+
+    if (playerPos.y >= cameraPos.y + camera.bounds.height)
+    {
+        player->Die();
+        gsm->getContext().lives = player->lives;
+
+        if (player->lives <= 0)
+        {
+            gsm->changeState(new GameOverState(gsm));
+        }
+        else
+        {
+            gsm->changeState(new GetReadyState(gsm, worldNum, levelNum, GetReadyReason::RESPAWN));
+        }
+        return;
+    }
+
     // Check for game over
     // Time and lives
-    if (hudManager->getTime() <= 0 || player->GetPosition().y > HEIGHT_BOUNDARY)
+    if (hudManager->getTime() <= 0)
     {
         player->Die();
         gsm->getContext().lives = player->lives;
@@ -159,19 +189,9 @@ void PlayingState::update()
 
 void PlayingState::draw()
 {
-    // Camera2D camera = {0};
-    // camera.target = {player->position.x + player->rect.width / 2, float(GetScreenHeight() / 2)};
-    // camera.offset = {float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
-    Camera2D camera = {0};
-    if (player->GetBounds().x > cameraPos.x)
-    {
-        cameraPos.x = player->GetBounds().x;
-    }
-    camera.target = cameraPos;
-    camera.offset = Vector2{float(GetScreenWidth() / 2), 0};
-    camera.zoom = 1.0f;
+    camera.setTarget(cameraPos);
 
-    BeginMode2D(camera);
+    BeginMode2D(camera.camera);
     level->render();
     player->Draw();
 

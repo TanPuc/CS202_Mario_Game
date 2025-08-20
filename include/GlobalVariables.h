@@ -37,7 +37,7 @@ enum TileState
 #define MARIO_WIDTH 32.0f
 #define MARIO_HEIGHT 32.0f
 #define FRAME_PADDING 2
-#define SCREEN_WIDTH 320
+#define SCREEN_WIDTH 400
 #define SCREEN_HEIGHT 240
 #define SCALE 2.0f
 #define GRID_WIDTH 211
@@ -45,7 +45,6 @@ enum TileState
 #define GRID_HEIGHT 15
 #define TILE_SIZE 16.0f
 #define HEIGHT_BOUNDARY GRID_HEIGHT *TILE_SIZE *SCALE
-
 #define START_POS_WORLD_1_1 Vector2({6 * TILE_SIZE * SCALE, 13 * TILE_SIZE * SCALE})
 
 #endif // GLOBAL_VARIABLES_H
