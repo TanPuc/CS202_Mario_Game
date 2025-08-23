@@ -41,6 +41,7 @@ enum TileState
 #define SCREEN_HEIGHT 240
 #define SCALE 2.0f
 #define TILE_SIZE 16.0f
+#define GRID_HEIGHT 15
 #define HEIGHT_BOUNDARY GRID_HEIGHT *TILE_SIZE *SCALE
 
 #define START_POS_WORLD_1_1 Vector2({6 * TILE_SIZE * SCALE, 13 * TILE_SIZE * SCALE})

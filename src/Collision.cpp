@@ -180,3 +180,9 @@ void Collision::ResolveCollision(Vector2 &position, Rectangle &bbox, Vector2 &ve
         }
         z.clear();
     }
+}
+
+bool Collision::IsCollideWithLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
+{
+    return false;
+}

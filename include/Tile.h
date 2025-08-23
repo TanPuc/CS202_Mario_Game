@@ -89,8 +89,11 @@ public:
     TileState getState() const { return state; }
 
     TileInstance(Vector2 pos, std::shared_ptr<Tile> tile);
-    virtual void update(Mario &player) = 0;
-    virtual void render() = 0;
+    virtual void update(Mario &player) {}
+    virtual void render()
+    {
+        DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+    }
 };
 
 class DummyInstance : public TileInstance

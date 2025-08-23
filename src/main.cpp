@@ -26,27 +26,15 @@ int main(void)
 
 	float initialPosX = 0.0f;
 	Vector2 CameraPos = {0, 0};
-	Mario *player = new Mario({initialPosX, 0.0f});
-	Level level("./assets/Levels/world_1.1.txt");
+	// No exit key
+	SetExitKey(KEY_NULL);
 
-	while (!WindowShouldClose())
+	GameStateManager gsm;
+	SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
+	gsm.changeState(new MenuState(&gsm));
+
+	while (!WindowShouldClose() && !gsm.isExiting())
 	{
-		/// UPDATE GAME
-		player->HandleInput();
-		player->Update(level); // Handling player collision and movement
-		level.update(*player);
-
-		/// RENDER GAME
-		Camera2D camera = {0};
-		Vector2 playerPos = player->GetPosition();
-		if (playerPos.x > CameraPos.x)
-		{
-			CameraPos.x = playerPos.x;
-		}
-		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), float(GetScreenHeight() / 2)};
-		camera.offset = (Vector2){float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
-		camera.zoom = 1.0f;
-
 		BeginDrawing();
 		ClearBackground(MARIO_SKYBLUE);
 		// ClearBackground(SKYBLUE);
@@ -63,23 +51,14 @@ int main(void)
 
 		gsm.draw();
 
-		ClearBackground(MARIO_SKYBLACK);
-		BeginMode2D(camera);
+		// std::cout << "Running fine" << std::endl;
 
-		level->render();
-		player->Draw();
-
-		EndMode2D();
 		EndDrawing();
 	}
 	SoundManager::getInstance().unload();
 	ResourceManager::GetInstance().UnloadResources();
 
 	CloseAudioDevice();
-	if (player)
-		delete player;
-	if (level)
-		delete level;
 	CloseWindow();
 
 	return 0;

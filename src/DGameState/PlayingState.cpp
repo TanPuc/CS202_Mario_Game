@@ -29,7 +29,7 @@ void PlayingState::enter()
     // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
     // player = std::make_unique<Mario>(START_POS_WORLD_1_1);
 
-    level = std::make_unique<Level>("./assets/Levels/world_1.1.txt");
+    level = std::make_unique<Level_1_1>("./assets/Levels/world_1.1.txt");
 
     player = std::make_unique<Mario>(currentData.playerPosition);
     player->lives = currentData.lives;
