@@ -1,6 +1,7 @@
 #include "Tile.h"
 #include "Mario.h"
 #include "BrickPieces.h"
+#include "ItemManager.h"
 
 float Q_rsqrt(float number)
 {
@@ -50,17 +51,22 @@ void BrickInstance::handleBreaking(Mario &player)
     {
         switch (state)
         {
-        case STATE_NORMAL:
-        {
-            // If player.state == STATE_SUPER
-            // state = STATE_BROKEN;
-            // else
-            state = STATE_INTERACTED;
-            q_b_a.iniVelY();
-        }
-        break;
-        default:
-            break;
+            case STATE_NORMAL:
+            {
+                // If player.state == STATE_SUPER
+                // state = STATE_BROKEN;
+                // else
+                if (player.GetForm() == BIG || player.GetForm() == FIRE || player.GetForm() == SUPER)
+                {
+                    state = STATE_BROKEN;
+                }
+                else
+                {
+                    state = STATE_INTERACTED;
+                    q_b_a.iniVelY();
+                }
+            } break; 
+            default: break;
         }
     }
 }
@@ -68,7 +74,7 @@ void BrickInstance::handleBreaking(Mario &player)
 BrickInstance::BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick)
     : TileInstance(pos, brick), hbox(Rectangle{pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2), pos.y + (TILE_SIZE * SCALE), HITBOX_WIDTH, HITBOX_HEIGHT}), dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
 
-void BrickInstance::update(Mario &player)
+void BrickInstance::update(Mario &player, ItemManager &itemManager)
 {
     handleBreaking(player);
     handleAnimation();
@@ -81,75 +87,88 @@ void BrickInstance::render()
 }
 
 QuestionInstance::QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question)
-    : TileInstance(pos, question), hbox(Rectangle{pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2), pos.y + (TILE_SIZE * SCALE), HITBOX_WIDTH, HITBOX_HEIGHT}), dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
+    : TileInstance(pos, question),
+      hbox(Rectangle{
+          pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2),
+          pos.y + (TILE_SIZE * SCALE),
+          HITBOX_WIDTH,
+          HITBOX_HEIGHT}),
+      dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
 
 void QuestionInstance::handleAnimation()
 {
     switch (state)
     {
-    case STATE_NORMAL:
-    {
-        frameCounter++;
-        if (normal.x == 0)
+        case STATE_NORMAL:
         {
-            if (frameCounter >= frameSpeed2)
+            frameCounter++;
+            if (normal.x == 0)
             {
-                frameCounter = 0;
-                normal.x += 16;
+                if (frameCounter >= frameSpeed2)
+                {
+                    frameCounter = 0;
+                    normal.x += 16;
+                }
             }
-        }
-        else
-        {
-            if (frameCounter >= frameSpeed)
+            else
             {
-                frameCounter = 0;
-                normal.x += 16;
-                if (normal.x >= 48)
-                    normal.x = 0;
+                if (frameCounter >= frameSpeed)
+                {
+                    frameCounter = 0;
+                    normal.x += 16;
+                    if (normal.x >= 48)
+                        normal.x = 0;
+                }
             }
-        }
-    }
-    break;
-    case STATE_INTERACTED:
-    {
-        normal.x = 48;
-        if (!q_b_a.is_update(pos.y))
+        } break;
+        case STATE_INTERACTED:
         {
-            state = STATE_ACTIVATED;
-        }
-        dest.y = pos.y;
-    }
-    break;
-    case STATE_ACTIVATED:
-    {
-        normal.x = 48;
-    }
-    break;
-    default:
-        break;
+            normal.x = 48;
+            if (!q_b_a.is_update(pos.y))
+            {
+                state = STATE_ACTIVATED;
+            }
+            dest.y = pos.y;
+        } break;
+        case STATE_ACTIVATED:
+        {
+            normal.x = 48;
+        } break;
+        default: break;
     }
 }
 
-void QuestionInstance::handleActivation(Mario &player)
+void QuestionInstance::handleActivation(Mario &player, ItemManager &itemManager)
 {
     Rectangle playerBBox = player.rect;
     if (CheckCollisionRecs(playerBBox, hbox))
     {
         switch (state)
         {
-        case STATE_NORMAL:
-        {
-            state = STATE_INTERACTED;
-            q_b_a.iniVelY();
-        }
-        break;
+            case STATE_NORMAL:
+            {
+                state = STATE_INTERACTED;
+                q_b_a.iniVelY();
+                if ( hasMushroom )
+                {
+                    itemManager.SpawnMushroom(Vector2{pos.x, pos.y - TILE_SIZE * SCALE}, Vector2{60.0f, 0.0f}, RIGHT);
+                }
+                else if ( hasFlower )
+                {
+                    itemManager.SpawnFireFlower(Vector2{pos.x, pos.y - TILE_SIZE * SCALE}, Vector2{0.0f, 0.0f}, RIGHT);
+                }
+                else 
+                {
+                    // Spawn coins 
+                }
+            } break;
         }
     }
 }
 
-void QuestionInstance::update(Mario &player)
+void QuestionInstance::update(Mario &player, ItemManager &itemManager)
 {
-    handleActivation(player);
+    handleActivation(player, itemManager);
     handleAnimation();
 }
 
@@ -159,40 +178,7 @@ void QuestionInstance::render()
     DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox
 }
 
-BackgroundInstance::BackgroundInstance(Vector2 pos, std::shared_ptr<Tile> background) : TileInstance(pos, background)
-{
-    bbox = Rectangle{0, 0, 0, 0};
-}
-
-void BackgroundInstance::render()
-{
-    DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
-}
-
-void PipeInstance1::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE); }
-void PipeInstance2::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE); }
-void PipeInstance3::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE); }
-
-HardblockInstance::HardblockInstance(Vector2 pos, std::shared_ptr<Tile> hardblock)
-    : TileInstance(pos, hardblock) {}
-
-void HardblockInstance::update(Mario &player)
-{
-    // handleCollision(player);
-}
-
-void HardblockInstance::render()
-{
-    DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
-}
-
-GoalpoleInstance::GoalpoleInstance(Vector2 pos, std::shared_ptr<Tile> goalpole)
-    : TileInstance(pos, goalpole), hbox(Rectangle{pos.x, pos.y, 64, 11 * TILE_SIZE * SCALE}), goalFlag({pos.x - 32.0f, pos.y + 68.0f})
-{
-    bbox = Rectangle{0, 0, 0, 0};
-}
-
-void GoalpoleInstance::update(Mario &player)
+void GoalpoleInstance::update(Mario &player, ItemManager &itemManager)
 {
     if (CheckCollisionRecs(player.GetBounds(), hbox))
     {
@@ -209,12 +195,23 @@ void GoalpoleInstance::render()
     goalFlag.Draw();
 }
 
-void FortressInstance::update(Mario &player)
+PlatformInstance::PlatformInstance(Vector2 pos_1, Vector2 pos_2, std::shared_ptr<Tile> platform, int direction) : TileInstance(pos_1, platform)
 {
-    fortressFlag.Update();
+    if (direction == 0) // Up and down
+    {
+        topPos = std::make_shared<Vector2>(pos_1);
+        bottomPos = std::make_shared<Vector2>(pos_2);
+        bbox = Rectangle{topPos->x, topPos->y, platform->getTexture().width * SCALE, platform->getTexture().height * SCALE};
+    }
+    else if (direction == 1) // Left and right
+    {
+        leftPos = std::make_shared<Vector2>(pos_1);
+        rightPos = std::make_shared<Vector2>(pos_2);
+        bbox = Rectangle{leftPos->x, leftPos->y, platform->getTexture().width * SCALE, platform->getTexture().height * SCALE};
+    }
 }
 
-void LavaSurfaceInstance::update(Mario &player)
+void LavaSurfaceInstance::update(Mario &player, ItemManager &itemManager)
 {
     if (CheckCollisionRecs(player.GetBounds(), hbox))
     {
@@ -223,25 +220,8 @@ void LavaSurfaceInstance::update(Mario &player)
     }
 }
 
-void FortressInstance::render()
-{
-    fortressFlag.Draw();
-}
 void LavaSurfaceInstance::render()
 {
     DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
     DrawRectangleLinesEx(hbox, 2.0f, RED); // Draw hitbox
 }
-
-// void PlatformInstance::update(Mario& player)
-// {
-//     float deltaTime = GetFrameTime();
-
-//     if ( pos.y > bottomPos.y ||  pos.y < topPos.y )
-//     {
-//         velocity.y *= -1;
-//     }
-//     pos.y += velocity.y * deltaTime;
-//     bbox.y = pos.y;
-
-// }

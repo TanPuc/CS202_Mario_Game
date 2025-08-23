@@ -14,6 +14,7 @@ class FortressFlag;
 class Tile;
 class TileInstance;
 class Mario;
+class ItemManager;
 
 class EntityManager
 {
@@ -24,9 +25,12 @@ public:
     std::vector<int> toRemove;
 
     void addBrickPieces(Vector2 position);
+    void initFortressFlag(Vector2 position, float fortressWidth);
     void initPlatform();
     void update(Mario &player);
     void render();
+    // Need a separate render function for proper displaying 
+    void renderFortressFlag(); 
 };
 
 typedef std::vector<std::vector<std::shared_ptr<TileInstance>>> TileInstancesGrid;
@@ -47,7 +51,7 @@ public:
     int getGridHeight() const { return tileInstancesGrid.size(); }
     int getGridWidth() const { return tileInstancesGrid[0].size(); }
 
-    virtual void update(Mario &player) = 0;
+    virtual void update(Mario &player, ItemManager& itemManager ) = 0;
     virtual void render() = 0;
 };
 
@@ -56,7 +60,7 @@ class Level_1_1 : public Level
 public:
     Level_1_1(const char *filePath);
     void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y);
-    void update(Mario &player) override;
+    void update(Mario &player, ItemManager& itemManager) override;
     void render() override;
 };
 
@@ -65,7 +69,7 @@ class Level_1_3 : public Level
 public:
     Level_1_3(const char *filePath);
     void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y);
-    void update(Mario &player) override;
+    void update(Mario &player, ItemManager& itemManager) override;
     void render() override;
 };
 
@@ -74,7 +78,7 @@ class Level_1_4 : public Level
 public:
     Level_1_4(const char *filePath);
     void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y);
-    void update(Mario &player) override;
+    void update(Mario &player, ItemManager& itemManager) override;
     void render() override;
 };
 

@@ -8,9 +8,9 @@
 #include "DCore/ResourceManager.h"
 #include "DCore/SoundManager.h"
 
-// #define MARIO_SKYBLUE (Color){68, 145, 190, 255}
-#define MARIO_SKYBLUE (Color{68, 145, 190, 225})
-// #define MARIO_SKYBLUE (Color){148, 148, 255, 255}
+// #define MARIO_SKYBLUE (Color{68, 145, 190, 255})
+// #define MARIO_SKYBLUE (Color{68, 145, 190, 225})
+#define MARIO_SKYBLUE (Color){148, 148, 255, 255}
 #define MARIO_SKYBLACK (Color){0, 0, 0, 255}
 
 int main(void)
@@ -21,7 +21,7 @@ int main(void)
 	SetTargetFPS(60);
 
 	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
-	ResourceManager::GetInstance().LoadBackgroundTexture("assets/menu_background.png");
+	// ResourceManager::GetInstance().LoadBackgroundTexture("assets/menu_background.png");
 	SoundManager::getInstance().load();
 
 	float initialPosX = 0.0f;
@@ -37,6 +37,7 @@ int main(void)
 	{
 		BeginDrawing();
 		ClearBackground(MARIO_SKYBLUE);
+		gsm.update();
 		// ClearBackground(SKYBLUE);
 		Texture2D background = ResourceManager::GetInstance().GetBackgroundTexture();
 		float bgAspectRatio = (float)background.width / (float)background.height;
@@ -50,8 +51,6 @@ int main(void)
 		DrawTexturePro(background, sourceRec, destRec, origin, 0.0f, WHITE);
 
 		gsm.draw();
-
-		// std::cout << "Running fine" << std::endl;
 
 		EndDrawing();
 	}

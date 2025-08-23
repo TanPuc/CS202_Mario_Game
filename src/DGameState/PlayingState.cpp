@@ -61,6 +61,9 @@ void PlayingState::enter()
     hudManager->resetTime(currentData.timeRemaining);
     hudManager->updateWorld(worldNum, levelNum);
     playerAdapter->update();
+
+    // TEST
+    // player->position.x = 200 * TILE_SIZE * SCALE;
 }
 
 void PlayingState::exit()
@@ -104,7 +107,7 @@ void PlayingState::update()
     player->Update(*level); // Handling player collision and movement
 
     // Handle Mario's death
-    level->update(*player);
+    level->update(*player, itemManager);
 
     playerAdapter->update();
     hudManager->updateTime();
