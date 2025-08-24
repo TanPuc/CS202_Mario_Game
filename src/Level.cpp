@@ -2,7 +2,6 @@
 #include "Tile.h"
 #include "FortressFlag.h"
 #include "ItemManager.h"
-#include "FireBar.h"
 #include <ctime>
 #include <random>
 

@@ -5,6 +5,7 @@
 #include <memory>
 #include <map>
 #include <raylib.h>
+#include "FireBar.h"
 #include "GlobalVariables.h"
 
 // Forward declaration
@@ -15,7 +16,6 @@ class Tile;
 class TileInstance;
 class Mario;
 class ItemManager;
-class FireBar;
 
 class EntityManager
 {

@@ -5,10 +5,11 @@
 #include "Entity.h"
 #include "GlobalVariables.h"
 #include "GameSprite/FireBallSprite.h"
+#include "Mario.h"
+
 
 // Forward declaration
 class Level;
-class Mario;
 
 class FireBarElement : public Entity
 {
@@ -33,7 +34,36 @@ public:
         
     }
 
-    void update(Mario& player);
+    void update(Mario& player)
+    {
+    // Rotate 10 degree every 8 frames 
+    timer++;
+    if (timer > 8)
+    {
+        timer = 0;
+    
+        float dx = centerOfElement.x - centerOfRotation.x;
+        float dy = centerOfElement.y - centerOfRotation.y;
+
+        float rotatedX = dx * std::cos(angle) + dy * std::sin(angle);
+        float rotatedY = - dx * std::sin(angle) + dy * std::cos(angle);
+
+        centerOfElement.x = centerOfRotation.x + rotatedX;
+        centerOfElement.y = centerOfRotation.y + rotatedY;
+
+        position.x = centerOfElement.x - FIREBALL_SIZE / 2;
+        position.y = centerOfElement.y - FIREBALL_SIZE / 2;
+
+        rect.x = position.x;
+        rect.y = position.y;
+    }
+
+    if ( CheckCollisionRecs(player.GetBounds(), rect) )
+    {
+        player.Die();
+        std::cout << player.lives << std::endl;
+    }
+    }
 
     void Draw() 
     {
