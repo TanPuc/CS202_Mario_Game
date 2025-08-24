@@ -43,7 +43,10 @@ public:
         std::cout << "Mushroom collected!" << std::endl;
         if (isCollected || mario.form != MARIO_FORM::SMALL)
             return;
-        mario.Grow();
+        // mario.Grow();
+        mario.ChangeForm(MARIO_FORM::BIG);
+        mario.position.y = position.y - mario.rect.height;
+        mario.rect.y = mario.position.y;
         isCollected = true;
         // Handle collision with other entities if needed
     }

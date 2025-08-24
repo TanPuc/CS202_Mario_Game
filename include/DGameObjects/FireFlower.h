@@ -47,9 +47,8 @@ public:
     {
         if (isCollected || mario.form != MARIO_FORM::BIG)
             return;
-        mario.ChangeToFire();
-        mario.position.y = position.y - 32.0f;
-        mario.rect.y = mario.position.y;
+        // mario.ChangeToFire();
+        mario.ChangeForm(MARIO_FORM::FIRE);
         isCollected = true;
         // Handle collision with other entities if needed
     }

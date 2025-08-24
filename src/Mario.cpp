@@ -42,8 +42,6 @@ void Mario::Die()
 
 void Mario::Grow()
 {
-    if (form != SMALL)
-        return;
     form = BIG;
     rect.height = MARIO_HEIGHT * 2.0f;
     sprite->SwitchForm(form);
@@ -51,8 +49,6 @@ void Mario::Grow()
 
 void Mario::ChangeToFire()
 {
-    if (form != BIG)
-        return;
     form = FIRE;
     rect.height = MARIO_HEIGHT * 2.0f;
     sprite->SwitchForm(form);
@@ -60,8 +56,6 @@ void Mario::ChangeToFire()
 
 void Mario::ChangeToSuper()
 {
-    if (form != BIG)
-        return;
     form = SUPER;
     rect.height = MARIO_HEIGHT * 2.0f;
     sprite->SwitchForm(form);
@@ -69,11 +63,22 @@ void Mario::ChangeToSuper()
 
 void Mario::Shrink()
 {
-    if (form == SMALL)
-        return;
     form = SMALL;
     rect.height = MARIO_HEIGHT;
     sprite->SwitchForm(form);
+}
+
+void Mario::ChangeForm(MARIO_FORM newForm)
+{
+    if (form == newForm)
+        return;
+
+    std::cout << "Form change initiated from " << form << " to " << newForm << std::endl;
+
+    isTransforming = true;
+    transformTimer = 1.0f; // 5 seconds
+    previousForm = form;
+    targetForm = newForm;
 }
 
 void Mario::ChangeForm()
@@ -159,36 +164,83 @@ bool Mario::IsHurt() const
     return false;
 }
 
+void Mario::ChangeToTargetForm(MARIO_FORM targetForm)
+{
+    switch (targetForm)
+    {
+    case SMALL:
+        Shrink();
+        break;
+    case BIG:
+        Grow();
+        break;
+    case FIRE:
+        ChangeToFire();
+        break;
+    }
+}
+
 void Mario::Update(Level &level)
 {
     float dt = GetFrameTime();
     std::unique_ptr<MarioState> newState = currentState->Update(*this, *sprite);
+    if (newState != nullptr)
+    {
+        currentState = std::move(newState);
+    }
 
-    // Prevent throwing animation from being interrupted
+    // Prevent animation from being interrupted
     if (isThrowing)
     {
         throwTimer--;
         if (throwTimer <= 0)
         {
             isThrowing = false;
-            // onShootFireBall();
-            std::cout << "Finished throwing animation\n";
+            // std::cout << "Finished throwing animation\n";
+        }
+    }
+    if (isTransforming)
+    {
+        transformTimer -= dt; // float time countdown
+
+        // Handle frame toggling
+        frameIndex++;
+        if (frameIndex >= FRAME_INDEX_THRESHOLD) // e.g. 10 frames
+        {
+            frameIndex = 0;
+            // Toggle between old and new form visually
+            showingTarget = !showingTarget;
+            // std::cout << "Toggling form display: " << (showingTarget ? "Target Form" : "Previous Form") << std::endl;
+            if (showingTarget)
+                ChangeToTargetForm(targetForm);
+            else
+                ChangeToTargetForm(previousForm);
+        }
+
+        // End transformation
+        if (transformTimer <= 0.0f)
+        {
+            // std::cout << "Form change completed: " << previousForm << " -> " << targetForm << std::endl;
+            isTransforming = false;
+            form = targetForm;
+            ChangeToTargetForm(form);
+
+            // Reset
+            transformTimer = 0.0f;
+            frameIndex = 0;
+            showingTarget = false;
         }
     }
 
-    if (newState != nullptr)
-    {
-        currentState = std::move(newState);
-    }
-
+    // If transformation animation is on-going, don't update the position
+    // Checking for hurt invincibility
     if (hurtBuffer > 0.0f)
-    {
         hurtBuffer -= GetFrameTime();
-    }
     else
-    {
         hurtBuffer = 0.0f;
-    }
+
+    if (isTransforming)
+        return;
 
     ApplyGravity(velocity, GRAVITY);
 

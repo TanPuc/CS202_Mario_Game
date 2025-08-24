@@ -16,7 +16,7 @@ void ItemManager::UpdateItems(Level &level, Mario &mario)
         if (item)
         {
             item->Update(level);
-            if (CheckCollisionRecs(item->rect, mario.rect))
+            if (CheckCollisionRecs(item->rect, mario.rect) && !item->isCollected && !mario.isTransforming)
             {
                 // std::cout << "Collision detected between Mario and item!" << std::endl;
                 item->Collect(mario);

@@ -125,8 +125,9 @@ void PlayingState::update()
 
     if (IsKeyPressed(KEY_F))
     {
-        Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
-        player->Slide(playerGridCoords);
+        // Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
+        // player->Slide(playerGridCoords);
+        player->ChangeForm(SMALL);
     }
 
     if (player->GetBounds().x > cameraPos.x)

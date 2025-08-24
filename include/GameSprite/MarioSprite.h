@@ -45,7 +45,10 @@ public:
 
     void SwitchForm(MARIO_FORM newForm)
     {
-        if (newForm == SMALL)
+        std::cout << "Form Switched in Sprite\n";
+        switch (newForm)
+        {
+        case SMALL:
         {
             idleAnimation = {{0, 16, 16, 16}};
             walkAnimation = {{16 + FRAME_PADDING, 16, 16, 16}, {0, 16, 16, 16}};
@@ -54,8 +57,9 @@ public:
             duckAnimation = {{0, 16, 16, 16}};
             deadAnimation = {{306, 16, 16, 16}};
             slidingAnimation = {{126, 16, 16, 16}};
+            break;
         }
-        else if (newForm == BIG)
+        case BIG:
         {
             idleAnimation = {{0, 88, 16, 16 * 2}};
             walkAnimation = {{(16 + FRAME_PADDING) * 2, 88, 16, 16 * 2}, {16 + FRAME_PADDING, 88, 16, 16 * 2}, {0, 88, 16, 16 * 2}};
@@ -64,8 +68,9 @@ public:
             duckAnimation = {{54, 96, 16, 16 * 1.5f}};
             deadAnimation = {{306, 16, 16, 16}};
             slidingAnimation = {{212, 88, 16, 16 * 2}};
+            break;
         }
-        else if (newForm == FIRE)
+        case FIRE:
         {
             idleAnimation = {{0, 260, 16, 16 * 2}};
             walkAnimation = {{(16 + FRAME_PADDING) * 2, 260, 16, 16 * 2}, {16 + FRAME_PADDING, 260, 16, 16 * 2}, {0, 260, 16, 16 * 2}};
@@ -74,13 +79,16 @@ public:
             duckAnimation = {{54, 268, 16, 16 * 1.5f}};
             deadAnimation = {{306, 16, 16, 16}};
             slidingAnimation = {{212, 260, 16, 16 * 2}};
+            break;
         }
-        else
+        default:
         {
             std::cerr << "Unknown Mario form!" << std::endl;
+            break;
         }
+        }
+        frameRec = currentAnimation->frames[0];
     }
-
     void SwitchAnimation(STATE state_) override
     {
         if (state_ == prevState)
@@ -124,7 +132,9 @@ public:
         if (currentAnimation)
         {
             currentAnimation->frameCounter = 0;
+            frameRec = currentAnimation->frames[0];
         }
+
         prevState = state_;
     }
 
@@ -161,6 +171,8 @@ public:
             frameRec.width = -abs(frameRec.width);
         }
         // DrawTextureRec(spriteSheet, frameRec, entity.position, WHITE);
+
+        std::cout << "Sprite Rec y: " << frameRec.y << std::endl;
         DrawTexturePro(spriteSheet, frameRec,
                        {entity.position.x, entity.position.y, entity.rect.width, entity.rect.height},
                        {0, 0}, 0.0f, WHITE);
