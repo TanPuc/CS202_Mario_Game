@@ -29,12 +29,15 @@ public:
     float contact_time = 0.0f;
     std::vector<std::pair<std::array<int, 2>, float>> z;
 
-    // Dedicated to resolve collision between player and tiles map
     void CheckCollision(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
-    void ResolveCollision(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
 
-    // Helper
-    bool IsCollideWithLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
+    void PlayerVsLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
+
+    void MushroomVsLevel(Vector2& position, Rectangle& bbox, Vector2& velocity, Level& level);
+
+    void FireBallVsLevel(Vector2& position, Rectangle& bbox, Vector2& velocity, Level& level);
 };
+
+Rectangle getSweptBBox(Vector2& position, Rectangle &bbox, Vector2 &velocity, float dt);
 
 #endif // COLLISION_H

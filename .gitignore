@@ -71,3 +71,4 @@ build.ninja
 # VSCode folder
 .vscode/settings.json
 /.vscode
+.vs/

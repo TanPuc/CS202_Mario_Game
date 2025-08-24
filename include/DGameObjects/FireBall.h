@@ -13,7 +13,7 @@
 #define FIREBALL_THRESHOLD 3  // Number of maximum fireballs
 #define FIREBALL_LIFETIME 120 // Fireball lifetime in frames
 
-#define FIREBALL_SIZE 8 * SCALE
+// #define FIREBALL_SIZE 8 * SCALE
 
 class FireBall : public Entity
 {
@@ -77,12 +77,13 @@ public:
 
     void ResolveCollision(Level &level)
     {
-        if (collision.IsCollideWithLevel(position, rect, velocity, level))
-        {
-            velocity.y = -150.f;
-        }
-        collision.CheckCollision(position, rect, velocity, level);
-        collision.ResolveCollision(position, rect, velocity, level);
+        // if (collision.IsCollideWithLevel(position, rect, velocity, level))
+        // {
+        //     velocity.y = -150.f;
+        // }
+        // collision.CheckCollision(position, rect, velocity, level);
+        // collision.ResolveCollision(position, rect, velocity, level);
+        collision.FireBallVsLevel(position, rect, velocity, level);
     }
 };
 

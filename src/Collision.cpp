@@ -2,6 +2,7 @@
 #include "Level.h"
 #include "Tile.h"
 #include <iostream>
+#include "GlobalVariables.h"
 
 namespace aabb
 {
@@ -93,28 +94,49 @@ namespace aabb
         }
         return false;
     }
+
+    // Please do not uncomment and use this function
+    // bool ResolveDynamicRects ( Vector2& position, Rectangle& source, Vector2& source_velocity, float fElapsedTime, Rectangle& target, Vector2& target_velocity )
+    // {
+    //     Vector2 contact_point, contact_normal;
+    //     float contact_time = 0.0f;
+    //     Vector2 relative_velocity = { source_velocity.x - target_velocity.x, source_velocity.y - target_velocity.y };
+    //     if ( CheckCollisionStaticRectDynamicRect(source, source_velocity, target, contact_point, contact_normal, contact_time, fElapsedTime))
+    //     {
+    //         relative_velocity.x += contact_normal.x * std::abs(relative_velocity.x) * ( 1 - contact_time );
+    //         relative_velocity.y += contact_normal.y * std::abs(relative_velocity.y) * ( 1 - contact_time );
+    //         source_velocity.x = relative_velocity.x + target_velocity.x;
+    //         source_velocity.y = relative_velocity.y + target_velocity.y;
+    //         return true;
+    //     }
+    //     return false;
+    // }
 }
 
 void Collision::CheckCollision(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
 {
+    float tile_size = TILE_SIZE * SCALE;
     float dt = GetFrameTime();
     Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
-    int minX = std::floor(std::min(position.x, nextPos.x) / (TILE_SIZE * SCALE));
-    int minY = std::floor(std::min(position.y, nextPos.y) / (TILE_SIZE * SCALE));
-    int maxX = std::floor(std::max(position.x + bbox.width, nextPos.x + bbox.width) / (TILE_SIZE * SCALE));
-    int maxY = std::floor(std::max(position.y + bbox.height, nextPos.y + bbox.height) / (TILE_SIZE * SCALE));
+    float minX = std::min(position.x, nextPos.x);
+    float minY = std::min(position.y, nextPos.y);
+    float maxX = std::max(position.x + bbox.width, nextPos.x + bbox.width);
+    float maxY = std::max(position.y + bbox.height, nextPos.y + bbox.height);
+    float min_coordinate_X = minX / tile_size;
+    float min_coordinate_Y = minY / tile_size;
+    float max_coordinate_X = maxX / tile_size;
+    float max_coordinate_Y = maxY / tile_size;
 
-    for (int y = minY; y <= maxY; y++)
+    for (int y = min_coordinate_Y; y <= max_coordinate_Y; y++)
     {
-        for (int x = minX; x <= maxX; x++)
+        for (int x = min_coordinate_X; x <= max_coordinate_X; x++)
         {
-            // Assume that player will never go out of grid map in x-direction
-            if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
+            if (x < 0 || x >= level.getGridWidth() || y < 0 || y >= level.getGridHeight())
                 continue;
-            if (level.tileInstancesGrid[y][x])
+            if (level.getTileInstance(y, x))
             {
                 if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity,
-                                                              level.tileInstancesGrid[y][x]->bbox, contact_point, contact_normal, contact_time, dt))
+                                                              level.getTileInstance(y, x)->bbox, contact_point, contact_normal, contact_time, dt))
                 {
                     std::array<int, 2> temp = {y, x};
                     z.push_back({temp, contact_time});
@@ -124,42 +146,173 @@ void Collision::CheckCollision(Vector2 &position, Rectangle &bbox, Vector2 &velo
     }
 }
 
-void Collision::ResolveCollision(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
+void Collision::PlayerVsLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
 {
-    float dt = GetFrameTime();
-    std::sort(z.begin(), z.end(), compare);
-    for (auto j : z)
-    {
-        aabb::ResolveStaticRectDynamicRect(bbox, velocity, dt, level.tileInstancesGrid[j.first[0]][j.first[1]]->bbox);
-    }
-    z.clear();
-}
-
-bool Collision::IsCollideWithLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
-{
+    float tile_size = TILE_SIZE * SCALE;
     float dt = GetFrameTime();
     Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
-    int minX = std::floor(std::min(position.x, nextPos.x) / (TILE_SIZE * SCALE));
-    int minY = std::floor(std::min(position.y, nextPos.y) / (TILE_SIZE * SCALE));
-    int maxX = std::floor(std::max(position.x + bbox.width, nextPos.x + bbox.width) / (TILE_SIZE * SCALE));
-    int maxY = std::floor(std::max(position.y + bbox.height, nextPos.y + bbox.height) / (TILE_SIZE * SCALE));
+    float minX = std::min(position.x, nextPos.x);
+    float minY = std::min(position.y, nextPos.y);
+    float maxX = std::max(position.x + bbox.width, nextPos.x + bbox.width);
+    float maxY = std::max(position.y + bbox.height, nextPos.y + bbox.height);
+    float min_coordinate_X = minX / tile_size;
+    float min_coordinate_Y = minY / tile_size;
+    float max_coordinate_X = maxX / tile_size;
+    float max_coordinate_Y = maxY / tile_size;
 
-    for (int y = minY; y <= maxY; y++)
+    for (int y = min_coordinate_Y; y <= max_coordinate_Y; y++)
     {
-        for (int x = minX; x <= maxX; x++)
+        for (int x = min_coordinate_X; x <= max_coordinate_X; x++)
         {
-            // Assume that player will never go out of grid map in x-direction
-            if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
+            if (x < 0 || x >= level.getGridWidth() || y < 0 || y >= level.getGridHeight())
                 continue;
-            if (level.tileInstancesGrid[y][x])
+            if (level.getTileInstance(y, x))
             {
-                if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity,
-                                                              level.tileInstancesGrid[y][x]->bbox, contact_point, contact_normal, contact_time, dt))
+                // Check collision with the original bounding box of interactble tiles 
+                // since we need to update bounding box for animation 
+                auto brick = dynamic_cast<BrickInstance*>(level.getTileInstance(y, x).get());
+                auto question = dynamic_cast<QuestionInstance*>(level.getTileInstance(y, x).get());
+                Rectangle tileBBox = brick ? brick->getOriginalBBox() : 
+                    ( question ? question->getOriginalBBox() : level.getTileInstance(y, x)->bbox );
+
+                if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity, tileBBox, contact_point, contact_normal, contact_time, dt))
                 {
-                    return true;
+                    std::array<int, 2> temp = {y, x};
+                    z.push_back({temp, contact_time});
                 }
             }
         }
     }
-    return false;
+
+    std::sort(z.begin(), z.end(), compare);
+    for (auto j : z)
+    {
+        Vector2 cp, cn;
+        float ct = 0.0f;
+
+        auto brick = dynamic_cast<BrickInstance*>(level.getTileInstance(j.first[0], j.first[1]).get());
+        auto question = dynamic_cast<QuestionInstance*>(level.getTileInstance(j.first[0], j.first[1]).get());
+        Rectangle tileBBox = brick ? brick->getOriginalBBox() : 
+            ( question ? question->getOriginalBBox() : level.getTileInstance(j.first[0], j.first[1])->bbox );
+
+        if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity, tileBBox, cp, cn, ct, dt))
+        {
+            velocity.x += cn.x * std::abs(velocity.x) * (1 - ct);
+            velocity.y += cn.y * std::abs(velocity.y) * (1 - ct);
+        }
+    }
+    z.clear();
+
+    // Check collision with platforms
+    Rectangle playerSweptBBox = getSweptBBox(position, bbox, velocity, dt);
+    for (const auto &platform : level.entityManager.platforms)
+    {
+        if (CheckCollisionRecs(playerSweptBBox, platform->bbox))
+        {
+            aabb::ResolveStaticRectDynamicRect(bbox, velocity, dt, platform->bbox);
+        }
+    }
+}
+
+void Collision::MushroomVsLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
+{
+    float tile_size = TILE_SIZE * SCALE;
+    float dt = GetFrameTime();
+    Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
+    float minX = std::min(position.x, nextPos.x);
+    float minY = std::min(position.y, nextPos.y);
+    float maxX = std::max(position.x + bbox.width, nextPos.x + bbox.width);
+    float maxY = std::max(position.y + bbox.height, nextPos.y + bbox.height);
+    float min_coordinate_X = minX / tile_size;
+    float min_coordinate_Y = minY / tile_size;
+    float max_coordinate_X = maxX / tile_size;
+    float max_coordinate_Y = maxY / tile_size;
+
+    for (int y = min_coordinate_Y; y <= max_coordinate_Y; y++)
+    {
+        for (int x = min_coordinate_X; x <= max_coordinate_X; x++)
+        {
+            if (x < 0 || x >= level.getGridWidth() || y < 0 || y >= level.getGridHeight())
+                continue;
+            if (level.getTileInstance(y, x))
+            {
+                if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity,
+                                                              level.getTileInstance(y, x)->bbox, contact_point, contact_normal, contact_time, dt))
+                {
+                    std::array<int, 2> temp = {y, x};
+                    z.push_back({temp, contact_time});
+                }
+            }
+        }
+    }
+    std::sort(z.begin(), z.end(), compare);
+    for (auto j : z)
+    {
+        Vector2 cp, cn;
+        float ct = 0.0f;
+        if ( aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity, level.getTileInstance(j.first[0], j.first[1])->bbox, cp, cn, ct, dt) )
+        {
+            velocity.y += cn.y * std::abs(velocity.y) * (1 - ct);
+            if ( cn.x != 0 )
+            {
+                velocity.x *= -1; // Reflect if faces wall 
+            }
+            else 
+            {
+                velocity.x += cn.x * std::abs(velocity.x) * (1 - ct);
+            }
+        }
+    }
+    z.clear();
+
+    for (int y = min_coordinate_Y; y <= max_coordinate_Y + 1; y++)
+    {
+        for (int x = min_coordinate_X; x <= max_coordinate_X; x++)
+        {
+            if (x < 0 || x >= level.getGridWidth() || y < 0 || y >= level.getGridHeight())
+                continue;
+            if (level.getTileInstance(y, x))
+            {
+                if ( CheckCollisionRecs(bbox, level.getTileInstance(y, x)->bbox) )
+                {
+                    if (level.getTileInstance(y, x)->getState() == STATE_INTERACTED )
+                    {
+                        velocity.y -= 40.0f;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Collision::FireBallVsLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
+{
+    CheckCollision(position, bbox, velocity, level);
+    float dt = GetFrameTime();
+    std::sort(z.begin(), z.end(), compare);
+    for (auto j : z)
+    {
+        Vector2 cp, cn;
+        float ct = 0.0f;
+        if ( aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity, level.getTileInstance(j.first[0], j.first[1])->bbox, cp, cn, ct, dt) )
+        {
+            velocity.x += cn.x * std::abs(velocity.x) * (1 - ct);
+            velocity.y += cn.y * std::abs(velocity.y) * (1 - ct);
+            if ( cn.y != 0 )
+            {
+                velocity.y = -150.f;
+            }
+        }
+    }
+    z.clear();
+}
+
+Rectangle getSweptBBox(Vector2& position, Rectangle &bbox, Vector2 &velocity, float dt)
+{
+    Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
+    float minX = std::min(position.x, nextPos.x);
+    float minY = std::min(position.y, nextPos.y);
+    float maxX = std::max(position.x + bbox.width, nextPos.x + bbox.width);
+    float maxY = std::max(position.y + bbox.height, nextPos.y + bbox.height);
+    return Rectangle{minX, minY, maxX - minX, maxY - minY};
 }

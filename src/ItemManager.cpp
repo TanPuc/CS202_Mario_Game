@@ -1,4 +1,5 @@
 #include "ItemManager.h"
+#include "Level.h"
 #include <algorithm>
 
 void ItemManager::AddItem(std::unique_ptr<Item> item)

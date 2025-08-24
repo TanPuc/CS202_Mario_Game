@@ -7,8 +7,11 @@
 #include "DGameObjects/Mushroom.h"
 #include "DGameObjects/FireFlower.h"
 #include "Physics.h"
-#include "Level.h"
+// #include "Level.h"
 #include "Mario.h"
+
+// Forward declaration
+class Level;
 
 class ItemManager
 {

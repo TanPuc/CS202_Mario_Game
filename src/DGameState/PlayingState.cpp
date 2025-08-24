@@ -31,7 +31,7 @@ void PlayingState::enter()
     // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
     // player = std::make_unique<Mario>(START_POS_WORLD_1_1);
 
-    level = std::make_unique<Level>("./assets/Levels/world_1.1.txt");
+    level = std::make_unique<Level_1_4>("./assets/Levels/world_1.4.txt");
 
     player = std::make_unique<Mario>(currentData.playerPosition);
     player->lives = currentData.lives;
@@ -44,9 +44,9 @@ void PlayingState::enter()
     // Items
     // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
     // entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
-    itemManager.AddItem(std::make_unique<Coin>(Vector2{200, 100}));
-    itemManager.AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
-    itemManager.AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
+    // itemManager.AddItem(std::make_unique<Coin>(Vector2{200, 100}));
+    // itemManager.AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
+    // itemManager.AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
 
     player->lives = gsm->getContext().lives;
     player->coins = 0;
@@ -125,7 +125,7 @@ void PlayingState::update()
     player->Update(*level); // Handling player collision and movement
 
     // Handle Mario's death
-    level->update(*player);
+    level->update(*player, itemManager);
 
     playerAdapter->update();
     hudManager->updateTime();
