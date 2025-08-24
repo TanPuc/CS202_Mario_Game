@@ -6,10 +6,12 @@
 #include "DCore/SoundManager.h"
 #include "DCore/SaveManager.h"
 
+
 PlayingState::PlayingState(GameStateManager *manager, const GameData &initialData) : gsm(manager), currentData(initialData) {}
 
 void PlayingState::enter()
 {
+    enemyAsset::Load();
     SoundManager::getInstance().stopMusic();
     SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
     heartTexture = LoadTexture("assets/mario.png");
@@ -62,8 +64,23 @@ void PlayingState::enter()
     hudManager->updateWorld(worldNum, levelNum);
     playerAdapter->update();
 
-    // TEST
-    // player->position.x = 200 * TILE_SIZE * SCALE;
+
+    enemyManager = new EnemyManager(player.get(), level.get(), fireBallManager.GetFireBalls());
+    Vector2 posEnemy = { 300, 100 };
+    // enemyManager->spawnEnemyAt(EnemyType::goopa, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::beezybettle, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::blooper, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::spiny, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::paratroopa, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::hammer, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::piranhaplant, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::hammerbro, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::bowser, posEnemy);
+
 }
 
 void PlayingState::exit()
@@ -72,6 +89,7 @@ void PlayingState::exit()
     UnloadTexture(heartTexture);
     UnloadTexture(coinIcon);
     UnloadTexture(pauseIconTexture);
+    enemyAsset::Unload();
 }
 
 void PlayingState::update()
@@ -141,6 +159,10 @@ void PlayingState::update()
     fireBallManager.Update(*level);
     itemManager.UpdateItems(*level, *player); // Update all entities
 
+    //Enemy
+    enemyManager->update();
+
+
     // Check for game over
     // Time and lives
     if (hudManager->getTime() <= 0 || player->GetPosition().y > HEIGHT_BOUNDARY)
@@ -177,6 +199,7 @@ void PlayingState::draw()
     BeginMode2D(camera);
     level->render();
     player->Draw();
+    enemyManager->draw();
 
     fireBallManager.Draw();
     itemManager.DrawItems();

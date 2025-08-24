@@ -12,9 +12,7 @@ void TimeDisplay::reset(int startTime)
 void TimeDisplay::update()
 {
     timer += GetFrameTime();
-    // if (timer >= 0.01f && timeRemaining > 0)
-    // {
-    if (timer >= 1.0f && timeRemaining > 0)
+    if (timer >= 1000000.0f && timeRemaining > 0)
     {
         timer = 0.0f;
         timeRemaining--;

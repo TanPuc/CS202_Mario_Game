@@ -7,7 +7,7 @@
 class Entity;
 class Level;
 
-#define GRAVITY 10.0f
+#define GRAVITY 900.0f
 #define JUMP_FORCE 500.0f
 // #define JUMP_FORCE 1000.0f
 #define SPEED 200.0f
@@ -29,9 +29,13 @@ bool ConsumeJumpBuffer();
 // Function declarations only
 void ApplyGravity(Vector2 &velocity, float gravity);
 void ClampVelocity(Vector2 &velocity);
-bool CheckCollision(const Entity &a, const Entity &b);
-bool CheckCollision(const Entity &a, const Level &level);
-bool CheckCollision(const Rectangle &a, const Level &level);
-bool CheckCollision(const Entity &a, const Level &level, Vector2 &collisionPoint);
+//bool CheckCollision(const Entity &a, const Entity &b);
+//bool CheckCollision(const Entity &a, const Level &level);
+//bool CheckCollision(const Rectangle &a, const Level &level);
+//bool CheckCollision(const Entity &a, const Level &level, Vector2 &collisionPoint);
+//
+//bool CheckOverlapX(const Rectangle& A, const Rectangle& B);
+//bool CheckOverlapY(const Rectangle& A, const Rectangle& B);
+//bool CheckOverlap(const Rectangle& A, const Rectangle& B);
 
 #endif // PHYSICS_H

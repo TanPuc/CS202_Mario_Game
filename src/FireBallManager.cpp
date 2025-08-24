@@ -43,3 +43,8 @@ void FireBallManager::ShootFireBall(Vector2 position, DIRECTION direction)
         fireballs.push_back(std::move(newFireBall));
     }
 }
+
+const std::vector<std::shared_ptr<FireBall>>& FireBallManager::GetFireBalls() const
+{
+    return fireballs;
+}
