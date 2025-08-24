@@ -36,9 +36,9 @@ int main(void)
 	while (!WindowShouldClose() && !gsm.isExiting())
 	{
 		BeginDrawing();
-		ClearBackground(MARIO_SKYBLACK);
+		SoundManager::getInstance().updateMusicStreams();
+		ClearBackground(SKYBLUE);
 		gsm.update();
-		// ClearBackground(SKYBLUE);
 		Texture2D background = ResourceManager::GetInstance().GetBackgroundTexture();
 		float bgAspectRatio = (float)background.width / (float)background.height;
 		float bgScreenWidth = (float)GetScreenWidth() + 15;
@@ -51,7 +51,6 @@ int main(void)
 		DrawTexturePro(background, sourceRec, destRec, origin, 0.0f, WHITE);
 
 		gsm.draw();
-
 		EndDrawing();
 	}
 	SoundManager::getInstance().unload();

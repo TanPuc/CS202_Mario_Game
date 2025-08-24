@@ -33,7 +33,7 @@ void CollisionMap::DetectCollisionMap(Enemy& e, const Level& level)
 
     for (int y = minY; y <= maxY; y++) {
         for (int x = minX; x <= maxX; x++) {
-            if (x < 0 || y < 0 || x >= GRID_WIDTH || y >= GRID_HEIGHT) continue;
+            if (x < 0 || y < 0 || x >= level.getGridWidth() || y >= level.getGridHeight()) continue;
             if (level.tileInstancesGrid[y][x]) {
                 if (aabb::CheckCollisionStaticRectDynamicRect(e.getHurtBox(), e.getVelocity(),
                     level.tileInstancesGrid[y][x]->bbox, cp, cn, t, et)) {

@@ -100,7 +100,7 @@ bool ConditionGrounded::evaluate(Enemy& e)
 
     for (int y = minY; y <= maxY; y++) {
         for (int x = minX; x <= maxX; x++) {
-            if (x < 0 || y < 0 || x >= GRID_WIDTH || y >= GRID_HEIGHT) continue;
+            if (x < 0 || y < 0 || x >= m_level.getGridWidth()|| y >= m_level.getGridHeight()) continue;
             if (m_level.tileInstancesGrid[y][x]) {
                 if (aabb::CheckCollisionStaticRectDynamicRect(e.getHurtBox(), e.getVelocity(),
                     m_level.tileInstancesGrid[y][x]->bbox, cp, cn, t, et)) {
