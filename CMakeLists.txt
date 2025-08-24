@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 project(Mario)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set download and extraction directories
 set(DOWNLOAD_DIR "${CMAKE_SOURCE_DIR}/zip_files")
@@ -90,8 +88,3 @@ add_custom_command(TARGET Mario POST_BUILD
     $<TARGET_FILE_DIR:Mario>/assets
     COMMENT "Copying assets to output directory"
 )
-
-
-if (MSVC)
-    add_compile_options(/permissive-)
-endif()

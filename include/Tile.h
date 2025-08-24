@@ -235,7 +235,7 @@ public:
 class FortressInstance : public TileInstance
 {
 private:
-    Rectangle hbox = {};
+    Rectangle hbox;
 
 public:
     FortressInstance(Vector2 pos, std::shared_ptr<Tile> fortress)

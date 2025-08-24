@@ -26,12 +26,6 @@ void WalkState::enter(Enemy& e)
 
 	e.setSprite(getName());
 }
-void WalkOnLedgeState::enter(Enemy& e)
-{
-	WalkState::enter(e);
-	//e.setCollisionMap(new CollisionMap(new CollisionStrategyXReverse(),new CollisionStrategyXReverseLedge()));
-	e.setCollisionMap(new CollisionMap(new CollisionStrategyXReverse(), nullptr));
-}
 void WalkState::exit(Enemy& e) {}
 void WalkState::update(Enemy& e) {}
 StateType WalkState::getName() const
@@ -184,10 +178,7 @@ void HopState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
 
-	CollisionMapStrategyCombined* CombinedCollisionStrategy = new CollisionMapStrategyCombined();
-	CombinedCollisionStrategy->addStrategy(new CollisionStrategyXReverse());
-	CombinedCollisionStrategy->addStrategy(new CollisionStrategyYJump(m_power));
-	e.setCollisionMap(new CollisionMap(CombinedCollisionStrategy, nullptr));
+	e.setCollisionMap(new CollisionMap(new CollisionStrategyXReverse(),new CollisionStrategyYJump(m_power)));
 
 	e.setSprite(getName());
 }
@@ -227,8 +218,6 @@ void ShellSlidingState::enter(Enemy& e)
 	compoMove->addStrategy(new MoveStrategyBasic(-m_speed, e, m_player));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
 	e.setMoveStrategy(compoMove);
-
-	e.setCollisionMap(new CollisionMap(new CollisionStrategyXReverse(), nullptr));
 
 	e.setSprite(getName());
 }

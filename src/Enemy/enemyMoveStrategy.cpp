@@ -22,7 +22,7 @@ MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e, const Mario& mario) :
 MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e) :
 	speed(value)
 {
-	e.setVelocityX(-speed);	//so it is 20 instead of 20+x...
+	e.setVelocityX(speed);	//so it is 20 instead of 20+x...
 }
 void MoveStrategyBasic::move(Enemy& e)
 {

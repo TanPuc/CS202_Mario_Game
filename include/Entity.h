@@ -13,10 +13,10 @@ class Level;
 class Entity
 {
 public:
-    Rectangle rect = {};
-    Vector2 position = {};
-    Vector2 velocity = {};
-    Collision collision = {};
+    Rectangle rect;
+    Vector2 position;
+    Vector2 velocity;
+    Collision collision;
     DIRECTION direction = RIGHT; // Default direction
     bool isActive;
 
