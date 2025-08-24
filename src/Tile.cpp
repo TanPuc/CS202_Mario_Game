@@ -1,6 +1,7 @@
 #include "Tile.h"
 #include "Mario.h"
 #include "BrickPieces.h"
+#include "DGameState/PlayingState.h"
 
 float Q_rsqrt(float number)
 {
@@ -68,7 +69,7 @@ void BrickInstance::handleBreaking(Mario &player)
 BrickInstance::BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick)
     : TileInstance(pos, brick), hbox(Rectangle{pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2), pos.y + (TILE_SIZE * SCALE), HITBOX_WIDTH, HITBOX_HEIGHT}), dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
 
-void BrickInstance::update(Mario &player)
+void BrickInstance::update(Mario &player, PlayingState* ps)
 {
     handleBreaking(player);
     handleAnimation();
@@ -130,26 +131,39 @@ void QuestionInstance::handleAnimation()
     }
 }
 
-void QuestionInstance::handleActivation(Mario &player)
+void QuestionInstance::handleActivation(Mario &player, PlayingState* ps)
 {
     Rectangle playerBBox = player.rect;
     if (CheckCollisionRecs(playerBBox, hbox))
     {
-        switch (state)
-        {
-        case STATE_NORMAL:
+        // switch (state)
+        // {
+        // case STATE_NORMAL:
+        // {
+        //     state = STATE_INTERACTED;
+        //     q_b_a.iniVelY();
+        //     player.score += 100;
+        // }
+        // break;
+        // }
+        if (state == STATE_NORMAL)
         {
             state = STATE_INTERACTED;
             q_b_a.iniVelY();
-        }
-        break;
+            
+            player.score += 100;
+            SoundManager::getInstance().playSound(SoundEffect::COIN);
+            if (ps) 
+            {
+                ps->addFloatingScore(this->pos, "100");
+            }
         }
     }
 }
 
-void QuestionInstance::update(Mario &player)
+void QuestionInstance::update(Mario &player, PlayingState* ps)
 {
-    handleActivation(player);
+    handleActivation(player, ps);
     handleAnimation();
 }
 
@@ -176,7 +190,7 @@ void PipeInstance3::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, SCAL
 HardblockInstance::HardblockInstance(Vector2 pos, std::shared_ptr<Tile> hardblock)
     : TileInstance(pos, hardblock) {}
 
-void HardblockInstance::update(Mario &player)
+void HardblockInstance::update(Mario &player, PlayingState* ps)
 {
     // handleCollision(player);
 }
@@ -192,9 +206,14 @@ GoalpoleInstance::GoalpoleInstance(Vector2 pos, std::shared_ptr<Tile> goalpole)
     bbox = Rectangle{0, 0, 0, 0};
 }
 
-void GoalpoleInstance::update(Mario &player)
+void GoalpoleInstance::update(Mario &player, PlayingState* ps)
 {
-    if (CheckCollisionRecs(player.GetBounds(), hbox))
+    if (state == STATE_ACTIVATED && goalFlag.IsFinishedSliding()) 
+    {
+        isLevelFinished = true;
+    }
+
+    if (!isLevelFinished && CheckCollisionRecs(player.GetBounds(), hbox))
     {
         state = STATE_ACTIVATED;
         goalFlag.iniVelY();
@@ -209,7 +228,7 @@ void GoalpoleInstance::render()
     goalFlag.Draw();
 }
 
-void FortressInstance::update(Mario &player)
+void FortressInstance::update(Mario &player, PlayingState* ps)
 {
     fortressFlag.Update();
 }

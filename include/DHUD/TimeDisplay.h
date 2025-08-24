@@ -17,4 +17,8 @@ class TimeDisplay : public GUIElement
         {
             return timeRemaining;
         }
+        void setTime(int newTime)
+        {
+            timeRemaining = newTime;
+        }
 };

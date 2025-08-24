@@ -19,6 +19,7 @@ class GetReadyState: public GameState
         GetReadyReason reason;
         std::unique_ptr<HUDManager> hudManager;
         Texture2D lifeIcon, coinIcon;
+        GameData dataForNextLevel;
     public:
         GetReadyState(GameStateManager* manager, int world, int level, GetReadyReason reason);
 

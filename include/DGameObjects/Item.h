@@ -4,6 +4,8 @@
 #include "Entity.h"
 #include "Mario.h"
 
+class Mario;
+
 class Item : public Entity
 {
 public:

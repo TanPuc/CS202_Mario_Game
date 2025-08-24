@@ -15,7 +15,7 @@
 int main(void)
 {
 	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
-	InitWindow(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "Mario");
+	InitWindow(800, 480, "Mario");
 	InitAudioDevice();
 	SetTargetFPS(60);
 

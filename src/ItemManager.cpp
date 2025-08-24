@@ -9,33 +9,22 @@ void ItemManager::AddItem(std::unique_ptr<Item> item)
     }
 }
 
-void ItemManager::UpdateItems(Level &level, Mario &mario)
+void ItemManager::UpdateItems(Level &level, Mario &mario, PlayingState *ps)
 {
     for (auto &item : items)
     {
         if (item)
         {
             item->Update(level);
-            if (CheckCollisionRecs(item->rect, mario.rect))
+            if (!item->isCollected && CheckCollisionRecs(item->rect, mario.rect))
             {
-                // std::cout << "Collision detected between Mario and item!" << std::endl;
-                item->Collect(mario);
+                item->Collect(mario); 
             }
         }
     }
 
-    // Remove destroyed items (optional)
-    for (auto it = items.begin(); it != items.end();)
-    {
-        if (!(*it)->isActive || (*it)->isCollected)
-        {
-            it = items.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
+    items.erase(std::remove_if(items.begin(), items.end(), 
+        [](const auto& item) { return !item || item->isCollected; }), items.end());
 }
 
 void ItemManager::DrawItems()
@@ -51,10 +40,10 @@ void ItemManager::DrawItems()
 
 void ItemManager::SpawnMushroom(Vector2 position, Vector2 velocity, DIRECTION direction)
 {
-    items.push_back(std::make_unique<Mushroom>(position, velocity, direction));
+    items.push_back(std::move(std::make_unique<Mushroom>(position, velocity, direction)));
 }
 
 void ItemManager::SpawnFireFlower(Vector2 position, Vector2 velocity, DIRECTION direction)
 {
-    items.push_back(std::make_unique<FireFlower>(position, velocity, direction));
+    items.push_back(std::move(std::make_unique<FireFlower>(position, velocity, direction)));
 }

@@ -1,3 +1,4 @@
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Collision.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Collision.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGUI\Button.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Button.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGUI\GUIManager.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\GUIManager.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DGUI\ImageButton.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\ImageButton.obj
@@ -20,7 +21,12 @@ C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DHUD\LifePoint.cpp;C:\Users
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DHUD\ScoreDisplay.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\ScoreDisplay.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DHUD\TimeDisplay.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\TimeDisplay.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DHUD\WorldDisplay.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\WorldDisplay.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DSound\SoundManager 2.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\SoundManager 2.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\FireBallManager.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\FireBallManager.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\ItemManager.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\ItemManager.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Level.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Level.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Mario.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Mario.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\MarioState.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\MarioState.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Physics.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Physics.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Tile.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Tile.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\main.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\main.obj

@@ -23,6 +23,7 @@ void LevelState::buildGUI()
     guiManager.addElement(new ImageButton({startX, startY}, buttonSize, buttonTexture, "WORLD 1-1",
         [this] ()
         {
+            this->gsm->getContext().resetForNewGame();
             this->gsm->changeState(new GetReadyState(this->gsm, 1, 1, GetReadyReason::NEW_GAME));
         }
     ));
@@ -31,6 +32,7 @@ void LevelState::buildGUI()
     guiManager.addElement(new ImageButton({startX, startY + gapY}, buttonSize, buttonTexture, "WORLD 1-2",
         [this] ()
         {
+            this->gsm->getContext().resetForNewGame();
             this->gsm->changeState(new GetReadyState(this->gsm, 1, 2, GetReadyReason::NEW_GAME));
         }
     ));
@@ -39,6 +41,7 @@ void LevelState::buildGUI()
     guiManager.addElement(new ImageButton({startX, startY + gapY * 2}, buttonSize, buttonTexture, "WORLD 1-3",
         [this] ()
         {
+            this->gsm->getContext().resetForNewGame();
             this->gsm->changeState(new GetReadyState(this->gsm, 1, 3, GetReadyReason::NEW_GAME));
         }
     ));

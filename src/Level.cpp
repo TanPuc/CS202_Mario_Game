@@ -1,7 +1,8 @@
 #include "Level.h"
 #include "Tile.h"
+#include "DGameState/PlayingState.h"
 
-Level::Level(const char* filePath){
+Level::Level(const char* filePath, PlayingState* ps){
     tileMap = { 
         {1, std::make_shared<Tile>("./assets/Tiles/Overworld/pipe2.png")},
         {2, std::make_shared<Tile>("./assets/Tiles/Overworld/background.png")},
@@ -23,13 +24,13 @@ Level::Level(const char* filePath){
             for (int j = 0; j < GRID_WIDTH; ++j) {
                 fin >> temp;
                 Vector2 pos = Vector2{ j * TILE_SIZE * SCALE, i * TILE_SIZE * SCALE };
-                addTileInstance(pos, temp, i, j);
+                addTileInstance(pos, temp, i, j, ps);
             }
         fin.close();
     }
 }
 
-void Level::addTileInstance(Vector2 pos, int tileID, int x, int y) {
+void Level::addTileInstance(Vector2 pos, int tileID, int x, int y, PlayingState* ps) {
     float t = TILE_SIZE * SCALE;
     std::shared_ptr<TileInstance> tileInstance = nullptr;
     switch ( tileID ) {
@@ -43,7 +44,16 @@ void Level::addTileInstance(Vector2 pos, int tileID, int x, int y) {
         } break;
         case 2: tileInstance = std::make_shared<BackgroundInstance>(pos, tileMap[tileID]); break;
         case 4: tileInstance = std::make_shared<FortressInstance>(pos, tileMap[tileID]); break;
-        case 7: tileInstance = std::make_shared<GoalpoleInstance>(pos, tileMap[tileID]); break;
+        case 7: 
+        {
+            auto goalpoleInstance = std::make_shared<GoalpoleInstance>(pos, tileMap[tileID]);
+            tileInstance = goalpoleInstance;
+
+            if ( ps ) 
+            {
+                ps->setGoalpole(goalpoleInstance);
+            }
+        } break;
         case 8: tileInstance = std::make_shared<GroundInstance>(pos, tileMap[tileID]); break;
         case 9: tileInstance = std::make_shared<HardblockInstance>(pos, tileMap[tileID]); break;
         case 10: {
@@ -71,11 +81,11 @@ void Level::addTileInstance(Vector2 pos, int tileID, int x, int y) {
     }
 }
 
-void Level::update(Mario& player){
+void Level::update(Mario& player, PlayingState* ps){
     for ( int i = 0; i < GRID_HEIGHT; i++ ) {
         for ( int j = 0; j < GRID_WIDTH; j++ ) {
             if ( tileInstancesGrid[i][j] ) {
-                tileInstancesGrid[i][j]->update(player);
+                tileInstancesGrid[i][j]->update(player, ps);
                 if ( tileInstancesGrid[i][j]->getState() == STATE_BROKEN ) {
                     entityManager.addBrickPieces( tileInstancesGrid[i][j]->getPos() );
                     tileInstancesGrid[i][j] = nullptr; 

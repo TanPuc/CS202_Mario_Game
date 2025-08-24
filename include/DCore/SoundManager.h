@@ -9,6 +9,7 @@ enum class SoundEffect
     JUMP,
     COIN,
     FIRE_BALL,
+    POWERUP,
     LEVEL_START,
     PLAYER_DOWN,
     GAME_OVER
@@ -52,6 +53,7 @@ class SoundManager
             sfx[SoundEffect::LEVEL_START] = LoadSound("assets/smb_stage_clear.wav");
             sfx[SoundEffect::PLAYER_DOWN] = LoadSound("assets/smb_mariodie.wav");
             sfx[SoundEffect::FIRE_BALL] = LoadSound("assets/smb_fireball.wav");
+            sfx[SoundEffect::POWERUP] = LoadSound("assets/smb_powerup.wav");
             sfx[SoundEffect::GAME_OVER] = LoadSound("assets/smb_game_over.wav");
             musicTracks[MusicTrack::MAIN_THEME] = LoadMusicStream("assets/Ground_Theme.mp3");
 

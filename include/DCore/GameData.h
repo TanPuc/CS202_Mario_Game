@@ -1,5 +1,6 @@
 #pragma once
 #include "raylib.h"
+#include "GlobalVariables.h"
 
 struct EnityData
 {
@@ -17,6 +18,10 @@ struct GameData
     int worldNum;
     int levelNum;
 
+    MARIO_FORM playerForm;
+    TileState tileStates[GRID_HEIGHT][GRID_WIDTH];
+
+
     // std::vector<EntityData> enemiesData;
     // std::vector<EntityData> itemsData;
 
@@ -29,5 +34,13 @@ struct GameData
         playerPosition = { 0, 0 };
         worldNum = 1;
         levelNum = 1;
+        playerForm = SMALL;
+        for (int i=0; i< GRID_HEIGHT; i++)
+        {
+            for (int j=0; j< GRID_WIDTH; j++)
+            {
+                tileStates[i][j] = STATE_NORMAL;
+            }
+        }
     }
 };

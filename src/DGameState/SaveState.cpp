@@ -26,6 +26,7 @@ void SaveSlotState::buildGUI()
 
     guiManager.addElement(new ImageButton({ screenCenterX - buttonWidth / 2, startY }, buttonSize, buttonTexture, "NEW GAME",
         [this]() {
+            this -> gsm->getContext().resetForNewGame();
             GameData newData;
             this->gsm->changeState(new GetReadyState(this->gsm, newData.worldNum, newData.levelNum, GetReadyReason::NEW_GAME));
         }
@@ -85,8 +86,10 @@ void SaveSlotState::update()
 void SaveSlotState::draw()
 {
     Font font = ResourceManager::GetInstance().GetGameFont();
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
     const char* title = "SELECT SLOT";
     Vector2 titleSize = MeasureTextEx(font, title, 50, 3.0f);
+    DrawTextEx(font, title, {(GetScreenWidth() - titleSize.x) / 2.0f + 3, 63}, 50, 3.0f, Fade(BLACK, 0.5f));
     DrawTextEx(font, title, {(GetScreenWidth() - titleSize.x) / 2.0f, 60}, 50, 3.0f, WHITE);
 
     guiManager.draw();

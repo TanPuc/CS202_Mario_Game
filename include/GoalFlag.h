@@ -29,6 +29,11 @@ public:
         velY = 200.0f;
     }
 
+    bool IsFinishedSliding() const
+    {
+        return velY == 0.0f;
+    }
+
     void Draw() override
     {
         DrawTextureEx(texture, position, 0.0f, SCALE, WHITE);
