@@ -15,6 +15,7 @@
 #include "DCore/GameData.h"
 #include "Tile.h"
 
+#include "GameCamera.h"
 #include "raylib.h"
 #include <vector>
 #include <memory>
@@ -53,6 +54,7 @@ private:
     Texture2D marioTexture, heartTexture, coinIcon;
 
     Vector2 cameraPos;
+    GameCamera &camera = GameCamera::getInstance();
 
     // PAUSE BUTTON
     std::unique_ptr<ImageButton> pauseButton;

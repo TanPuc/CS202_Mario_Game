@@ -20,156 +20,159 @@ enum class MusicTrack
     MAIN_THEME,
 };
 
-class SoundManager 
+class SoundManager
 {
-    private:
-        std::map<SoundEffect, Sound> sfx;
-        std::map<MusicTrack, Music> musicTracks;
+private:
+    std::map<SoundEffect, Sound> sfx;
+    std::map<MusicTrack, Music> musicTracks;
 
-        float musicVolume = 0.5f;
-        float sfxVolume = 0.5f;
+    float musicVolume = 0.5f;
+    float sfxVolume = 0.5f;
 
-        Music currentMusic;
-        bool isMusicPlaying = false;
+    Music currentMusic;
+    bool isMusicPlaying = false;
 
-        float musicVolumeBeforeMute;
-        float sfxVolumeBeforeMute;
+    float musicVolumeBeforeMute;
+    float sfxVolumeBeforeMute;
 
-        SoundManager() = default;
-    public:
-        SoundManager(const SoundManager&) = delete;
-        SoundManager& operator=(const SoundManager&) = delete;
+    SoundManager() = default;
 
-        static SoundManager& getInstance()
+public:
+    SoundManager(const SoundManager &) = delete;
+    SoundManager &operator=(const SoundManager &) = delete;
+
+    static SoundManager &getInstance()
+    {
+        static SoundManager instance;
+        return instance;
+    }
+
+    void load()
+    {
+        sfx[SoundEffect::JUMP] = LoadSound("assets/smb_jump-small.wav");
+        sfx[SoundEffect::COIN] = LoadSound("assets/smb_coin.wav");
+        sfx[SoundEffect::LEVEL_START] = LoadSound("assets/smb_stage_clear.wav");
+        sfx[SoundEffect::PLAYER_DOWN] = LoadSound("assets/smb_mariodie.wav");
+        sfx[SoundEffect::FIRE_BALL] = LoadSound("assets/smb_fireball.wav");
+        sfx[SoundEffect::GAME_OVER] = LoadSound("assets/smb_game_over.wav");
+        musicTracks[MusicTrack::MAIN_THEME] = LoadMusicStream("assets/Ground_Theme.mp3");
+
+        setSFXVolume(sfxVolume);
+        setMusicVolume(musicVolume);
+    }
+
+    void unload()
+    {
+        for (auto const &[key, val] : sfx)
         {
-            static SoundManager instance;
-            return instance;
+            UnloadSound(val);
         }
 
-        void load()
+        sfx.clear();
+
+        for (auto const &[key, val] : musicTracks)
         {
-            sfx[SoundEffect::JUMP] = LoadSound("assets/smb_jump-small.wav");
-            sfx[SoundEffect::COIN] = LoadSound("assets/smb_coin.wav");
-            sfx[SoundEffect::LEVEL_START] = LoadSound("assets/smb_stage_clear.wav");
-            sfx[SoundEffect::PLAYER_DOWN] = LoadSound("assets/smb_mariodie.wav");
-            sfx[SoundEffect::FIRE_BALL] = LoadSound("assets/smb_fireball.wav");
-            sfx[SoundEffect::POWERUP] = LoadSound("assets/smb_powerup.wav");
-            sfx[SoundEffect::GAME_OVER] = LoadSound("assets/smb_game_over.wav");
-            musicTracks[MusicTrack::MAIN_THEME] = LoadMusicStream("assets/Ground_Theme.mp3");
-
-            setSFXVolume(sfxVolume);
-            setMusicVolume(musicVolume);
-        }
-        
-        void unload()
-        {
-            for (auto const& [key, val] : sfx)
-            {
-                UnloadSound(val);
-            }
-
-            sfx.clear();
-
-            for (auto const& [key, val] : musicTracks)
-            {
-                UnloadMusicStream(val);
-            }
-
-            musicTracks.clear();
+            UnloadMusicStream(val);
         }
 
-        void playSound(SoundEffect effect)
+        musicTracks.clear();
+    }
+
+    void playSound(SoundEffect effect)
+    {
+        if (sfx.count(effect))
         {
-            if (sfx.count(effect))
-            {
-                PlaySound(sfx[effect]);
-            }
+            PlaySound(sfx[effect]);
         }
+    }
 
-        void playMusic(MusicTrack track)
+    void playMusic(MusicTrack track)
+    {
+        if (musicTracks.count(track))
         {
-            if(musicTracks.count(track))
-            {
-                currentMusic = musicTracks[track];
-                PlayMusicStream(currentMusic);
-                isMusicPlaying = true;
-            }
+            currentMusic = musicTracks[track];
+            PlayMusicStream(currentMusic);
+            isMusicPlaying = true;
         }
-        
-        void updateMusicStreams()
+    }
+
+    void updateMusicStreams()
+    {
+        if (isMusicPlaying)
         {
-            if (isMusicPlaying)
-            {
-                UpdateMusicStream(currentMusic);
-            }
+            UpdateMusicStream(currentMusic);
         }
+    }
 
-        void setMusicVolume(float volume)
+    void setMusicVolume(float volume)
+    {
+        musicVolume = volume;
+        if (musicVolume < 0.0f)
+            musicVolume = 0.0f;
+        if (musicVolume > 1.0f)
+            musicVolume = 1.0f;
+
+        ::SetMusicVolume(currentMusic, musicVolume);
+    }
+
+    void setSFXVolume(float volume)
+    {
+        sfxVolume = volume;
+        if (sfxVolume < 0.0f)
+            sfxVolume = 0.0f;
+        if (sfxVolume > 1.0f)
+            sfxVolume = 1.0f;
+
+        for (auto &[key, val] : sfx)
         {
-            musicVolume = volume;
-            if (musicVolume < 0.0f) musicVolume = 0.0f;
-            if (musicVolume > 1.0f) musicVolume = 1.0f;
-
-            ::SetMusicVolume(currentMusic, musicVolume);
+            SetSoundVolume(val, sfxVolume);
         }
+    }
 
-        void setSFXVolume(float volume)
+    float getMusicVolume() const
+    {
+        return musicVolume;
+    }
+
+    float getSFXVolume() const
+    {
+        return sfxVolume;
+    }
+
+    void stopMusic()
+    {
+        StopMusicStream(currentMusic);
+        isMusicPlaying = false;
+    }
+
+    bool isMusicCurrentlyPlaying() const
+    {
+        return isMusicPlaying && IsMusicStreamPlaying(currentMusic);
+    }
+
+    void toggleMusicMute()
+    {
+        if (musicVolume > 0.0f)
         {
-            sfxVolume = volume;
-            if (sfxVolume < 0.0f) sfxVolume = 0.0f;
-            if (sfxVolume > 1.0f) sfxVolume = 1.0f;
-
-            for (auto& [key, val] : sfx)
-            {
-                SetSoundVolume(val, sfxVolume);
-            }
+            musicVolumeBeforeMute = musicVolume;
+            setMusicVolume(0.0f);
         }
-
-        float getMusicVolume() const
+        else
         {
-            return musicVolume;
+            setMusicVolume(musicVolumeBeforeMute > 0.0f ? musicVolumeBeforeMute : 0.5f);
         }
+    }
 
-        float getSFXVolume() const
+    void toggleSFXMute()
+    {
+        if (sfxVolume > 0.0f)
         {
-            return sfxVolume;
+            sfxVolumeBeforeMute = sfxVolume;
+            setSFXVolume(0.0f);
         }
-
-        void stopMusic()
+        else
         {
-            StopMusicStream(currentMusic);
-            isMusicPlaying = false;
+            setSFXVolume(sfxVolumeBeforeMute > 0.0f ? sfxVolumeBeforeMute : 0.8f);
         }
-
-        bool isMusicCurrentlyPlaying() const
-        {
-            return isMusicPlaying && IsMusicStreamPlaying(currentMusic);
-        }
-
-        void toggleMusicMute()
-        {
-            if (musicVolume >0.0f)
-            {
-                musicVolumeBeforeMute = musicVolume;
-                setMusicVolume(0.0f);
-            }
-            else
-            {
-                setMusicVolume(musicVolumeBeforeMute >0.0f? musicVolumeBeforeMute : 0.5f);
-            }
-        }
-
-        void toggleSFXMute()
-        {
-            if (sfxVolume > 0.0f)
-            {
-                sfxVolumeBeforeMute = sfxVolume;
-                setSFXVolume(0.0f);
-            }
-            else
-            {
-                setSFXVolume(sfxVolumeBeforeMute > 0.0f ? sfxVolumeBeforeMute : 0.8f);
-            }
-        }
-
+    }
 };

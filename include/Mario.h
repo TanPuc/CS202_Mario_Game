@@ -10,6 +10,8 @@
 #include "MarioState.h"
 #include "GameSprite/MarioSprite.h"
 
+#define HURT_BUFFER_THRESHOLD 1.0f
+
 #include "DCore/SoundManager.h"
 class Mario : public Entity
 {
@@ -18,6 +20,7 @@ public:
     std::unique_ptr<MarioSprite> sprite;
     MARIO_FORM form;
     // std::vector<std::shared_ptr<FireBall>> fireballs;
+    float hurtBuffer;
     int lives;
     int coins;
     long long score;
@@ -26,6 +29,7 @@ public:
     {
         rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
         sprite = std::make_unique<MarioSprite>();
+        hurtBuffer = 0.0f;
     }
 
     void Die()
@@ -122,8 +126,20 @@ public:
         currentState->Draw(*this, *sprite);
     }
 
+    void Hurt()
+    {
+        hurtBuffer = HURT_BUFFER_THRESHOLD;
+    }
+
+    bool IsHurt() const
+    {
+        return hurtBuffer == 0.0f;
+    }
+
     void Update(Level &level) override
     {
+
+        float dt = GetFrameTime();
         std::unique_ptr<MarioState> newState = currentState->Update(*this, *sprite);
         if (newState != nullptr)
         {
@@ -131,9 +147,16 @@ public:
             // sprite->SwitchAnimation(currentState->GetType());
         }
 
-        float gravity = 900.0f;
-        float dt = GetFrameTime();
-        ApplyGravity(velocity, gravity);
+        if (hurtBuffer > 0.0f)
+        {
+            hurtBuffer -= GetFrameTime();
+        }
+        else
+        {
+            hurtBuffer = 0.0f;
+        }
+
+        ApplyGravity(velocity, GRAVITY);
 
         // Left wall
         if (position.x < 0)
@@ -170,6 +193,13 @@ public:
     Vector2 GetPosition() const
     {
         return position;
+    }
+
+    void SetPosition(Vector2 newPosition)
+    {
+        position = newPosition;
+        rect.x = position.x;
+        rect.y = position.y;
     }
 };
 
