@@ -28,7 +28,8 @@ void PlayingState::enter()
 
     level = std::make_unique<Level>("./assets/Levels/world_1.1.txt");
 
-    player = std::make_unique<Mario>(
+    player = std::make_unique<Character>(
+        MARIO,
         currentData.playerPosition,
         [this]()
         {

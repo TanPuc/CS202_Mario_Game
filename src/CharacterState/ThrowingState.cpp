@@ -1,11 +1,11 @@
-#include "MarioState/ThrowingState.h"
-#include "MarioState/IdleState.h"
-#include "MarioState/WalkingState.h"
-#include "MarioState/JumpingState.h"
-#include "MarioState/DuckingState.h"
+#include "CharacterState/ThrowingState.h"
+#include "CharacterState/IdleState.h"
+#include "CharacterState/WalkingState.h"
+#include "CharacterState/JumpingState.h"
+#include "CharacterState/DuckingState.h"
 #include "DCore/SoundManager.h"
 
-std::unique_ptr<MarioState> ThrowingState::HandleInput(Mario &player, Sprite &sprite)
+std::unique_ptr<CharacterState> ThrowingState::HandleInput(Character &player, Sprite &sprite)
 {
     float deltaTime = GetFrameTime();
 
@@ -83,13 +83,13 @@ std::unique_ptr<MarioState> ThrowingState::HandleInput(Mario &player, Sprite &sp
     return nullptr;
 }
 
-std::unique_ptr<MarioState> ThrowingState::Update(Mario &player, Sprite &sprite)
+std::unique_ptr<CharacterState> ThrowingState::Update(Character &player, Sprite &sprite)
 {
     sprite.SwitchAnimation(STATE_THROWING);
     return nullptr;
 }
 
-void ThrowingState::Draw(Mario &player, Sprite &sprite)
+void ThrowingState::Draw(Character &player, Sprite &sprite)
 {
     sprite.Draw(player);
 }

@@ -1,8 +1,10 @@
-#ifndef MARIO_H
-#define MARIO_H
+#ifndef CHARACTER_H
+#define CHARACTER_H
 
-#include "MarioState/MarioState.h"
+#include "CharacterState/CharacterState.h"
+#include "GameSprite/CharacterSprite.h"
 #include "GameSprite/MarioSprite.h"
+#include "GameSprite/LuigiSprite.h"
 #include "GameSprite/ThrowingSprite.h"
 #include "Entity.h"
 #include "GlobalVariables.h"
@@ -11,18 +13,20 @@
 #define HURT_BUFFER_THRESHOLD 1.0f
 #define FRAME_INDEX_THRESHOLD 6
 
-class MarioState;
+class CharacterState;
 class MarioSprite;
+class LuigiSprite;
 
-class Mario : public Entity
+class Character : public Entity
 {
 public:
     std::function<void()> onDeath;
 
-    std::unique_ptr<MarioState> currentState;
-    std::unique_ptr<MarioSprite> sprite;
+    std::unique_ptr<CharacterState> currentState;
+    std::unique_ptr<CharacterSprite> sprite;
     std::unique_ptr<ThrowingSprite> throwingSprite;
-    MARIO_FORM form;
+    CHARACTER_FORM form;
+    CHARACTER character;
     float hurtBuffer; // > 0 means invisibility frame, = 0 means can be damaged
     bool isThrowing;
     int lives;
@@ -31,16 +35,17 @@ public:
     long long score;
 
     // Transformation
-    MARIO_FORM previousForm; // For transformation back
-    MARIO_FORM targetForm;   // For transformation forward
+    CHARACTER_FORM previousForm; // For transformation back
+    CHARACTER_FORM targetForm;   // For transformation forward
     bool isTransforming = false;
     bool showingTarget = false;
     float transformTimer;
     int frameIndex;
-    void ChangeToTargetForm(MARIO_FORM form);
+    void ChangeToTargetForm(CHARACTER_FORM form);
 
-    Mario(Vector2 position);
-    Mario(Vector2 position, std::function<void()> onDeathAction);
+    Character(Vector2 position);
+    Character(Vector2 position, std::function<void()> onDeathAction);
+    Character(CHARACTER character, Vector2 position, std::function<void()> onDeathAction);
 
     void Die();
     void Hurt();
@@ -51,7 +56,7 @@ public:
     void ChangeToFire();
     void ChangeToSuper();
     void Shrink();
-    void ChangeForm(MARIO_FORM newForm);
+    void ChangeForm(CHARACTER_FORM newForm);
     void ChangeForm(); // Debug
 
     void Slide(Vector2 contactPoint);
@@ -65,7 +70,7 @@ public:
 
     // Helper
     DIRECTION GetDirection() const;
-    MARIO_FORM GetForm() const;
+    CHARACTER_FORM GetForm() const;
     Vector2 GetPosition() const;
     void SetPosition(Vector2 newPosition);
     void SetOnDeathAction(std::function<void()> action);

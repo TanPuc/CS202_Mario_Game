@@ -38,15 +38,15 @@ public:
         rect.y = position.y;
     }
 
-    void Collect(Mario &mario) override
+    void Collect(Character &character) override
     {
         std::cout << "Mushroom collected!" << std::endl;
-        if (isCollected || mario.form != MARIO_FORM::SMALL)
+        if (isCollected || character.form != CHARACTER_FORM::SMALL)
             return;
-        // mario.Grow();
-        mario.ChangeForm(MARIO_FORM::BIG);
-        mario.position.y = position.y - mario.rect.height;
-        mario.rect.y = mario.position.y;
+        // character.Grow();
+        character.ChangeForm(CHARACTER_FORM::BIG);
+        character.position.y = position.y - character.rect.height;
+        character.rect.y = character.position.y;
         isCollected = true;
         // Handle collision with other entities if needed
     }

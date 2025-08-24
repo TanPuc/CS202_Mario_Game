@@ -11,7 +11,7 @@
 class BrickPiece;
 class Tile;
 class TileInstance;
-class Mario;
+class Character;
 
 // pipe2: 1
 // background: 2
@@ -47,7 +47,7 @@ public:
 
     Level(const char *filePath);
     void addTileInstance(Vector2 pos, int tileID, int x, int y);
-    void update(Mario &player);
+    void update(Character &player);
     void render();
 };
 
@@ -68,7 +68,7 @@ public:
 
 //     Level_2(const char* filePath);
 //     void addTileInstance(Vector2& pos, int& tileID, int& x, int& y);
-//     void update(Mario& player);
+//     void update(Character& player);
 //     void render();
 // };
 

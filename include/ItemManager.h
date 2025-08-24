@@ -8,7 +8,7 @@
 #include "DGameObjects/FireFlower.h"
 #include "Physics.h"
 #include "Level.h"
-#include "Mario.h"
+#include "Character.h"
 
 class ItemManager
 {
@@ -19,7 +19,7 @@ public:
     void AddItem(std::unique_ptr<Item> item);
     void SpawnMushroom(Vector2 position, Vector2 velocity, DIRECTION direction);
     void SpawnFireFlower(Vector2 position, Vector2 velocity, DIRECTION direction);
-    void UpdateItems(Level &level, Mario &mario);
+    void UpdateItems(Level &level, Character &character);
     void DrawItems();
 };
 

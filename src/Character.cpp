@@ -1,23 +1,23 @@
-#include "Mario.h"
-#include "MarioState/IdleState.h"
-#include "MarioState/DeadState.h"
-#include "MarioState/SlidingState.h"
-#include "MarioState/ThrowingState.h"
+#include "CharacterState/CharacterState.h"
+#include "CharacterState/IdleState.h"
+#include "CharacterState/DeadState.h"
+#include "CharacterState/SlidingState.h"
+#include "CharacterState/ThrowingState.h"
 
-Mario::Mario(Vector2 position)
-    : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})),
+Character::Character(Vector2 position)
+    : Entity(position, Vector2({CHARACTER_WIDTH, CHARACTER_HEIGHT})),
       form(SMALL),
       hurtBuffer(0.0f),
       lives(3), coins(0), score(0)
 {
-    rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
+    rect = {position.x, position.y, CHARACTER_WIDTH, CHARACTER_HEIGHT};
     sprite = std::make_unique<MarioSprite>();
     throwingSprite = std::make_unique<ThrowingSprite>();
     currentState = std::make_unique<IdleState>();
 }
 
-Mario::Mario(Vector2 position, std::function<void()> onDeathAction)
-    : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})),
+Character::Character(Vector2 position, std::function<void()> onDeathAction)
+    : Entity(position, Vector2({CHARACTER_WIDTH, CHARACTER_HEIGHT})),
       form(SMALL),
       hurtBuffer(0.0f),
       lives(3),
@@ -25,13 +25,36 @@ Mario::Mario(Vector2 position, std::function<void()> onDeathAction)
       score(0),
       onDeath(std::move(onDeathAction))
 {
-    rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
+    rect = {position.x, position.y, CHARACTER_WIDTH, CHARACTER_HEIGHT};
     sprite = std::make_unique<MarioSprite>();
     throwingSprite = std::make_unique<ThrowingSprite>();
     currentState = std::make_unique<IdleState>();
 }
 
-void Mario::Die()
+Character::Character(CHARACTER character, Vector2 position, std::function<void()> onDeathAction)
+    : Entity(position, Vector2({CHARACTER_WIDTH, CHARACTER_HEIGHT})),
+      form(SMALL),
+      hurtBuffer(0.0f),
+      lives(3),
+      coins(0),
+      score(0),
+      onDeath(std::move(onDeathAction)),
+      character(character)
+{
+    rect = {position.x, position.y, CHARACTER_WIDTH, CHARACTER_HEIGHT};
+    if (character == MARIO)
+    {
+        sprite = std::make_unique<MarioSprite>();
+    }
+    else
+    {
+        sprite = std::make_unique<LuigiSprite>();
+    }
+    throwingSprite = std::make_unique<ThrowingSprite>();
+    currentState = std::make_unique<IdleState>();
+}
+
+void Character::Die()
 {
     Shrink();
     lives--;
@@ -40,35 +63,35 @@ void Mario::Die()
     velocity.y = -500.0f;
 }
 
-void Mario::Grow()
+void Character::Grow()
 {
     form = BIG;
-    rect.height = MARIO_HEIGHT * 2.0f;
+    rect.height = CHARACTER_HEIGHT * 2.0f;
     sprite->SwitchForm(form);
 }
 
-void Mario::ChangeToFire()
+void Character::ChangeToFire()
 {
     form = FIRE;
-    rect.height = MARIO_HEIGHT * 2.0f;
+    rect.height = CHARACTER_HEIGHT * 2.0f;
     sprite->SwitchForm(form);
 }
 
-void Mario::ChangeToSuper()
+void Character::ChangeToSuper()
 {
     form = SUPER;
-    rect.height = MARIO_HEIGHT * 2.0f;
+    rect.height = CHARACTER_HEIGHT * 2.0f;
     sprite->SwitchForm(form);
 }
 
-void Mario::Shrink()
+void Character::Shrink()
 {
     form = SMALL;
-    rect.height = MARIO_HEIGHT;
+    rect.height = CHARACTER_HEIGHT;
     sprite->SwitchForm(form);
 }
 
-void Mario::ChangeForm(MARIO_FORM newForm)
+void Character::ChangeForm(CHARACTER_FORM newForm)
 {
     if (form == newForm)
         return;
@@ -81,39 +104,39 @@ void Mario::ChangeForm(MARIO_FORM newForm)
     targetForm = newForm;
 }
 
-void Mario::ChangeForm()
+void Character::ChangeForm()
 {
     if (IsKeyPressed(KEY_F))
     {
         if (form == SMALL)
         {
             form = BIG;
-            rect.height = MARIO_HEIGHT * 2.0f;
+            rect.height = CHARACTER_HEIGHT * 2.0f;
         }
         else if (form == BIG)
         {
             form = FIRE;
-            rect.height = MARIO_HEIGHT * 2.0f;
+            rect.height = CHARACTER_HEIGHT * 2.0f;
         }
         else if (form == FIRE)
         {
             form = SMALL;
-            rect.width = MARIO_WIDTH;
-            rect.height = MARIO_HEIGHT;
+            rect.width = CHARACTER_WIDTH;
+            rect.height = CHARACTER_HEIGHT;
         }
-        std::cout << "Mario changed form to: " << form << std::endl;
+        std::cout << "Character changed form to: " << form << std::endl;
     }
     if (IsKeyPressed(KEY_R))
     {
         form = SMALL;
-        rect.width = MARIO_WIDTH;
-        rect.height = MARIO_HEIGHT;
+        rect.width = CHARACTER_WIDTH;
+        rect.height = CHARACTER_HEIGHT;
     }
 
     sprite->SwitchForm(form);
 }
 
-void Mario::Slide(Vector2 contactPoint) // Contact Point is a x, y coordinate according to the level grid
+void Character::Slide(Vector2 contactPoint) // Contact Point is a x, y coordinate according to the level grid
 {
     // Start sliding
     currentState = std::make_unique<SlidingState>();
@@ -122,22 +145,22 @@ void Mario::Slide(Vector2 contactPoint) // Contact Point is a x, y coordinate ac
     velocity = {0, 0};
 }
 
-void Mario::ShootFireBall()
+void Character::ShootFireBall()
 {
     isThrowing = true;
     throwTimer = THROWING_FRAME_THRESHOLD;
 }
 
-void Mario::HandleInput()
+void Character::HandleInput()
 {
-    std::unique_ptr<MarioState> newState = currentState->HandleInput(*this, *sprite);
+    std::unique_ptr<CharacterState> newState = currentState->HandleInput(*this, *sprite);
     if (newState != nullptr)
     {
         currentState = std::move(newState);
     }
 }
 
-void Mario::Draw()
+void Character::Draw()
 {
     DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);
     if (isThrowing)
@@ -146,7 +169,7 @@ void Mario::Draw()
         currentState->Draw(*this, *sprite);
 }
 
-void Mario::Hurt()
+void Character::Hurt()
 {
     if (hurtBuffer > 0) // Invisibility frame active
         return;
@@ -155,7 +178,7 @@ void Mario::Hurt()
         Die();
 }
 
-bool Mario::IsHurt() const
+bool Character::IsHurt() const
 {
     if (hurtBuffer > 0.0f)
     {
@@ -164,7 +187,7 @@ bool Mario::IsHurt() const
     return false;
 }
 
-void Mario::ChangeToTargetForm(MARIO_FORM targetForm)
+void Character::ChangeToTargetForm(CHARACTER_FORM targetForm)
 {
     switch (targetForm)
     {
@@ -180,10 +203,10 @@ void Mario::ChangeToTargetForm(MARIO_FORM targetForm)
     }
 }
 
-void Mario::Update(Level &level)
+void Character::Update(Level &level)
 {
     float dt = GetFrameTime();
-    std::unique_ptr<MarioState> newState = currentState->Update(*this, *sprite);
+    std::unique_ptr<CharacterState> newState = currentState->Update(*this, *sprite);
     if (newState != nullptr)
     {
         currentState = std::move(newState);
@@ -253,7 +276,7 @@ void Mario::Update(Level &level)
 
         if (position.y > HEIGHT_BOUNDARY)
         {
-            std::cout << "Mario fell out of the world." << std::endl;
+            std::cout << "Character fell out of the world." << std::endl;
             if (onDeath != nullptr)
                 onDeath();
         }
@@ -290,35 +313,35 @@ void Mario::Update(Level &level)
     }
 }
 
-void Mario::ResolveCollision(Level &level)
+void Character::ResolveCollision(Level &level)
 {
     collision.CheckCollision(position, rect, velocity, level);
     collision.ResolveCollision(position, rect, velocity, level);
 }
 
-DIRECTION Mario::GetDirection() const
+DIRECTION Character::GetDirection() const
 {
     return direction;
 }
 
-MARIO_FORM Mario::GetForm() const
+CHARACTER_FORM Character::GetForm() const
 {
     return form;
 }
 
-Vector2 Mario::GetPosition() const
+Vector2 Character::GetPosition() const
 {
     return position;
 }
 
-void Mario::SetPosition(Vector2 newPosition)
+void Character::SetPosition(Vector2 newPosition)
 {
     position = newPosition;
     rect.x = position.x;
     rect.y = position.y;
 }
 
-void Mario::SetOnDeathAction(std::function<void()> action)
+void Character::SetOnDeathAction(std::function<void()> action)
 {
     onDeath = std::move(action);
 }

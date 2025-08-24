@@ -9,17 +9,17 @@ void ItemManager::AddItem(std::unique_ptr<Item> item)
     }
 }
 
-void ItemManager::UpdateItems(Level &level, Mario &mario)
+void ItemManager::UpdateItems(Level &level, Character &character)
 {
     for (auto &item : items)
     {
         if (item)
         {
             item->Update(level);
-            if (CheckCollisionRecs(item->rect, mario.rect) && !item->isCollected && !mario.isTransforming)
+            if (CheckCollisionRecs(item->rect, character.rect) && !item->isCollected && !character.isTransforming)
             {
-                // std::cout << "Collision detected between Mario and item!" << std::endl;
-                item->Collect(mario);
+                // std::cout << "Collision detected between Character and item!" << std::endl;
+                item->Collect(character);
             }
         }
     }

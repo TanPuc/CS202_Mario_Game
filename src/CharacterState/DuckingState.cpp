@@ -1,8 +1,8 @@
-#include "MarioState/DuckingState.h"
-#include "MarioState/IdleState.h"
-#include "MarioState/WalkingState.h"
+#include "CharacterState/DuckingState.h"
+#include "CharacterState/IdleState.h"
+#include "CharacterState/WalkingState.h"
 
-std::unique_ptr<MarioState> DuckingState::HandleInput(Mario &player, Sprite &sprite)
+std::unique_ptr<CharacterState> DuckingState::HandleInput(Character &player, Sprite &sprite)
 {
     float deltaTime = GetFrameTime();
 
@@ -56,13 +56,13 @@ std::unique_ptr<MarioState> DuckingState::HandleInput(Mario &player, Sprite &spr
     return nullptr;
 }
 
-std::unique_ptr<MarioState> DuckingState::Update(Mario &player, Sprite &sprite)
+std::unique_ptr<CharacterState> DuckingState::Update(Character &player, Sprite &sprite)
 {
     sprite.SwitchAnimation(STATE_DUCKING);
     return nullptr;
 }
 
-void DuckingState::Draw(Mario &player, Sprite &sprite)
+void DuckingState::Draw(Character &player, Sprite &sprite)
 {
     sprite.Draw(player);
 }

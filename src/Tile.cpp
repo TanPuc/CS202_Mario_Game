@@ -1,5 +1,5 @@
 #include "Tile.h"
-#include "Mario.h"
+#include "Character.h"
 #include "BrickPieces.h"
 
 float Q_rsqrt(float number)
@@ -43,7 +43,7 @@ void BrickInstance::handleAnimation()
     }
 }
 
-void BrickInstance::handleBreaking(Mario &player)
+void BrickInstance::handleBreaking(Character &player)
 {
     Rectangle playerBBox = player.rect;
     if (CheckCollisionRecs(playerBBox, hbox))
@@ -68,7 +68,7 @@ void BrickInstance::handleBreaking(Mario &player)
 BrickInstance::BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick)
     : TileInstance(pos, brick), hbox(Rectangle{pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2), pos.y + (TILE_SIZE * SCALE), HITBOX_WIDTH, HITBOX_HEIGHT}), dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
 
-void BrickInstance::update(Mario &player)
+void BrickInstance::update(Character &player)
 {
     handleBreaking(player);
     handleAnimation();
@@ -130,7 +130,7 @@ void QuestionInstance::handleAnimation()
     }
 }
 
-void QuestionInstance::handleActivation(Mario &player)
+void QuestionInstance::handleActivation(Character &player)
 {
     Rectangle playerBBox = player.rect;
     if (CheckCollisionRecs(playerBBox, hbox))
@@ -147,7 +147,7 @@ void QuestionInstance::handleActivation(Mario &player)
     }
 }
 
-void QuestionInstance::update(Mario &player)
+void QuestionInstance::update(Character &player)
 {
     handleActivation(player);
     handleAnimation();
@@ -176,7 +176,7 @@ void PipeInstance3::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, SCAL
 HardblockInstance::HardblockInstance(Vector2 pos, std::shared_ptr<Tile> hardblock)
     : TileInstance(pos, hardblock) {}
 
-void HardblockInstance::update(Mario &player)
+void HardblockInstance::update(Character &player)
 {
     // handleCollision(player);
 }
@@ -192,7 +192,7 @@ GoalpoleInstance::GoalpoleInstance(Vector2 pos, std::shared_ptr<Tile> goalpole)
     bbox = Rectangle{0, 0, 0, 0};
 }
 
-void GoalpoleInstance::update(Mario &player)
+void GoalpoleInstance::update(Character &player)
 {
     if (CheckCollisionRecs(player.GetBounds(), hbox))
     {
@@ -209,7 +209,7 @@ void GoalpoleInstance::render()
     goalFlag.Draw();
 }
 
-void FortressInstance::update(Mario &player)
+void FortressInstance::update(Character &player)
 {
     fortressFlag.Update();
 }

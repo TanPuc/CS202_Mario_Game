@@ -2,7 +2,7 @@
 
 #include "DCore/GameState.h"
 #include "DGameState/GameStateManager.h"
-#include "Mario.h"
+#include "Character.h"
 #include "Level.h"
 #include "DHUD/HUDManager.h"
 #include "DGameObjects/PlayerAdapter.h"
@@ -24,7 +24,7 @@ private:
     GameStateManager *gsm;
     ItemManager itemManager;
     FireBallManager fireBallManager;
-    std::unique_ptr<Mario> player;
+    std::unique_ptr<Character> player;
     std::unique_ptr<Level> level;
     std::unique_ptr<PlayerAdapter> playerAdapter;
     std::unique_ptr<HUDManager> hudManager;

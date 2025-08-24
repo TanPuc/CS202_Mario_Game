@@ -1,13 +1,13 @@
-#include "MarioState/JumpingState.h"
-#include "MarioState/IdleState.h"
-#include "MarioState/WalkingState.h"
-#include "MarioState/ThrowingState.h"
+#include "CharacterState/JumpingState.h"
+#include "CharacterState/IdleState.h"
+#include "CharacterState/WalkingState.h"
+#include "CharacterState/ThrowingState.h"
 
-std::unique_ptr<MarioState> JumpingState::HandleInput(Mario &player, Sprite &sprite)
+std::unique_ptr<CharacterState> JumpingState::HandleInput(Character &player, Sprite &sprite)
 {
     float deltaTime = GetFrameTime();
     // // Shoot fire ball
-    // if (player.GetForm() == MARIO_FORM::FIRE)
+    // if (player.GetForm() == CHARACTER_FORM::FIRE)
     // {
     //     if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT))
     //     {
@@ -51,7 +51,7 @@ std::unique_ptr<MarioState> JumpingState::HandleInput(Mario &player, Sprite &spr
     return nullptr;
 }
 
-std::unique_ptr<MarioState> JumpingState::Update(Mario &player, Sprite &sprite)
+std::unique_ptr<CharacterState> JumpingState::Update(Character &player, Sprite &sprite)
 {
     if (player.velocity.y == 0)
     {
@@ -62,7 +62,7 @@ std::unique_ptr<MarioState> JumpingState::Update(Mario &player, Sprite &sprite)
     return nullptr;
 }
 
-void JumpingState::Draw(Mario &player, Sprite &sprite)
+void JumpingState::Draw(Character &player, Sprite &sprite)
 {
     sprite.Draw(player);
 }

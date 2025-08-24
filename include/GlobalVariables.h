@@ -14,13 +14,20 @@ enum STATE
     STATE_THROWING,
 };
 
+enum CHARACTER
+{
+    NONE,
+    MARIO,
+    LUIGI
+};
+
 enum DIRECTION
 {
     LEFT,
     RIGHT
 };
 
-enum MARIO_FORM
+enum CHARACTER_FORM
 {
     SMALL,
     BIG,
@@ -36,8 +43,8 @@ enum TileState
     STATE_BROKEN
 };
 
-#define MARIO_WIDTH 32.0f
-#define MARIO_HEIGHT 32.0f
+#define CHARACTER_WIDTH 32.0f
+#define CHARACTER_HEIGHT 32.0f
 #define FRAME_PADDING 2
 #define SCREEN_WIDTH 400
 #define SCREEN_HEIGHT 240

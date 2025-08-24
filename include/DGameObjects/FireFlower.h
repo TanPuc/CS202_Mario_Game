@@ -43,12 +43,12 @@ public:
         collision.ResolveCollision(position, rect, velocity, level);
     };
 
-    void Collect(Mario &mario) override
+    void Collect(Character &character) override
     {
-        if (isCollected || mario.form != MARIO_FORM::BIG)
+        if (isCollected || character.form != CHARACTER_FORM::BIG)
             return;
-        // mario.ChangeToFire();
-        mario.ChangeForm(MARIO_FORM::FIRE);
+        // character.ChangeToFire();
+        character.ChangeForm(CHARACTER_FORM::FIRE);
         isCollected = true;
         // Handle collision with other entities if needed
     }
