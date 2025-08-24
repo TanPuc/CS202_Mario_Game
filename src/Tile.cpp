@@ -1,5 +1,5 @@
 #include "Tile.h"
-#include "Mario.h"
+#include "Character.h"
 #include "BrickPieces.h"
 #include "ItemManager.h"
 
@@ -43,7 +43,7 @@ void BrickInstance::handleAnimation()
     }
 }
 
-void BrickInstance::handleBreaking(Mario &player)
+void BrickInstance::handleBreaking(Character &player)
 {
     Rectangle playerBBox = player.rect;
     if (CheckCollisionRecs(playerBBox, hbox))
@@ -79,7 +79,7 @@ BrickInstance::BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick)
     originalBBox = bbox;
 }
 
-void BrickInstance::update(Mario &player, ItemManager &itemManager)
+void BrickInstance::update(Mario &player)
 {
     handleBreaking(player);
     handleAnimation();

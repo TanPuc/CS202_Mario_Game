@@ -35,7 +35,10 @@ public:
 
     void MushroomVsLevel(Vector2& position, Rectangle& bbox, Vector2& velocity, Level& level);
 
-    void FireBallVsLevel(Vector2& position, Rectangle& bbox, Vector2& velocity, Level& level);
+    // Helper
+    bool IsCollideWithLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
+    bool IsCollideWithLevelHorizontally(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
+    bool IsCollideWithLevelVertically(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
 };
 
 Rectangle getSweptBBox(Vector2& position, Rectangle &bbox, Vector2 &velocity, float dt);

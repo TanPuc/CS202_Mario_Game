@@ -33,7 +33,21 @@ void PlayingState::enter()
 
     level = std::make_unique<Level_1_4>("./assets/Levels/world_1.4.txt");
 
-    player = std::make_unique<Mario>(currentData.playerPosition);
+    player = std::make_unique<Character>(
+        MARIO,
+        currentData.playerPosition,
+        [this]()
+        {
+            gsm->getContext().lives = player->lives;
+            if (player->lives <= 0)
+            {
+                pendingGameOver = true;
+            }
+            else
+            {
+                pendingRespawn = true;
+            }
+        });
     player->lives = currentData.lives;
     player->coins = currentData.coins;
     player->score = currentData.score;
@@ -52,7 +66,8 @@ void PlayingState::enter()
     player->coins = 0;
     player->score = 0;
 
-    cameraPos = Vector2{0.0f, 0.0f};
+    cameraPos = Vector2{GetScreenWidth() / 2.0f, 0.0f};
+    camera.setTarget(cameraPos);
 
     hudManager = std::make_unique<HUDManager>(heartTexture, coinIcon);
     playerAdapter = std::make_unique<PlayerAdapter>(player.get());
@@ -95,11 +110,11 @@ void PlayingState::exit()
 void PlayingState::update()
 {
     // if we press escape, we want to pause the game
-    // if (IsKeyPressed(KEY_ESCAPE))
-    // {
-    //     gsm->pushState(new PauseState(gsm, worldNum, levelNum));
-    //     return;
-    // }
+    if (IsKeyPressed(KEY_ESCAPE))
+    {
+        gsm->pushState(new PauseState(gsm, worldNum, levelNum));
+        return;
+    }
 
     pauseButton->update();
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && pauseButton->contains(GetMousePosition()))
@@ -115,49 +130,56 @@ void PlayingState::update()
     currentData.timeRemaining = hudManager->getTime();
 
     player->HandleInput();
-    if (player->GetForm() == FIRE)
-    {
-        if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT))
-        {
-            fireBallManager.ShootFireBall(player->GetPosition(), player->GetDirection());
-        }
-    }
     player->Update(*level); // Handling player collision and movement
 
-    // Handle Mario's death
-    level->update(*player, itemManager);
+    if (player->GetForm() == FIRE)
+    {
+        if ((IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT)) && !player->isThrowing)
+        {
+            // player->ShootFireBall();
+            std::cout << "Switched animation into throwing\n";
+            player->ShootFireBall();
+            Vector2 playerHandPos = player->GetPosition();
+            playerHandPos.x += player->GetBounds().width;
+            playerHandPos.y += (player->GetBounds().height / 2);
+            fireBallManager.ShootFireBall(playerHandPos, player->GetDirection());
+        }
+    }
+
+    Vector2 playerPos = player->GetPosition();
+
+    if (IsKeyPressed(KEY_F))
+    {
+        // Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
+        // player->Slide(playerGridCoords);
+        player->ChangeForm(SMALL);
+    }
+
+    if (player->GetBounds().x > cameraPos.x)
+    {
+        cameraPos.x = player->GetBounds().x;
+    }
+
+    level->update(*player);
 
     playerAdapter->update();
     hudManager->updateTime();
 
-    // for (auto it = entities.begin(); it != entities.end();)
-    // {
-    //     (*it)->Update(*level); // Update each entity
-    //     if (CheckCollisionRecs(player->GetBounds(), (*it)->GetBounds()))
-    //     {
-    //         if (auto coin = dynamic_cast<Coin *>((*it).get()))
-    //         {
-    //             if (!coin->isCollected)
-    //             {
-    //                 coin->isCollected = true;
-    //                 player->coins++;
-    //                 player->score += 100;
-    //             }
-    //         }
-    //     }
-
-    //     if (auto coin = dynamic_cast<Coin *>((*it).get()); coin && coin->isCollected)
-    //     {
-    //         it = entities.erase(it);
-    //     }
-    //     else
-    //     {
-    //         ++it;
-    //     }
-    // }
-
     fireBallManager.Update(*level);
     itemManager.UpdateItems(*level, *player); // Update all entities
+
+    // Check for player horizontal bounding
+    if (playerPos.x < cameraPos.x - (camera.bounds.width / 2) || playerPos.x + player->GetBounds().width > cameraPos.x + camera.bounds.width)
+    {
+        player->SetPosition({cameraPos.x - (camera.bounds.width / 2), playerPos.y});
+        player->velocity.x = 0; // Stop horizontal movement
+    }
+
+    // Handle Mario's death
+    if (playerPos.y >= cameraPos.y + camera.bounds.height && pendingRespawn == false)
+    {
+        player->Die();
+    }
 
     //Enemy
     enemyManager->update();
@@ -165,38 +187,28 @@ void PlayingState::update()
 
     // Check for game over
     // Time and lives
-    if (hudManager->getTime() <= 0 || player->GetPosition().y > HEIGHT_BOUNDARY)
+    if (hudManager->getTime() <= 0)
     {
         player->Die();
-        gsm->getContext().lives = player->lives;
+    }
 
-        if (player->lives <= 0)
-        {
-            gsm->changeState(new GameOverState(gsm));
-        }
-        else
-        {
-            gsm->changeState(new GetReadyState(gsm, worldNum, levelNum, GetReadyReason::RESPAWN));
-        }
+    if (pendingGameOver)
+    {
+        gsm->changeState(new GameOverState(gsm));
+        return;
+    }
+    if (pendingRespawn)
+    {
+        gsm->changeState(new GetReadyState(gsm, worldNum, levelNum, GetReadyReason::RESPAWN));
         return;
     }
 }
 
 void PlayingState::draw()
 {
-    // Camera2D camera = {0};
-    // camera.target = {player->position.x + player->rect.width / 2, float(GetScreenHeight() / 2)};
-    // camera.offset = {float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
-    Camera2D camera = {0};
-    if (player->GetBounds().x > cameraPos.x)
-    {
-        cameraPos.x = player->GetBounds().x;
-    }
-    camera.target = cameraPos;
-    camera.offset = Vector2{float(GetScreenWidth() / 2), 0};
-    camera.zoom = 1.0f;
+    camera.setTarget(cameraPos);
 
-    BeginMode2D(camera);
+    BeginMode2D(camera.camera);
     level->render();
     player->Draw();
     enemyManager->draw();

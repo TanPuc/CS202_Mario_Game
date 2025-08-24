@@ -1,5 +1,5 @@
 #include "raylib.h"
-#include "Mario.h"
+#include "Character.h"
 #include "Level.h"
 #include "DGameObjects/Coin.h"
 #include "DGameObjects/Mushroom.h"
