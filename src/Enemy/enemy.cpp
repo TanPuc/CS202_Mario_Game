@@ -138,8 +138,8 @@ void Enemy::setHurtBox()
 {
 	m_HurtBox.x = position.x;
 	m_HurtBox.y = position.y;
-	m_HurtBox.width = rect.width * TILEFACTOR;
-	m_HurtBox.height = rect.height * TILEFACTOR;
+	m_HurtBox.width = rect.width * SCALE;
+	m_HurtBox.height = rect.height * SCALE;
 }
 
 Rectangle Enemy::getHitBox() const {

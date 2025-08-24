@@ -15,8 +15,8 @@ class CollisionMap
 private:
 	vector<pair<array<int, 2>, float>> m_UnResolvedTiles;
 
-	ICollisionMapStrategy* m_X = nullptr;
-	ICollisionMapStrategy* m_Y = nullptr;
+	ICollisionMapStrategy* m_Direction = nullptr;
+	ICollisionMapStrategy* m_Rectangle = nullptr;
 
 public:
 	CollisionMap(ICollisionMapStrategy* X, ICollisionMapStrategy* Y);
@@ -44,31 +44,36 @@ public:
 class ICollisionMapStrategy
 {
 public:
-	virtual void collide(Enemy&) = 0;
+	virtual void collide(Enemy&, Rectangle) = 0;
 	virtual ~ICollisionMapStrategy() = default;
 };
 
 class CollisionStrategyXPushOut : public ICollisionMapStrategy
 {
 public:
-	void collide(Enemy&) override;
+	void collide(Enemy&,  Rectangle) override;
 };
 class CollisionStrategyXReverse : public ICollisionMapStrategy
 {
 public:
-	void collide(Enemy&) override;
+	void collide(Enemy&, Rectangle) override;
+};
+class CollisionStrategyXReverseLedge : public ICollisionMapStrategy
+{
+public:
+	void collide(Enemy&, Rectangle) override;
 };
 
 class CollisionStrategyYPushOut : public ICollisionMapStrategy
 {
 public:
-	void collide(Enemy&) override;
+	void collide(Enemy&, Rectangle) override;
 };
 class CollisionStrategyYJump : public ICollisionMapStrategy
 {
 public:
 	CollisionStrategyYJump(float mangnitude);
-	void collide(Enemy&) override;
+	void collide(Enemy&, Rectangle) override;
 private:
 	float m_magnitude;
 };
@@ -76,13 +81,13 @@ private:
 class CollisionStrategyState : public ICollisionMapStrategy
 {
 public:
-	void collide(Enemy&) override;
+	void collide(Enemy&, Rectangle) override;
 };
 
 class CollisionMapStrategyCombined : public ICollisionMapStrategy
 {
 public:
-	void collide(Enemy&) override;
+	void collide(Enemy&, Rectangle) override;
 	void addStrategy(ICollisionMapStrategy*);
 	~CollisionMapStrategyCombined();
 

@@ -31,10 +31,10 @@ void SpriteEnemy::draw(Enemy& e)
     Rectangle dest = e.getHurtBox();
     dest.width *= m_OffSet.width;
     dest.height *= m_OffSet.height;
-    dest.y += m_OffSet.y * TILEFACTOR;
-    dest.x += m_OffSet.x * TILEFACTOR;
-    dest.width -= m_OffSet.x * TILEFACTOR;
-    dest.height -= m_OffSet.y * TILEFACTOR;
+    dest.y += m_OffSet.y * SCALE;
+    dest.x += m_OffSet.x * SCALE;
+    dest.width -= m_OffSet.x * SCALE;
+    dest.height -= m_OffSet.y * SCALE;
 
     DrawTexturePro(sprite.m_Texture, src, dest, { 0,0 }, 0, WHITE);
 }
