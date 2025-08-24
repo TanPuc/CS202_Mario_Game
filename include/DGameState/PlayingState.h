@@ -6,7 +6,7 @@
 #include "Level.h"
 #include "DHUD/HUDManager.h"
 #include "DGameObjects/PlayerAdapter.h"
-#include "DGameObjects/Coin.h"
+#include "DGameObjects/CoinBlock.h"
 #include "DGameObjects/Mushroom.h"
 #include "DGameObjects/FireFlower.h"
 #include "ItemManager.h"

@@ -6,7 +6,6 @@
 #include "DCore/SoundManager.h"
 #include "DCore/SaveManager.h"
 
-
 PlayingState::PlayingState(GameStateManager *manager, const GameData &initialData) : gsm(manager), currentData(initialData) {}
 
 void PlayingState::enter()
@@ -44,7 +43,7 @@ void PlayingState::enter()
     // Items
     // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
     // entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
-    // itemManager.AddItem(std::make_unique<Coin>(Vector2{200, 100}));
+    itemManager.SpawnCoinBlock(Vector2{200, 100}, Vector2{0, 0}, DIRECTION::RIGHT);
     // itemManager.AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
     // itemManager.AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
 
@@ -64,23 +63,21 @@ void PlayingState::enter()
     hudManager->updateWorld(worldNum, levelNum);
     playerAdapter->update();
 
-
     enemyManager = new EnemyManager(player.get(), level.get(), fireBallManager.GetFireBalls());
-    Vector2 posEnemy = { 300, 100 };
+    Vector2 posEnemy = {300, 100};
     // enemyManager->spawnEnemyAt(EnemyType::goopa, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::beezybettle, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::blooper, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::spiny, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::beezybettle, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::blooper, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::spiny, posEnemy);
     // enemyManager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::paratroopa, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::hammer, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::piranhaplant, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::hammerbro, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::paratroopa, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::hammer, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::piranhaplant, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::hammerbro, posEnemy);
     // enemyManager->spawnEnemyAt(EnemyType::bowser, posEnemy);
-
 }
 
 void PlayingState::exit()
@@ -159,9 +156,8 @@ void PlayingState::update()
     fireBallManager.Update(*level);
     itemManager.UpdateItems(*level, *player); // Update all entities
 
-    //Enemy
+    // Enemy
     enemyManager->update();
-
 
     // Check for game over
     // Time and lives

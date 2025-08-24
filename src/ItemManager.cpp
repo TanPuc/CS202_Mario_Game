@@ -59,3 +59,7 @@ void ItemManager::SpawnFireFlower(Vector2 position, Vector2 velocity, DIRECTION 
 {
     items.push_back(std::make_unique<FireFlower>(position, velocity, direction));
 }
+void ItemManager::SpawnCoinBlock(Vector2 position, Vector2 velocity, DIRECTION direction)
+{
+    items.push_back(std::make_unique<CoinBlock>(position));
+}
