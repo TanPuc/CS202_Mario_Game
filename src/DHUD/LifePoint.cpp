@@ -2,12 +2,12 @@
 #include "DCore/ResourceManager.h"
 #include <string>
 
-LifePoint::LifePoint(Texture2D heartTexture) : currentLifePoint(maxLifePoint), heartTexture(heartTexture) 
+LifePoint::LifePoint(Texture2D heartTexture) : currentLifePoint(maxLifePoint), heartTexture(heartTexture)
 {
-    this -> size = {float(heartTexture.width), float(heartTexture.height)};
+    this->size = {float(heartTexture.width), float(heartTexture.height)};
 }
 
-void LifePoint::updateLifePoint(int newCount) 
+void LifePoint::updateLifePoint(int newCount)
 {
     currentLifePoint = newCount;
 }
@@ -24,9 +24,9 @@ void LifePoint::draw()
     float aspectRatio = (float)heartTexture.width / (float)heartTexture.height;
     float iconHeight = 20.0f;
     float iconWidth = iconHeight * aspectRatio;
-    Vector2 iconSize = { iconWidth, iconHeight };
-    Rectangle iconPosition = { position.x, position.y + 25, iconSize.x, iconSize.y };
-    Rectangle sourceRect = { 0, 0, heartTexture.width, heartTexture.height };
+    Vector2 iconSize = {iconWidth, iconHeight};
+    Rectangle iconPosition = {position.x, position.y + 25, iconSize.x, iconSize.y};
+    Rectangle sourceRect = {0, 0, static_cast<float>(heartTexture.width), static_cast<float>(heartTexture.height)};
 
     DrawTexturePro(heartTexture, sourceRect, iconPosition, {0, 0}, 0, WHITE);
 

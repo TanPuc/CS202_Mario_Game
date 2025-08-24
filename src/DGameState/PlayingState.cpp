@@ -168,8 +168,6 @@ void PlayingState::updatePlaying()
         }
     }
 
-    Vector2 playerPos = player->GetPosition();
-
     if (IsKeyPressed(KEY_F))
     {
         Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};

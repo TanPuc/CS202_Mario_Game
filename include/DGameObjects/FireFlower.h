@@ -51,7 +51,7 @@ public:
         isCollected = true;
         // character.ChangeToFire();
         character.ChangeForm(CHARACTER_FORM::FIRE);
-        mario.score += 1000;
+        character.score += 1000;
         SoundManager::getInstance().playSound(SoundEffect::POWERUP);
         // SoundManager::getInstance().playSound(SoundEffect::COIN);
         // if (ps)

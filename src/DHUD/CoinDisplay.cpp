@@ -3,19 +3,19 @@
 #include <string>
 #include <cstdio>
 
-CoinDisplay::CoinDisplay(Texture2D coinTexture) : currentCoins(0), coinTexture(coinTexture) 
+CoinDisplay::CoinDisplay(Texture2D coinTexture) : currentCoins(0), coinTexture(coinTexture)
 {
     this->size = {float(coinTexture.width), float(coinTexture.height)};
 }
 
-void CoinDisplay::updateCoins(int newCount) 
+void CoinDisplay::updateCoins(int newCount)
 {
     currentCoins = newCount;
 }
 
 void CoinDisplay::draw()
 {
-    Font font  = ResourceManager::GetInstance().GetGameFont();
+    Font font = ResourceManager::GetInstance().GetGameFont();
     float fontSize = 20.0f;
     float spacing = 1.0f;
 
@@ -27,7 +27,7 @@ void CoinDisplay::draw()
     float coinDisplayWidth = coinDisplayHeight * aspectRatio;
     Vector2 coinSize = {coinDisplayWidth, coinDisplayHeight};
     Rectangle coinRect = {position.x, position.y + 25, coinSize.x, coinSize.y};
-    Rectangle sourceRect = {0, 0, coinTexture.width, coinTexture.height};
+    Rectangle sourceRect = {0, 0, static_cast<float>(coinTexture.width), static_cast<float>(coinTexture.height)};
 
     DrawTexturePro(coinTexture, sourceRect, coinRect, {0, 0}, 0, WHITE);
 

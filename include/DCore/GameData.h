@@ -18,9 +18,8 @@ struct GameData
     int worldNum;
     int levelNum;
 
-    MARIO_FORM playerForm;
+    CHARACTER_FORM playerForm;
     TileState tileStates[GRID_HEIGHT][GRID_WIDTH];
-
 
     // std::vector<EntityData> enemiesData;
     // std::vector<EntityData> itemsData;
@@ -31,13 +30,13 @@ struct GameData
         coins = 0;
         score = 0;
         timeRemaining = 400;
-        playerPosition = {6000, 0};
+        playerPosition = {0, 0};
         worldNum = 1;
         levelNum = 1;
         playerForm = SMALL;
-        for (int i=0; i< GRID_HEIGHT; i++)
+        for (int i = 0; i < GRID_HEIGHT; i++)
         {
-            for (int j=0; j< GRID_WIDTH; j++)
+            for (int j = 0; j < GRID_WIDTH; j++)
             {
                 tileStates[i][j] = STATE_NORMAL;
             }

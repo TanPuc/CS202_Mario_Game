@@ -35,7 +35,7 @@ std::unique_ptr<CharacterState> WalkingState::HandleInput(Character &player, Spr
         return nullptr;
     }
 
-    if (jump_time > 0 && (IsKeyUp(KEY_SPACE) || IsKeyUp(KEY_UP) || IsKeyUp(KEY_W)))
+    if (jump_time > 1 && (IsKeyUp(KEY_SPACE) || IsKeyUp(KEY_UP) || IsKeyUp(KEY_W)))
     {
         player.velocity.y = -JUMP_FORCE * (HALF + float(0.05f * jump_time));
         SoundManager::getInstance().playSound(SoundEffect::JUMP);

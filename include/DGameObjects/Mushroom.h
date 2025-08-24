@@ -49,9 +49,9 @@ public:
         character.ChangeForm(CHARACTER_FORM::BIG);
         character.position.y = position.y - character.rect.height;
         character.rect.y = character.position.y;
+        character.score += 1000;
         isCollected = true;
 
-        mario.score += 1000;
         SoundManager::getInstance().playSound(SoundEffect::POWERUP);
         // if (ps)
         // {
