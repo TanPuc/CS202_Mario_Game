@@ -189,6 +189,9 @@ void QuestionInstance::render()
 
 void GoalpoleInstance::update(Mario &player, ItemManager &itemManager)
 {
+    // Need the CheckCollisionStaticRectDynamicRect to retrive the contact_point
+    // Mario will hold on to the goal pole with position.y = contact_point.y
+    // and slide down the goal pole, approach the fortress 
     if (CheckCollisionRecs(player.GetBounds(), hbox))
     {
         state = STATE_ACTIVATED;

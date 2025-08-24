@@ -15,7 +15,7 @@
 
 int main(void)
 {
-	SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+	SetConfigFlags( FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 	InitWindow(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "Mario");
 	InitAudioDevice();
 	SetTargetFPS(60);
@@ -36,7 +36,7 @@ int main(void)
 	while (!WindowShouldClose() && !gsm.isExiting())
 	{
 		BeginDrawing();
-		ClearBackground(MARIO_SKYBLUE);
+		ClearBackground(MARIO_SKYBLACK);
 		gsm.update();
 		// ClearBackground(SKYBLUE);
 		Texture2D background = ResourceManager::GetInstance().GetBackgroundTexture();

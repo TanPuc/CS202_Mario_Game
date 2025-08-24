@@ -92,7 +92,10 @@ public:
     }
     virtual void render()
     {
-        DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+        if ( tile )
+        {
+            DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+        }
     }
 };
 
@@ -270,7 +273,10 @@ class GrassBrickInstance : public TileInstance
 {
 public:
     GrassBrickInstance(Vector2 pos, std::shared_ptr<Tile> grass)
-        : TileInstance(pos, grass) {}
+        : TileInstance(pos, grass) 
+    {
+        bbox = Rectangle{0, 0, 0, 0};  
+    }
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);

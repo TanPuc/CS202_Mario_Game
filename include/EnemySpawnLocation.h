@@ -49,14 +49,20 @@ class EnemySpawnLocationLevel_1_1 : public EnemySpawnLocationLevel
 {
 public:
     EnemySpawnLocationLevel_1_1(int tb);
-    // How to use
-    // Declaration
-    // std::shared_ptr<EnemySpawnLocationLevel> ESLL = std::make_shared<EnemySpawnLocationLevel_1_1>(5);
-    // Loop
-    // std::vector<EnemySpawnLocation> ESLs = ESLL->getEnemySpawnLocation(right_border_x);
-    // for ( const auto& ESL : ESLs )
-    // {
-    //     enemyManager.spawnEnemy(ESL.type, ESL.spawn_position);
-    // }
 };
 
+class EnemySpawnLocationLevel_1_3 : public EnemySpawnLocationLevel 
+{
+public:
+    EnemySpawnLocationLevel_1_3(int tb);
+};
+
+// How to use
+// Declaration
+// std::shared_ptr<EnemySpawnLocationLevel> ESLL = std::make_shared<EnemySpawnLocationLevel_1_1>(5);
+// Loop
+// std::vector<EnemySpawnLocation> ESLs = ESLL->getEnemySpawnLocation(right_border_x);
+// for ( const auto& ESL : ESLs )
+// {
+//     enemyManager.spawnEnemy(ESL.type, ESL.spawn_position);
+// }

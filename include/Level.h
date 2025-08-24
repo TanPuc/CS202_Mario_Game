@@ -15,6 +15,7 @@ class Tile;
 class TileInstance;
 class Mario;
 class ItemManager;
+class FireBar;
 
 class EntityManager
 {
@@ -22,9 +23,11 @@ public:
     std::shared_ptr<FortressFlag> fortressFlag;
     std::vector<std::shared_ptr<PlatformInstance>> platforms;
     std::vector<std::shared_ptr<BrickPiece>> brickPieces;
+    std::vector<std::shared_ptr<FireBar>> fireBars;
     std::vector<int> toRemove;
 
     void addBrickPieces(Vector2 position);
+    void addFireBar(Vector2 position, float initial_angle);
     void initFortressFlag(Vector2 position, float fortressWidth);
     void initPlatform();
     void update(Mario &player);

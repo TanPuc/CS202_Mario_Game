@@ -13,7 +13,8 @@ public:
     Animation *currentAnimation;
     STATE prevState;
     int frameSpeed = 6; // 6fps
-
+    int animationTimer = 0;
+    
     FireBallSprite()
         : fireballAnimation({{247, 302 + 4, 8, 8},
                              {247 + 8 + FRAME_PADDING, 302 + 4, 8, 8},
@@ -40,7 +41,6 @@ public:
             return;
         }
 
-        static int animationTimer = 0;
         animationTimer++;
 
         if (animationTimer >= frameSpeed)

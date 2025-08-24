@@ -2,6 +2,9 @@
 #include "Tile.h"
 #include "FortressFlag.h"
 #include "ItemManager.h"
+#include "FireBar.h"
+#include <ctime>
+#include <random>
 
 Level_1_1::Level_1_1(const char *filePath)
 {
@@ -272,6 +275,7 @@ void Level_1_3::render()
 
 Level_1_4::Level_1_4(const char *filePath)
 {
+    srand(time(nullptr));
     tileMap =
         {
             {3, std::make_shared<Tile>("./assets/Tiles/Castle/lava.png")},
@@ -348,6 +352,13 @@ void Level_1_4::addTileInstance(Vector2 &pos, int &tileID, int &x, int &y)
     case 11:
         tileInstance = std::make_shared<TileInstance>(pos, tileMap[tileID]);
         break;
+    case 12:
+    {
+        tileInstance = std::make_shared<UsedBlockInstance>(pos, tileMap[tileID - 4]);
+        // auto usedBlockInstance = dynamic_cast<UsedBlockInstance*>(tileInstance.get());
+        // usedBlockInstance->initFireBar(rand() % 361);
+        entityManager.addFireBar(pos, rand() % 361);
+    } break;
     default:
         break;
     }
@@ -415,6 +426,13 @@ void EntityManager::initFortressFlag(Vector2 position, float fortressWidth)
     fortressFlag = std::make_shared<FortressFlag>(Vector2{position.x + fortressWidth / 2 - TILE_SIZE * SCALE / 2, position.y + TILE_SIZE * SCALE / 4});
 }
 
+void EntityManager::addFireBar(Vector2 position, float initial_angle)
+{
+    Vector2 center = { position.x + TILE_SIZE * SCALE / 2, position.y + TILE_SIZE * SCALE / 2 };
+    auto fireBar = std::make_shared<FireBar>(center, initial_angle);
+    fireBars.push_back(std::move(fireBar));
+}
+
 void EntityManager::update(Mario &player)
 {
     for (int i = 0; i < brickPieces.size(); i++)
@@ -434,6 +452,11 @@ void EntityManager::update(Mario &player)
     //     platform->update(player);
     // }
 
+    for ( auto& fireBar : fireBars )
+    {
+        fireBar->Update(player);
+    }
+
     // WIN 
     if ( fortressFlag )
     {
@@ -450,6 +473,10 @@ void EntityManager::render()
     for (const auto &platform : platforms)
     {
         platform->render();
+    }
+    for (const auto &fireBar : fireBars)
+    {
+        fireBar->Draw();
     }
 }
 

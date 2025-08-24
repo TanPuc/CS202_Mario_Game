@@ -13,7 +13,7 @@
 #define FIREBALL_THRESHOLD 3  // Number of maximum fireballs
 #define FIREBALL_LIFETIME 120 // Fireball lifetime in frames
 
-#define FIREBALL_SIZE 8 * SCALE
+// #define FIREBALL_SIZE 8 * SCALE
 
 class FireBall : public Entity
 {

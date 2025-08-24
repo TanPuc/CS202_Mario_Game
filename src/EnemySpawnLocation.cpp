@@ -2,6 +2,7 @@
 
 // Enemy spawn location
 // Level 1.1
+// All koopas are green 
 // x = 22 y = 12: 1 goomba
 
 // x = 40 y = 12: 1 goomba
@@ -25,7 +26,42 @@
     // Separate them 
 
 // Level 1.3
+// Tiled map are 1 column short 
+// All koopas are red
+// x = 27 y = 4: 1 koopa
 
+// x = 41 y = 3: 1 goomba
+
+// x = 44 y = 3: 1 goomba
+
+// x = 72 y = 7: 1 flyingKoopa
+    // x = 77 y = 5: 1 goomba
+    
+// x = 107 y = 6: 1 koopa
+    // x = 113 y = 12: 1 flying koopa
+
+// x = 131 y = 12: 1 koopa
+
+// Level 1.4
+
+
+std::vector<EnemySpawnLocation> EnemySpawnLocationLevel::getEnemySpawnLocation(float right_border_x)
+{
+    std::vector<EnemySpawnLocation> result{0};
+    for ( auto& ETL : ETLs )
+    {
+        // Check if the right border is past the trigger position
+        if ( right_border_x > ETL.trigger_position.x && !ETL.triggered )
+        {
+            ETL.triggered = true; // Mark as triggered
+            for ( const auto& enemy : ETL.enemies )
+            {
+                result.push_back(enemy);
+            }
+        }
+    }
+    return result;
+}
 
 EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLocationLevel(tb)
 {
@@ -133,20 +169,8 @@ EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLoc
     );
 }
 
-std::vector<EnemySpawnLocation> EnemySpawnLocationLevel::getEnemySpawnLocation(float right_border_x)
+EnemySpawnLocationLevel_1_3::EnemySpawnLocationLevel_1_3(int tb) : EnemySpawnLocationLevel(tb)
 {
-    std::vector<EnemySpawnLocation> result{0};
-    for ( auto& ETL : ETLs )
-    {
-        // Check if the right border is past the trigger position
-        if ( right_border_x > ETL.trigger_position.x && !ETL.triggered )
-        {
-            ETL.triggered = true; // Mark as triggered
-            for ( const auto& enemy : ETL.enemies )
-            {
-                result.push_back(enemy);
-            }
-        }
-    }
-    return result;
+    float t = TILE_SIZE * SCALE;
+
 }
