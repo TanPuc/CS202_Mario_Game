@@ -112,7 +112,7 @@ void Enemy::addVelocityX(float X)
 {
 	m_velocity.x += X;
 }
-Vector2& Enemy::getVelocity() 
+Vector2& Enemy::getVelocity()
 {
 	return m_velocity;
 }
@@ -130,7 +130,7 @@ void Enemy::reverseDirection()
 	m_velocity.x *= -1;
 }
 
-Rectangle& Enemy::getHurtBox() 
+Rectangle& Enemy::getHurtBox()
 {
 	return m_HurtBox;
 }
@@ -142,7 +142,8 @@ void Enemy::setHurtBox()
 	m_HurtBox.height = rect.height * TILEFACTOR;
 }
 
-Rectangle Enemy::getHitBox() const {
+Rectangle& Enemy::getHitBox()
+{
 	return m_HitBox;
 }
 void Enemy::setHitBox()

@@ -53,11 +53,11 @@ public:
 
 	void setPosition(Vector2);
 
-	Rectangle& getHurtBox() ;
+	Rectangle& getHurtBox();
 	void setHurtBox();
 
-	Rectangle getHitBox() const;
-	void setHitBox();		
+	Rectangle& getHitBox();
+	void setHitBox();
 
 	void setIsCollidedMap();
 	bool getIsCollidedMap();

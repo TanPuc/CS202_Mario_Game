@@ -1,29 +1,29 @@
-#ifndef COIN_H
-#define COIN_H
+#ifndef COINBLOCK_H
+#define COINBLOCK_H
 
 #include <raylib.h>
 #include <iostream>
 #include "Item.h"
 #include "Collision.h"
 #include "GlobalVariables.h"
-#include "GameSprite/CoinSprite.h"
+#include "GameSprite/CoinBlockSprite.h"
 #include "DCore/SoundManager.h"
 
 #define COIN_SIZE 16 * SCALE
 
-class Coin : public Item
+class CoinBlock : public Item
 {
 public:
-    CoinSprite coinSprite;
+    CoinBlockSprite coinBlockSprite;
     float timer = 0.0f; // Timer for coin animation
     const float lifeTime = 1.0f;
     Collision collision;
 
-    Coin(Vector2 pos) : Item(pos, {COIN_SIZE, COIN_SIZE}) {}
+    CoinBlock(Vector2 pos) : Item(pos, {COIN_SIZE, COIN_SIZE}) {}
 
     void Draw() override
     {
-        coinSprite.Draw(*this);
+        coinBlockSprite.Draw(*this);
     }
 
     void Collect(Mario &mario) override

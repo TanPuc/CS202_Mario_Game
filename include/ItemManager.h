@@ -6,6 +6,7 @@
 #include "DGameObjects/Item.h"
 #include "DGameObjects/Mushroom.h"
 #include "DGameObjects/FireFlower.h"
+#include "DGameObjects/CoinBlock.h"
 #include "Physics.h"
 // #include "Level.h"
 #include "Mario.h"
@@ -22,6 +23,7 @@ public:
     void AddItem(std::unique_ptr<Item> item);
     void SpawnMushroom(Vector2 position, Vector2 velocity, DIRECTION direction);
     void SpawnFireFlower(Vector2 position, Vector2 velocity, DIRECTION direction);
+    void SpawnCoinBlock(Vector2 position, Vector2 velocity, DIRECTION direction);
     void UpdateItems(Level &level, Mario &mario);
     void DrawItems();
 };
