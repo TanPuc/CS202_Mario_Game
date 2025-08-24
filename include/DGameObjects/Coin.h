@@ -1,11 +1,7 @@
 #ifndef COIN_H
 #define COIN_H
 
-#include <raylib.h>
-#include <iostream>
 #include "Item.h"
-#include "Collision.h"
-#include "GlobalVariables.h"
 #include "GameSprite/CoinSprite.h"
 #include "DCore/SoundManager.h"
 

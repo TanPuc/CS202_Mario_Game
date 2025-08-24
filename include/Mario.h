@@ -1,19 +1,17 @@
 #ifndef MARIO_H
 #define MARIO_H
 
-#include <iostream>
-#include <raylib.h>
-#include <array>
-#include <cmath>
-#include <memory>
-#include "GlobalVariables.h"
-#include "Entity.h"
-#include "MarioState.h"
+#include "MarioState/MarioState.h"
 #include "GameSprite/MarioSprite.h"
-#include "DCore/SoundManager.h"
-#include <functional>
+#include "GameSprite/ThrowingSprite.h"
+#include "Entity.h"
+#include "GlobalVariables.h"
+#include <raylib.h>
 
 #define HURT_BUFFER_THRESHOLD 1.0f
+
+class MarioState;
+class MarioSprite;
 
 class Mario : public Entity
 {
@@ -22,10 +20,14 @@ public:
 
     std::unique_ptr<MarioState> currentState;
     std::unique_ptr<MarioSprite> sprite;
+    std::unique_ptr<ThrowingSprite> throwingSprite;
     MARIO_FORM form;
     float hurtBuffer; // > 0 means invisibility frame, = 0 means can be damaged
+    bool isGrounded;
+    bool isThrowing;
     int lives;
     int coins;
+    int throwTimer;
     long long score;
 
     Mario(Vector2 position);
@@ -41,6 +43,10 @@ public:
     void ChangeToSuper();
     void Shrink();
     void ChangeForm(); // Debug
+
+    void Slide(Vector2 contactPoint);
+
+    void ShootFireBall();
 
     void HandleInput();
     void Draw() override;

@@ -3,6 +3,8 @@
 
 #include "Entity.h"
 #include "Mario.h"
+#include "GlobalVariables.h"
+#include "Collision.h"
 
 class Item : public Entity
 {

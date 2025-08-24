@@ -35,6 +35,8 @@ public:
 
     // Helper
     bool IsCollideWithLevel(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
+    bool IsCollideWithLevelHorizontally(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
+    bool IsCollideWithLevelVertically(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level);
 };
 
 #endif // COLLISION_H

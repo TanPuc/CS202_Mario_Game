@@ -1,32 +1,28 @@
-#ifndef COINSPRITE_H
-#define COINSPRITE_H
+#ifndef THROWINGSPRITE_H
+#define THROWINGSPRITE_H
 
 #include "Sprite.h"
 
-class CoinSprite : public Sprite
+class ThrowingSprite : public Sprite
 {
 private:
-    Animation coinAnimation;
+    Animation throwingAnimation;
 
 public:
     Texture2D spriteSheet;
     Animation *currentAnimation;
-    STATE prevState;
-    int frameSpeed = 6; // 6fps
+    Rectangle frameRec;
+    int frameSpeed = 12; // 12fps
     int animationTimer = 0;
 
-    CoinSprite()
-        : coinAnimation({{180, 36, 8, 16},
-                         {180 + 8 + FRAME_PADDING, 36, 8, 16},
-                         {180 + (8 + FRAME_PADDING) * 2, 36, 8, 16},
-                         {180 + (8 + FRAME_PADDING) * 3, 36, 8, 16}}),
-          prevState(STATE_IDLE)
+    ThrowingSprite()
+        : throwingAnimation({{208 + 16 + FRAME_PADDING, 294, 16, 16 * 2}})
     {
-        spriteSheet = LoadTexture("assets/SMB_Items_And_Objects.png");
-        currentAnimation = &coinAnimation;
+        spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
+        currentAnimation = &throwingAnimation;
     }
 
-    ~CoinSprite()
+    ~ThrowingSprite()
     {
         UnloadTexture(spriteSheet);
     }
@@ -78,4 +74,4 @@ public:
     }
 };
 
-#endif // COINSPRITE_H
+#endif // MARIOSPRITE_H

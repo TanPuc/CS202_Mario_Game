@@ -163,3 +163,61 @@ bool Collision::IsCollideWithLevel(Vector2 &position, Rectangle &bbox, Vector2 &
     }
     return false;
 }
+
+bool Collision::IsCollideWithLevelHorizontally(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
+{
+    float dt = GetFrameTime();
+    Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
+    int minX = std::floor(std::min(position.x, nextPos.x) / (TILE_SIZE * SCALE));
+    int minY = std::floor(std::min(position.y, nextPos.y) / (TILE_SIZE * SCALE));
+    int maxX = std::floor(std::max(position.x + bbox.width, nextPos.x + bbox.width) / (TILE_SIZE * SCALE));
+    int maxY = std::floor(std::max(position.y + bbox.height, nextPos.y + bbox.height) / (TILE_SIZE * SCALE));
+
+    for (int y = minY; y <= maxY; y++)
+    {
+        for (int x = minX; x <= maxX; x++)
+        {
+            // Assume that player will never go out of grid map in x-direction
+            if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
+                continue;
+            if (level.tileInstancesGrid[y][x])
+            {
+                if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity,
+                                                              level.tileInstancesGrid[y][x]->bbox, contact_point, contact_normal, contact_time, dt))
+                {
+                    return contact_normal.x != 0;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool Collision::IsCollideWithLevelVertically(Vector2 &position, Rectangle &bbox, Vector2 &velocity, Level &level)
+{
+    float dt = GetFrameTime();
+    Vector2 nextPos = {position.x + velocity.x * dt, position.y + velocity.y * dt};
+    int minX = std::floor(std::min(position.x, nextPos.x) / (TILE_SIZE * SCALE));
+    int minY = std::floor(std::min(position.y, nextPos.y) / (TILE_SIZE * SCALE));
+    int maxX = std::floor(std::max(position.x + bbox.width, nextPos.x + bbox.width) / (TILE_SIZE * SCALE));
+    int maxY = std::floor(std::max(position.y + bbox.height, nextPos.y + bbox.height) / (TILE_SIZE * SCALE));
+
+    for (int y = minY; y <= maxY; y++)
+    {
+        for (int x = minX; x <= maxX; x++)
+        {
+            // Assume that player will never go out of grid map in x-direction
+            if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT)
+                continue;
+            if (level.tileInstancesGrid[y][x])
+            {
+                if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity,
+                                                              level.tileInstancesGrid[y][x]->bbox, contact_point, contact_normal, contact_time, dt))
+                {
+                    return contact_normal.y != 0;
+                }
+            }
+        }
+    }
+    return false;
+}

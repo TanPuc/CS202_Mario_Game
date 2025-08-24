@@ -32,6 +32,7 @@ void PlayingState::enter()
         currentData.playerPosition,
         [this]()
         {
+            gsm->getContext().lives = player->lives;
             if (player->lives <= 0)
             {
                 pendingGameOver = true;
@@ -59,7 +60,7 @@ void PlayingState::enter()
     player->coins = 0;
     player->score = 0;
 
-    cameraPos = Vector2{0.0f, 0.0f};
+    cameraPos = Vector2{GetScreenWidth() / 2.0f, 0.0f};
     camera.setTarget(cameraPos);
 
     hudManager = std::make_unique<HUDManager>(heartTexture, coinIcon);
@@ -84,11 +85,11 @@ void PlayingState::exit()
 void PlayingState::update()
 {
     // if we press escape, we want to pause the game
-    // if (IsKeyPressed(KEY_ESCAPE))
-    // {
-    //     gsm->pushState(new PauseState(gsm, worldNum, levelNum));
-    //     return;
-    // }
+    if (IsKeyPressed(KEY_ESCAPE))
+    {
+        gsm->pushState(new PauseState(gsm, worldNum, levelNum));
+        return;
+    }
 
     pauseButton->update();
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && pauseButton->contains(GetMousePosition()))
@@ -104,15 +105,29 @@ void PlayingState::update()
     currentData.timeRemaining = hudManager->getTime();
 
     player->HandleInput();
+    player->Update(*level); // Handling player collision and movement
+
     if (player->GetForm() == FIRE)
     {
-        if (IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT))
+        if ((IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT)) && !player->isThrowing)
         {
-            fireBallManager.ShootFireBall(player->GetPosition(), player->GetDirection());
+            // player->ShootFireBall();
+            std::cout << "Switched animation into throwing\n";
+            player->ShootFireBall();
+            Vector2 playerHandPos = player->GetPosition();
+            playerHandPos.x += player->GetBounds().width;
+            playerHandPos.y += (player->GetBounds().height / 2);
+            fireBallManager.ShootFireBall(playerHandPos, player->GetDirection());
         }
     }
-    player->Update(*level); // Handling player collision and movement
+
     Vector2 playerPos = player->GetPosition();
+
+    if (IsKeyPressed(KEY_F))
+    {
+        Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
+        player->Slide(playerGridCoords);
+    }
 
     if (player->GetBounds().x > cameraPos.x)
     {
@@ -135,16 +150,9 @@ void PlayingState::update()
     }
 
     // Handle Mario's death
-    // if (IsKeyPressed(KEY_P))
-    // {
-    //     player->Die();
-    //     gsm->getContext().lives = player->lives;
-    // }
-
     if (playerPos.y >= cameraPos.y + camera.bounds.height && pendingRespawn == false)
     {
         player->Die();
-        gsm->getContext().lives = player->lives;
     }
 
     // Check for game over
@@ -152,7 +160,6 @@ void PlayingState::update()
     if (hudManager->getTime() <= 0)
     {
         player->Die();
-        gsm->getContext().lives = player->lives;
     }
 
     if (pendingGameOver)

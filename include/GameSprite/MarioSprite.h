@@ -12,6 +12,7 @@ private:
     Animation decelerationAnimation;
     Animation duckAnimation;
     Animation deadAnimation;
+    Animation slidingAnimation;
 
 public:
     Texture2D spriteSheet;
@@ -29,6 +30,7 @@ public:
           decelerationAnimation({{108, 16, 16, 16}}),
           duckAnimation({{0, 16, 16, 16}}),
           deadAnimation({{306, 16, 16, 16}}),
+          slidingAnimation({{126, 16, 16, 16}}),
           prevState(STATE_IDLE)
     {
         spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
@@ -51,6 +53,7 @@ public:
             decelerationAnimation = {{108, 16, 16, 16}};
             duckAnimation = {{0, 16, 16, 16}};
             deadAnimation = {{306, 16, 16, 16}};
+            slidingAnimation = {{126, 16, 16, 16}};
         }
         else if (newForm == BIG)
         {
@@ -60,6 +63,7 @@ public:
             decelerationAnimation = {{194, 88, 16, 16 * 2}};
             duckAnimation = {{54, 96, 16, 16 * 1.5f}};
             deadAnimation = {{306, 16, 16, 16}};
+            slidingAnimation = {{212, 88, 16, 16 * 2}};
         }
         else if (newForm == FIRE)
         {
@@ -69,6 +73,7 @@ public:
             decelerationAnimation = {{194, 260, 16, 16 * 2}};
             duckAnimation = {{54, 268, 16, 16 * 1.5f}};
             deadAnimation = {{306, 16, 16, 16}};
+            slidingAnimation = {{212, 260, 16, 16 * 2}};
         }
         else
         {
@@ -84,22 +89,31 @@ public:
         switch (state_)
         {
         case STATE_IDLE:
+            // std::cout << "Switched to idle animation\n";
             currentAnimation = &idleAnimation;
             break;
         case STATE_WALKING:
+            // std::cout << "Switched to walking animation\n";
             currentAnimation = &walkAnimation;
             break;
         case STATE_DECELERATING:
             currentAnimation = &decelerationAnimation;
             break;
         case STATE_JUMPING:
+            // std::cout << "Switched to jumping animation\n";
             currentAnimation = &jumpAnimation;
             break;
         case STATE_DUCKING:
+            // std::cout << "Switched to ducking animation\n";
             currentAnimation = &duckAnimation;
             break;
         case STATE_DEAD:
+            // std::cout << "Switched to dead animation\n";
             currentAnimation = &deadAnimation;
+            break;
+        case STATE_SLIDING:
+            // std::cout << "Switched to sliding animation\n";
+            currentAnimation = &slidingAnimation;
             break;
         default:
             std::cerr << "Unknown state: " << state_ << std::endl;

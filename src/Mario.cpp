@@ -1,4 +1,8 @@
 #include "Mario.h"
+#include "MarioState/IdleState.h"
+#include "MarioState/DeadState.h"
+#include "MarioState/SlidingState.h"
+#include "MarioState/ThrowingState.h"
 
 Mario::Mario(Vector2 position)
     : Entity(position, Vector2({MARIO_WIDTH, MARIO_HEIGHT})),
@@ -8,6 +12,7 @@ Mario::Mario(Vector2 position)
 {
     rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
     sprite = std::make_unique<MarioSprite>();
+    throwingSprite = std::make_unique<ThrowingSprite>();
     currentState = std::make_unique<IdleState>();
 }
 
@@ -22,6 +27,7 @@ Mario::Mario(Vector2 position, std::function<void()> onDeathAction)
 {
     rect = {position.x, position.y, MARIO_WIDTH, MARIO_HEIGHT};
     sprite = std::make_unique<MarioSprite>();
+    throwingSprite = std::make_unique<ThrowingSprite>();
     currentState = std::make_unique<IdleState>();
 }
 
@@ -102,6 +108,21 @@ void Mario::ChangeForm()
     sprite->SwitchForm(form);
 }
 
+void Mario::Slide(Vector2 contactPoint) // Contact Point is a x, y coordinate according to the level grid
+{
+    // Start sliding
+    currentState = std::make_unique<SlidingState>();
+    // Snap to Ox grid
+    contactPoint.x = static_cast<int>(contactPoint.x) / (TILE_SIZE * SCALE) * (TILE_SIZE * SCALE);
+    velocity = {0, 0};
+}
+
+void Mario::ShootFireBall()
+{
+    isThrowing = true;
+    throwTimer = THROWING_FRAME_THRESHOLD;
+}
+
 void Mario::HandleInput()
 {
     std::unique_ptr<MarioState> newState = currentState->HandleInput(*this, *sprite);
@@ -114,7 +135,10 @@ void Mario::HandleInput()
 void Mario::Draw()
 {
     DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);
-    currentState->Draw(*this, *sprite);
+    if (isThrowing)
+        throwingSprite->Draw(*this);
+    else
+        currentState->Draw(*this, *sprite);
 }
 
 void Mario::Hurt()
@@ -139,6 +163,19 @@ void Mario::Update(Level &level)
 {
     float dt = GetFrameTime();
     std::unique_ptr<MarioState> newState = currentState->Update(*this, *sprite);
+
+    // Prevent throwing animation from being interrupted
+    if (isThrowing)
+    {
+        throwTimer--;
+        if (throwTimer <= 0)
+        {
+            isThrowing = false;
+            // onShootFireBall();
+            std::cout << "Finished throwing animation\n";
+        }
+    }
+
     if (newState != nullptr)
     {
         currentState = std::move(newState);
@@ -155,7 +192,35 @@ void Mario::Update(Level &level)
 
     ApplyGravity(velocity, GRAVITY);
 
-    if (currentState->GetType() != STATE_DEAD) // Mario is not dead
+    switch (currentState->GetType())
+    {
+    case STATE_DEAD:
+    {
+        position.y += velocity.y * dt;
+        rect.y = position.y;
+
+        if (position.y > HEIGHT_BOUNDARY)
+        {
+            std::cout << "Mario fell out of the world." << std::endl;
+            if (onDeath != nullptr)
+                onDeath();
+        }
+        break;
+    }
+    case STATE_SLIDING:
+    {
+        if (collision.IsCollideWithLevel(position, rect, velocity, level))
+        {
+            // Handle collision with ground
+            currentState = std::make_unique<IdleState>();
+        }
+        ResolveCollision(level);
+
+        position.y += velocity.y * dt;
+        rect.y = position.y;
+        break;
+    }
+    default:
     {
         if (position.x < 0)
         {
@@ -170,17 +235,6 @@ void Mario::Update(Level &level)
         rect.x = position.x;
         rect.y = position.y;
     }
-    else
-    {
-        position.y += velocity.y * dt;
-        rect.y = position.y;
-
-        if (position.y > HEIGHT_BOUNDARY)
-        {
-            std::cout << "Mario fell out of the world." << std::endl;
-            if (onDeath != nullptr)
-                onDeath();
-        }
     }
 }
 
