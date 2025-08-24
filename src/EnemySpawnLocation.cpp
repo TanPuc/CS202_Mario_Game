@@ -1,8 +1,6 @@
 #include "EnemySpawnLocation.h"
 
 // Enemy spawn location
-// Trigger n tiles before
-// camera.x + GetScreenWidth() / 2 > x * TILE_SIZE * SCALE - n * TILE_SIZE * SCALE
 // Level 1.1
 // x = 22 y = 12: 1 goomba
 
@@ -25,6 +23,9 @@
 
 // x = 165 y = 12: 2 goomba 
     // Separate them 
+
+// Level 1.3
+
 
 EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLocationLevel(tb)
 {

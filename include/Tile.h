@@ -122,6 +122,7 @@ private:
 
     Q_B_A q_b_a;
     Rectangle hbox;
+    Rectangle originalBBox;
 
     void handleAnimation();
     void handleBreaking(Mario &player);
@@ -130,6 +131,11 @@ public:
     BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick);
     void update(Mario &player, ItemManager& itemManager) override;
     void render() override;
+
+    Rectangle& getOriginalBBox()
+    {
+        return originalBBox;
+    }
 };
 
 class QuestionInstance : public TileInstance
@@ -142,8 +148,9 @@ private:
     bool hasFlower = false;
     bool hasMushroom = false;
 
-    Rectangle hbox;
     Q_B_A q_b_a;
+    Rectangle hbox;
+    Rectangle originalBBox;
 
     Rectangle normal = {0, 0, 16, 16};
     Rectangle dest;
@@ -155,8 +162,19 @@ public:
     QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question);
     void update(Mario &player, ItemManager& itemManager) override;
     void render() override;
-    void setHasFlower() { hasFlower = true; }
-    void setHasMushroom() { hasMushroom = true; }
+
+    void setHasFlower() 
+    { 
+        hasFlower = true; 
+    }
+    void setHasMushroom() 
+    { 
+        hasMushroom = true; 
+    }
+    Rectangle& getOriginalBBox()
+    {
+        return originalBBox;
+    }
 };
 
 class BackgroundInstance : public TileInstance

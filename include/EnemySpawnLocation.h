@@ -24,7 +24,10 @@ struct EnemyTriggerLocation
     bool triggered = false;
     std::vector<EnemySpawnLocation> enemies;
 
-    EnemyTriggerLocation() {}
+    EnemyTriggerLocation() 
+    {
+        
+    }
     EnemyTriggerLocation(int tb, Vector2 t, std::vector<EnemySpawnLocation> e)
         : tilesBefore(tb), trigger_position(t), enemies(e) 
     {

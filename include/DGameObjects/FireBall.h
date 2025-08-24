@@ -77,12 +77,13 @@ public:
 
     void ResolveCollision(Level &level)
     {
-        if (collision.IsCollideWithLevel(position, rect, velocity, level))
-        {
-            velocity.y = -150.f;
-        }
-        collision.CheckCollision(position, rect, velocity, level);
-        collision.ResolveCollision(position, rect, velocity, level);
+        // if (collision.IsCollideWithLevel(position, rect, velocity, level))
+        // {
+        //     velocity.y = -150.f;
+        // }
+        // collision.CheckCollision(position, rect, velocity, level);
+        // collision.ResolveCollision(position, rect, velocity, level);
+        collision.FireBallVsLevel(position, rect, velocity, level);
     }
 };
 

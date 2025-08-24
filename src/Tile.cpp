@@ -30,17 +30,16 @@ void BrickInstance::handleAnimation()
 {
     switch (state)
     {
-    case STATE_INTERACTED:
-    {
-        if (!q_b_a.is_update(pos.y))
+        case STATE_INTERACTED:
         {
-            state = STATE_NORMAL;
-        }
-        dest.y = pos.y;
-    }
-    break;
-    default:
-        break;
+            if (!q_b_a.is_update(pos.y))
+            {
+                state = STATE_NORMAL;
+            }
+            dest.y = pos.y;
+            bbox.y = pos.y;
+        } break;
+        default: break;
     }
 }
 
@@ -53,9 +52,6 @@ void BrickInstance::handleBreaking(Mario &player)
         {
             case STATE_NORMAL:
             {
-                // If player.state == STATE_SUPER
-                // state = STATE_BROKEN;
-                // else
                 if (player.GetForm() == BIG || player.GetForm() == FIRE || player.GetForm() == SUPER)
                 {
                     state = STATE_BROKEN;
@@ -72,7 +68,16 @@ void BrickInstance::handleBreaking(Mario &player)
 }
 
 BrickInstance::BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick)
-    : TileInstance(pos, brick), hbox(Rectangle{pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2), pos.y + (TILE_SIZE * SCALE), HITBOX_WIDTH, HITBOX_HEIGHT}), dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
+    : TileInstance(pos, brick), 
+    hbox(Rectangle{
+        pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2), 
+        pos.y + (TILE_SIZE * SCALE), 
+        HITBOX_WIDTH, 
+        HITBOX_HEIGHT}), 
+    dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) 
+{
+    originalBBox = bbox;
+}
 
 void BrickInstance::update(Mario &player, ItemManager &itemManager)
 {
@@ -93,7 +98,10 @@ QuestionInstance::QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question)
           pos.y + (TILE_SIZE * SCALE),
           HITBOX_WIDTH,
           HITBOX_HEIGHT}),
-      dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
+      dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) 
+{
+    originalBBox = bbox;
+}
 
 void QuestionInstance::handleAnimation()
 {
@@ -129,6 +137,7 @@ void QuestionInstance::handleAnimation()
                 state = STATE_ACTIVATED;
             }
             dest.y = pos.y;
+            bbox.y = pos.y;
         } break;
         case STATE_ACTIVATED:
         {

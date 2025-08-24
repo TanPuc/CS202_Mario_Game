@@ -58,8 +58,7 @@ public:
 
     void ResolveCollision(Level &level)
     {
-        collision.CheckCollision(position, rect, velocity, level);
-        collision.ResolveCollision(position, rect, velocity, level);
+        collision.MushroomVsLevel(position, rect, velocity, level);
     };
 };
 

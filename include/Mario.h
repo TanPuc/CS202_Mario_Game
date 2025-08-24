@@ -152,8 +152,7 @@ public:
 
     void ResolveCollision(Level &level)
     {
-        collision.CheckCollision(position, rect, velocity, level);
-        collision.ResolveCollision(position, rect, velocity, level);
+        collision.PlayerVsLevel(position, rect, velocity, level);
     };
 
     // Helper
