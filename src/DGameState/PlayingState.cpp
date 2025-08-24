@@ -42,7 +42,8 @@ void PlayingState::enter()
     // Items
     // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
     // entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
-    itemManager.SpawnCoinBlock(Vector2{200, 100}, Vector2{0, 0}, DIRECTION::RIGHT);
+    itemManager.SpawnCoinBlock(Vector2{200, 100});
+    itemManager.SpawnCoin(Vector2{200, 100}, Vector2{0, -100.0f});
     // itemManager.AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
     // itemManager.AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
 

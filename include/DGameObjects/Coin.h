@@ -19,7 +19,9 @@ public:
     const float lifeTime = 1.0f;
     Collision collision;
 
-    Coin(Vector2 pos) : Item(pos, {COIN_SIZE, COIN_SIZE}) {}
+    Coin(Vector2 pos, Vector2 vel) : Item(pos, {COIN_SIZE, COIN_SIZE}){
+        this->velocity = vel;
+    }
 
     void Draw() override
     {
