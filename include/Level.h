@@ -8,6 +8,7 @@
 #include "GlobalVariables.h"
 
 // Forward declaration
+class PlayingState;
 class BrickPiece;
 class Tile;
 class TileInstance;
@@ -45,9 +46,9 @@ public:
     // Managing broken brick pieces
     EntityManager entityManager;
 
-    Level(const char *filePath);
-    void addTileInstance(Vector2 pos, int tileID, int x, int y);
-    void update(Character &player);
+    Level(const char *filePath, PlayingState *ps);
+    void addTileInstance(Vector2 pos, int tileID, int x, int y, PlayingState *ps);
+    void update(Character &player, PlayingState *ps);
     void render();
 };
 

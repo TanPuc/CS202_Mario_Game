@@ -10,6 +10,7 @@
 
 class HUDManager : public Observer
 {
+public:
     LifePoint lifePoint;
     ScoreDisplay scoreDisplay;
     CoinDisplay coinDisplay;

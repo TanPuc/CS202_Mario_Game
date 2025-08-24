@@ -1,7 +1,8 @@
 #include "Level.h"
 #include "Tile.h"
+#include "DGameState/PlayingState.h"
 
-Level::Level(const char *filePath)
+Level::Level(const char *filePath, PlayingState *ps)
 {
     tileMap = {
         {1, std::make_shared<Tile>("./assets/Tiles/Overworld/pipe2.png")},
@@ -25,13 +26,13 @@ Level::Level(const char *filePath)
             {
                 fin >> temp;
                 Vector2 pos = Vector2{j * TILE_SIZE * SCALE, i * TILE_SIZE * SCALE};
-                addTileInstance(pos, temp, i, j);
+                addTileInstance(pos, temp, i, j, ps);
             }
         fin.close();
     }
 }
 
-void Level::addTileInstance(Vector2 pos, int tileID, int x, int y)
+void Level::addTileInstance(Vector2 pos, int tileID, int x, int y, PlayingState *ps)
 {
     float t = TILE_SIZE * SCALE;
     std::shared_ptr<TileInstance> tileInstance = nullptr;
@@ -54,8 +55,16 @@ void Level::addTileInstance(Vector2 pos, int tileID, int x, int y)
         tileInstance = std::make_shared<FortressInstance>(pos, tileMap[tileID]);
         break;
     case 7:
-        tileInstance = std::make_shared<GoalpoleInstance>(pos, tileMap[tileID]);
-        break;
+    {
+        auto goalpoleInstance = std::make_shared<GoalpoleInstance>(pos, tileMap[tileID]);
+        tileInstance = goalpoleInstance;
+
+        if (ps)
+        {
+            ps->setGoalpole(goalpoleInstance);
+        }
+    }
+    break;
     case 8:
         tileInstance = std::make_shared<GroundInstance>(pos, tileMap[tileID]);
         break;
@@ -97,7 +106,7 @@ void Level::addTileInstance(Vector2 pos, int tileID, int x, int y)
     }
 }
 
-void Level::update(Character &player)
+void Level::update(Character &player, PlayingState *ps)
 {
     for (int i = 0; i < GRID_HEIGHT; i++)
     {
@@ -105,7 +114,7 @@ void Level::update(Character &player)
         {
             if (tileInstancesGrid[i][j])
             {
-                tileInstancesGrid[i][j]->update(player);
+                tileInstancesGrid[i][j]->update(player, ps);
                 if (tileInstancesGrid[i][j]->getState() == STATE_BROKEN)
                 {
                     entityManager.addBrickPieces(tileInstancesGrid[i][j]->getPos());

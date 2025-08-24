@@ -7,6 +7,8 @@
 #include "Collision.h"
 #include "GlobalVariables.h"
 #include "GameSprite/MushroomSprite.h"
+#include "DCore/SoundManager.h"
+#include "DGameState/PlayingState.h"
 
 #define MUSHROOM_SIZE 16
 
@@ -48,6 +50,13 @@ public:
         character.position.y = position.y - character.rect.height;
         character.rect.y = character.position.y;
         isCollected = true;
+
+        mario.score += 1000;
+        SoundManager::getInstance().playSound(SoundEffect::POWERUP);
+        // if (ps)
+        // {
+        //     ps -> addFloatingScore(this->position, "1000");
+        // }
         // Handle collision with other entities if needed
     }
 

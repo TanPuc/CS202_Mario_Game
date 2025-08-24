@@ -50,6 +50,7 @@ void GameOverState::update()
 void GameOverState::draw()
 {
     ClearBackground(BLACK);
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), BLACK);
     Font font = ResourceManager::GetInstance().GetGameFont();
     const char* text = "GAME OVER";
     float fontSize = 80.0f;

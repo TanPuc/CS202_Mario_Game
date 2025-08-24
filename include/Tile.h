@@ -22,6 +22,7 @@
 
 // Forward declaration
 class Character;
+class PlayingState;
 
 float Q_rsqrt(float number);
 bool compare(const std::pair<std::array<int, 2>, float> &a, const std::pair<std::array<int, 2>, float> &b);
@@ -89,7 +90,7 @@ public:
     TileState getState() const { return state; }
 
     TileInstance(Vector2 pos, std::shared_ptr<Tile> tile);
-    virtual void update(Character &player) = 0;
+    virtual void update(Character &player, PlayingState *ps) = 0;
     virtual void render() = 0;
 };
 
@@ -97,7 +98,7 @@ class DummyInstance : public TileInstance
 {
 public:
     DummyInstance(Vector2 pos) : TileInstance(pos, nullptr) {}
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override {}
 };
 
@@ -106,7 +107,7 @@ class GroundInstance : public TileInstance
 public:
     GroundInstance(Vector2 pos, std::shared_ptr<Tile> ground)
         : TileInstance(pos, ground) {}
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
@@ -127,7 +128,7 @@ private:
 
 public:
     BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick);
-    void update(Character &player) override;
+    void update(Character &player, PlayingState *ps) override;
     void render() override;
 };
 
@@ -145,11 +146,11 @@ private:
     Rectangle dest;
 
     void handleAnimation();
-    void handleActivation(Character &player);
+    void handleActivation(Character &player, PlayingState *ps);
 
 public:
     QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question);
-    void update(Character &player) override;
+    void update(Character &player, PlayingState *ps) override;
     void render() override;
 };
 
@@ -157,7 +158,7 @@ class BackgroundInstance : public TileInstance
 {
 public:
     BackgroundInstance(Vector2 pos, std::shared_ptr<Tile> background);
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override;
 };
 
@@ -166,7 +167,7 @@ class PipeInstance1 : public TileInstance
 public:
     PipeInstance1(Vector2 pos, std::shared_ptr<Tile> pipe)
         : TileInstance(pos, pipe) {}
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override;
 };
 class PipeInstance2 : public TileInstance
@@ -174,7 +175,7 @@ class PipeInstance2 : public TileInstance
 public:
     PipeInstance2(Vector2 pos, std::shared_ptr<Tile> pipe)
         : TileInstance(pos, pipe) {}
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override;
 };
 class PipeInstance3 : public TileInstance
@@ -182,7 +183,7 @@ class PipeInstance3 : public TileInstance
 public:
     PipeInstance3(Vector2 pos, std::shared_ptr<Tile> pipe)
         : TileInstance(pos, pipe) {}
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override;
 };
 
@@ -190,7 +191,7 @@ class HardblockInstance : public TileInstance
 {
 public:
     HardblockInstance(Vector2 pos, std::shared_ptr<Tile> hardblock);
-    void update(Character &player) override;
+    void update(Character &player, PlayingState *ps) override;
     void render() override;
 };
 
@@ -201,8 +202,9 @@ private:
     GoalFlag goalFlag;
 
 public:
+    bool isLevelFinished = false; // To indicate if the level is finished
     GoalpoleInstance(Vector2 pos, std::shared_ptr<Tile> goalpole);
-    void update(Character &player) override;
+    void update(Character &player, PlayingState *ps) override;
     void render() override;
 };
 
@@ -218,7 +220,7 @@ public:
     {
         bbox = Rectangle{0, 0, 0, 0};
     }
-    void update(Character &player) override;
+    void update(Character &player, PlayingState *ps) override;
     void render() override;
 };
 
@@ -230,7 +232,7 @@ public:
     {
         bbox = Rectangle{0, 0, 0, 0};
     }
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
@@ -242,7 +244,7 @@ class GrassInstance : public TileInstance
 public:
     GrassInstance(Vector2 pos, std::shared_ptr<Tile> grass)
         : TileInstance(pos, grass) {}
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
@@ -254,7 +256,7 @@ class GrassBrickInstance : public TileInstance
 public:
     GrassBrickInstance(Vector2 pos, std::shared_ptr<Tile> grass)
         : TileInstance(pos, grass) {}
-    void update(Character &player) override {}
+    void update(Character &player, PlayingState *ps) override {}
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);

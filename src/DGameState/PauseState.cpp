@@ -50,7 +50,7 @@ void PauseState::buildGUI()
     // Vector2 buttonSize = { maxTextWidth + padding.x * 2, 50.0f };
     float startX = (GetScreenWidth() - buttonSize.x) / 2.0f;
     float gapY = 60.0f;
-    float startY = 180.0f;
+    float startY = 130.0f;
 
     guiManager.addElement(new ImageButton({startX, startY}, buttonSize, buttonTexture, buttonLabels[0],
         [this]() 
@@ -130,8 +130,8 @@ void PauseState::draw()
     Font font = ResourceManager::GetInstance().GetGameFont();
     const char* title = "PAUSED";
     Vector2 titleSize = MeasureTextEx(font, title, 40, 4.0f);
-    DrawTextEx(font, title, {(GetScreenWidth() - titleSize.x) / 2 + 3, 103}, 40, 4.0f, Fade(BLACK, 0.5f));
-    DrawTextEx(font, title, {(GetScreenWidth() - titleSize.x) / 2, 100}, 40, 4.0f, WHITE);
+    DrawTextEx(font, title, {(GetScreenWidth() - titleSize.x) / 2 + 3, 83}, 40, 4.0f, Fade(BLACK, 0.5f));
+    DrawTextEx(font, title, {(GetScreenWidth() - titleSize.x) / 2, 80}, 40, 4.0f, WHITE);
     guiManager.draw();
 }
 

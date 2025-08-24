@@ -51,6 +51,7 @@ void WinState::update()
 void WinState::draw()
 {
     ClearBackground(DARKBLUE);
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), DARKBLUE);
 
     // BLING BLING
     Font font = ResourceManager::GetInstance().GetGameFont();

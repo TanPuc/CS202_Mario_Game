@@ -22,12 +22,18 @@ void CoinDisplay::draw()
     DrawTextEx(font, "COINS", {position.x, position.y}, fontSize, spacing, WHITE);
 
     // DrawText ("COINS", position.x, position.y, 20, WHITE);
+    float aspectRatio = (float)coinTexture.width / (float)coinTexture.height;
+    float coinDisplayHeight = 20.0f;
+    float coinDisplayWidth = coinDisplayHeight * aspectRatio;
+    Vector2 coinSize = {coinDisplayWidth, coinDisplayHeight};
+    Rectangle coinRect = {position.x, position.y + 25, coinSize.x, coinSize.y};
+    Rectangle sourceRect = {0, 0, coinTexture.width, coinTexture.height};
 
-    DrawTextureV(coinTexture, {position.x, position.y +25}, WHITE);
+    DrawTexturePro(coinTexture, sourceRect, coinRect, {0, 0}, 0, WHITE);
 
     std::string text = "x " + std::to_string(currentCoins);
 
-    float textPositionX = position.x + coinTexture.width + 8;
-    float textPositionY = position.y + (coinTexture.height / 2.0f) - 10; 
+    float textPositionX = position.x + coinDisplayWidth + 15;
+    float textPositionY = position.y + (coinDisplayHeight / 2.0f) - MeasureText(text.c_str(), fontSize) / 2.0f + 4;
     DrawTextEx(font, text.c_str(), {textPositionX, textPositionY + 25}, fontSize, spacing, GOLD);
 }

@@ -7,6 +7,7 @@
 #include "Collision.h"
 #include "GlobalVariables.h"
 #include "GameSprite/FireFlowerSprite.h"
+#include "DCore/SoundManager.h"
 
 #define FIREFLOWER_SIZE 16
 
@@ -47,9 +48,16 @@ public:
     {
         if (isCollected || character.form != CHARACTER_FORM::BIG)
             return;
+        isCollected = true;
         // character.ChangeToFire();
         character.ChangeForm(CHARACTER_FORM::FIRE);
-        isCollected = true;
+        mario.score += 1000;
+        SoundManager::getInstance().playSound(SoundEffect::POWERUP);
+        // SoundManager::getInstance().playSound(SoundEffect::COIN);
+        // if (ps)
+        // {
+        //     ps->addFloatingScore(this->position, "1000");
+        // }
         // Handle collision with other entities if needed
     }
 };

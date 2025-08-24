@@ -6,11 +6,11 @@ HUDManager::HUDManager(Texture2D heartTexture, Texture2D coinTexture)
     : lifePoint(heartTexture), scoreDisplay(), coinDisplay(coinTexture), worldDisplay(), timeDisplay()
 {
     // Initialize the position of the HUD elements
-    scoreDisplay.position = {60, 20};
-    coinDisplay.position = {220, 20};
-    worldDisplay.position = {380, 20};
-    timeDisplay.position = {530, 20};
-    lifePoint.position = {660, 20};
+    scoreDisplay.position = {30, 20};
+    coinDisplay.position = {190, 20};
+    worldDisplay.position = {340, 20};
+    timeDisplay.position = {490, 20};
+    lifePoint.position = {620, 20};
 
     // Set visibility and enable state
     lifePoint.isVisible = true;

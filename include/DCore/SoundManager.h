@@ -9,6 +9,7 @@ enum class SoundEffect
     JUMP,
     COIN,
     FIRE_BALL,
+    POWERUP,
     LEVEL_START,
     PLAYER_DOWN,
     GAME_OVER
