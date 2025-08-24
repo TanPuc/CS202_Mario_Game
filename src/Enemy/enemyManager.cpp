@@ -14,9 +14,9 @@
 
 const float WALKSPEED = 50;
 const float SHELLSPEED = 200;
-const float RANDOMSPEED = 20;
+const float RANDOMSPEED = 80;
 const float RANDOMBOUNDARY = 150;
-const float DISTANCESPEED = 50;
+const float DISTANCESPEED = 500;
 const float CHASESPEED = 300;
 const float SWIMSPEED = 20;
 const float FREQUENCY = 5;
@@ -27,7 +27,7 @@ const float HOPPOWER = 500;
 const float ATTACKSPEED = 100;
 const float BLOOPERGRAVITY = 100;
 
-const Vector2 OFFSET = { 500, 600};
+const Vector2 OFFSET = { 300, 300};
 vector<FireBall*> FIREBALLS = {};
 
 const float CHASETIMER = 1.0f;
@@ -259,7 +259,7 @@ Enemy* EnemyManager::spawnLakitu(Vector2 pos)
 
 	Texture2D text = enemyAsset::GetTexture(EnemyType::lakitu);
 
-	SpriteEnemy* sprite = new SpriteEnemy();
+	SpriteEnemy* sprite = new SpriteEnemy(m_player);
 	sprite->addSpriteConfig(StateType::Hover, { text, {0,0,16,24}, 0, 1 , 1.5f });
 	sprite->addSpriteConfig(StateType::Attack, { text, {16,0,16,24}, 16, 1 , 1.5f });
 	sprite->addSpriteConfig(StateType::DeadElse, { text, {0,0,16,-24}, 0, 1 , 0.5f });
@@ -470,7 +470,7 @@ Enemy* EnemyManager::spawnBowser(Vector2 pos)
 
 	fsm = builder
 		.addState(new PatrolState(RANDOMBOUNDARY,RANDOMSPEED, HOPPOWER, JUMPCOOLDOWNTIMER))
-		.addState(new AttackState(this,new AttackStrat(this, EnemyType::hammer), 5 , 0.5f))
+		.addState(new AttackState(this,new AttackStrat(this, EnemyType::hammer), 6 , 0.5f))
 		.addState(new AttackOffState(this, new AttackStrat(this, EnemyType::fireball)))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Patrol, new ConditionTimer(HAMMERCOOLDOWNTIMER), StateType::Attack)

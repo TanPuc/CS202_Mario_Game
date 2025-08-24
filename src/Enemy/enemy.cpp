@@ -108,6 +108,10 @@ void Enemy::addVelocityY(float Y)
 {
 	m_velocity.y += Y;
 }
+void Enemy::addVelocityX(float X)
+{
+	m_velocity.x += X;
+}
 Vector2 Enemy::getVelocity() const
 {
 	return m_velocity;

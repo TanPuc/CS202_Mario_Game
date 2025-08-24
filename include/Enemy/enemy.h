@@ -44,6 +44,7 @@ public:
 
 	void setVelocityX(float X);
 	void setVelocityY(float Y);
+	void addVelocityX(float X);
 	void addVelocityY(float Y);
 	Vector2 getVelocity() const;
 

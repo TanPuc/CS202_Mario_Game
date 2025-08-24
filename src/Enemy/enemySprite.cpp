@@ -44,7 +44,6 @@ void SpriteEnemy::update(Enemy& e)
     m_AnimationTimer += GetFrameTime();
     if (m_AnimationTimer >= m_Sprites[m_CurrentState].m_FrameTime) {
         m_AnimationTimer = 0;
-        cout << m_Sprites[m_CurrentState].m_FrameCount;
         m_CurrentFrame = (m_CurrentFrame + 1) % m_Sprites[m_CurrentState].m_FrameCount;
     }
 }

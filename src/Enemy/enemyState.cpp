@@ -57,7 +57,7 @@ HoverState::HoverState(float speedRandom, float boundary, float speedDistace, Ve
 void HoverState::enter(Enemy& e)
 {
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
-	//compoMove->addStrategy(new MoveStrategyRandom(m_boundary, m_speedRandom, &m_player->position));
+	compoMove->addStrategy(new MoveStrategyRandom(m_boundary, m_speedRandom, &m_player->position));
 	compoMove->addStrategy(new MoveStrategyKeepDistance(m_speedDistance, m_offset , m_player));
 	e.setMoveStrategy(compoMove);
 
@@ -97,7 +97,7 @@ void AttackState::update(Enemy& e)
 	
 	timer2 += GetFrameTime();
 
-	if (timer2 >= duration / m_amout && counter <= m_amout )
+	if (timer2 >= duration / m_amout && counter < m_amout )
 	{
 		m_attack->attack(e);
 		counter++;

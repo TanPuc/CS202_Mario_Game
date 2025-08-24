@@ -53,8 +53,10 @@ public:
 	void move(Enemy& e) override;
 private:
 	float m_speed;
-	Vector2 m_offset;
 	Mario* m_player;
+
+	Vector2 m_offset;
+
 
 };
 class MoveStrategyChase : public IMoveStrategy

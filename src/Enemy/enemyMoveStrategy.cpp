@@ -4,6 +4,7 @@
 #include "cmath"
 #include "Mario.h"
 #include "algorithm"
+#include "Physics.h"
 
 using namespace std;
 
@@ -53,10 +54,42 @@ MoveStrategyKeepDistance::MoveStrategyKeepDistance(float s, Vector2 off, Mario* 
 {}
 void MoveStrategyKeepDistance::move(Enemy& e)
 {
-	Vector2 lakituTarget = { m_player->position.x + m_offset.x,m_offset.y };
+	float Lengthfactor = m_player->velocity.x / MAX_VELOCITY;
+
+	Vector2 lakituTarget = { m_player->position.x + m_offset.x * Lengthfactor ,m_offset.y };
 	Vector2 direction = lakituTarget - Vector2{e.GetPosition().x, m_offset.y};
+
+
 	Vector2 temp = Vector2Scale(Vector2Normalize(direction) , m_speed);
-	e.setVelocityX(temp.x);
+
+	/*test*/ //e.setVelocityX(0);
+	float result;
+	
+	if (temp.x >= 0)
+	{
+		result = temp.x * Lengthfactor;
+		/*if (result < temp.x / 4)
+		{
+			result = temp.x / 4;
+		}*/
+		e.addVelocityX(result);
+
+	}
+	else
+	{
+		result = temp.x * (abs(e.GetPosition().x - m_player->GetPosition().x) / m_offset.x);
+		if (result < temp.x/5)
+		{
+			result = temp.x / 5;
+		}
+		e.addVelocityX(result);
+	}
+
+	cout << e.getVelocity().x << endl;
+
+	if (e.getVelocity().x > m_speed) e.setVelocityX(m_speed);
+
+
 	e.setVelocityY(temp.y);
 }
 
