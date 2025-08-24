@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Enemy/enemyManager.h"
 #include "DCore/GameState.h"
 #include "DGameState/GameStateManager.h"
 #include "Mario.h"
-#include "Level.h"
 #include "DHUD/HUDManager.h"
 #include "DGameObjects/PlayerAdapter.h"
 #include "DGameObjects/Coin.h"
@@ -13,7 +13,7 @@
 #include "FireBallManager.h"
 #include "DGUI/ImageButton.h"
 #include "DCore/GameData.h"
-#include "Enemy/enemyManager.h"
+#include "LevelManager.h"
 #include "raylib.h"
 #include <vector>
 #include <memory>
@@ -25,7 +25,8 @@ private:
     ItemManager itemManager;
     FireBallManager fireBallManager;
     std::unique_ptr<Mario> player;
-    std::unique_ptr<Level> level;
+    std::unique_ptr<LevelManager> levelManager;
+
     std::unique_ptr<PlayerAdapter> playerAdapter;
     std::unique_ptr<HUDManager> hudManager;
     EnemyManager* enemyManager;

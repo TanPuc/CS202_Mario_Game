@@ -237,3 +237,75 @@ void LavaSurfaceInstance::render()
     DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
     DrawRectangleLinesEx(hbox, 2.0f, RED); // Draw hitbox
 }
+
+void HiddenBlockInstance::render()
+{
+    if ( state == STATE_ACTIVATED || state == STATE_INTERACTED)
+    {
+        DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+    }
+    DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw hitbox
+}
+
+void HiddenBlockInstance::handleAnimation()
+{
+    switch (state)
+    {
+        case STATE_INTERACTED:
+        {
+            if (!q_b_a.is_update(pos.y))
+            {
+                state = STATE_ACTIVATED;
+            }
+        } break;
+        default: break;
+    }
+}
+
+void HiddenBlockInstance::handleActivation()
+{
+    switch ( state )
+    {
+        case STATE_NORMAL:
+        {
+            state = STATE_INTERACTED;
+            q_b_a.iniVelY();
+            spawnCoin = true;
+        } break;
+        default: break;
+    }
+}
+
+void HiddenBlockInstance::handleHiddenBBox(Mario& player)
+{
+    switch ( state )
+    {
+        case STATE_NORMAL:
+        {
+            // Only show the bbox when the player is below the block
+            if (player.GetPosition().y > original_bbox_y + bbox.height)
+            {
+                bbox.y = original_bbox_y;
+            }
+            else
+            {
+                bbox.y = 0;
+            }
+        };
+        default: break;
+    }
+}
+
+void HiddenBlockInstance::update(Mario &player, ItemManager &itemManager)
+{
+    // handleActivation(player, itemManager);
+    handleHiddenBBox(player);
+    handleAnimation();
+
+    if ( spawnCoin )
+    {
+        // itemManager.SpawnCoin();
+        spawnCoin = false;
+        std::cout << "Coin spawned!" << std::endl;
+    }
+}

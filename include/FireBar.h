@@ -1,5 +1,7 @@
-#define _USE_MATH_DEFINES
+#ifndef FIREBAR_H
+#define FIREBAR_H
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <math.h>
 #include <memory>
@@ -64,7 +66,6 @@ public:
     if ( CheckCollisionRecs(player.GetBounds(), rect) )
     {
         player.Die();
-        std::cout << player.lives << std::endl;
     }
     }
 
@@ -124,3 +125,5 @@ public:
         }
     }
 };
+
+#endif // FIREBAR_H

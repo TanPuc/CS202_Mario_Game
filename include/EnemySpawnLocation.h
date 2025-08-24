@@ -1,12 +1,10 @@
+#ifndef ENEMY_SPAWN_LOCATION_H
+#define ENEMY_SPAWN_LOCATION_H
+
 #include <raylib.h>
 #include <vector>
+#include "Enemy/enemyEnum.h"
 #include "GlobalVariables.h"
-
-enum EnemyType
-{
-    GOOMBA,
-    KOOPA
-};
 
 struct EnemySpawnLocation
 {
@@ -19,7 +17,6 @@ struct EnemySpawnLocation
 
 struct EnemyTriggerLocation
 {
-    int tilesBefore; 
     Vector2 trigger_position;
     bool triggered = false;
     std::vector<EnemySpawnLocation> enemies;
@@ -29,7 +26,7 @@ struct EnemyTriggerLocation
         
     }
     EnemyTriggerLocation(int tb, Vector2 t, std::vector<EnemySpawnLocation> e)
-        : tilesBefore(tb), trigger_position(t), enemies(e) 
+        : trigger_position(t), enemies(e) 
     {
         // Adjust trigger position based on the number of tiles before
         trigger_position.x -= tb * TILE_SIZE * SCALE; 
@@ -39,9 +36,7 @@ struct EnemyTriggerLocation
 class EnemySpawnLocationLevel
 {
 public:
-    int tilesBefore;
     std::vector<EnemyTriggerLocation> ETLs;
-    EnemySpawnLocationLevel(int tb) : tilesBefore(tb) {}
     std::vector<EnemySpawnLocation> getEnemySpawnLocation(float right_border_x);
 };
 
@@ -57,12 +52,10 @@ public:
     EnemySpawnLocationLevel_1_3(int tb);
 };
 
-// How to use
-// Declaration
-// std::shared_ptr<EnemySpawnLocationLevel> ESLL = std::make_shared<EnemySpawnLocationLevel_1_1>(5);
-// Loop
-// std::vector<EnemySpawnLocation> ESLs = ESLL->getEnemySpawnLocation(right_border_x);
-// for ( const auto& ESL : ESLs )
-// {
-//     enemyManager.spawnEnemy(ESL.type, ESL.spawn_position);
-// }
+class EnemySpawnLocationLevel_1_4 : public EnemySpawnLocationLevel
+{
+public:
+    EnemySpawnLocationLevel_1_4(int tb);
+};
+
+#endif // ENEMY_SPAWN_LOCATION_H

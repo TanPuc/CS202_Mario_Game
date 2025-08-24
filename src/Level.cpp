@@ -203,41 +203,44 @@ void Level_1_3::addTileInstance(Vector2 &pos, int &tileID, int &x, int &y)
     std::shared_ptr<TileInstance> tileInstance = nullptr;
     switch (tileID)
     {
-    case 2:
-        tileInstance = std::make_shared<BigFortressInstance>(pos, tileMap[tileID]);
-        break;
-    case 3:
-        tileInstance = std::make_shared<FortressInstance>(pos, tileMap[tileID]);
-        break;
-    case 4:
-        tileInstance = std::make_shared<GroundInstance>(pos, tileMap[tileID]);
-        break;
-    case 5:
-        tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]);
-        break;
-    case 6:
-        tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]);
-        break;
-    case 7:
-        tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]);
-        break;
-    case 9:
-        tileInstance = std::make_shared<HardblockInstance>(pos, tileMap[tileID]);
-        break;
-    case 10:
-        tileInstance = std::make_shared<GoalpoleInstance>(pos, tileMap[tileID]);
-        break;
-    case 11:
-        tileInstance = std::make_shared<GrassBrickInstance>(pos, tileMap[tileID]);
-        break;
-    case 12:
-        tileInstance = std::make_shared<BackgroundInstance>(pos, tileMap[tileID]);
-        break;
-    case 13:
-        tileInstance = std::make_shared<QuestionInstance>(pos, tileMap[tileID]);
-        break;
-    default:
-        break;
+        case 2:
+            tileInstance = std::make_shared<BigFortressInstance>(pos, tileMap[tileID]);
+            break;
+        case 3:
+            tileInstance = std::make_shared<FortressInstance>(pos, tileMap[tileID]);
+            break;
+        case 4:
+            tileInstance = std::make_shared<GroundInstance>(pos, tileMap[tileID]);
+            break;
+        case 5:
+            tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]);
+            break;
+        case 6:
+            tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]);
+            break;
+        case 7:
+            tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]);
+            break;
+        case 9:
+            tileInstance = std::make_shared<HardblockInstance>(pos, tileMap[tileID]);
+            break;
+        case 10:
+            tileInstance = std::make_shared<GoalpoleInstance>(pos, tileMap[tileID]);
+            break;
+        case 11:
+            tileInstance = std::make_shared<GrassBrickInstance>(pos, tileMap[tileID]);
+            break;
+        case 12:
+            tileInstance = std::make_shared<BackgroundInstance>(pos, tileMap[tileID]);
+            break;
+        case 13:
+            tileInstance = std::make_shared<QuestionInstance>(pos, tileMap[tileID]);
+            break;
+        case 697: 
+            tileInstance = std::make_shared<CoinInstance>(pos); 
+            break;
+        default:
+            break;
     }
     tileInstancesGrid[x][y] = tileInstance;
 }
@@ -251,6 +254,17 @@ void Level_1_3::update(Mario &player, ItemManager& itemManager)
             if (tileInstancesGrid[i][j])
             {
                 tileInstancesGrid[i][j]->update(player, itemManager);
+
+                // Remove initialized coin instances
+                if ( auto coinInstance = dynamic_cast<CoinInstance*>(tileInstancesGrid[i][j].get()) )
+                {
+                    if ( coinInstance->isCoinInitialized() )
+                    {
+                        std::cout << "COIN INITIALIZED at " << i << ", " << j << std::endl;
+                        tileInstancesGrid[i][j] = nullptr;
+                    }
+                }
+
             }
         }
     }
@@ -266,6 +280,7 @@ void Level_1_3::render()
             if (tileInstancesGrid[i][j])
             {
                 tileInstancesGrid[i][j]->render();
+                DrawRectangleLinesEx(tileInstancesGrid[i][j]->bbox, 2.0f, RED); // Draw bounding box
             }
         }
     }
@@ -354,10 +369,11 @@ void Level_1_4::addTileInstance(Vector2 &pos, int &tileID, int &x, int &y)
     case 12:
     {
         tileInstance = std::make_shared<UsedBlockInstance>(pos, tileMap[tileID - 4]);
-        // auto usedBlockInstance = dynamic_cast<UsedBlockInstance*>(tileInstance.get());
-        // usedBlockInstance->initFireBar(rand() % 361);
         entityManager.addFireBar(pos, rand() % 361);
     } break;
+    case 13:
+        tileInstance = std::make_shared<HiddenBlockInstance>(pos, tileMap[8]);
+        break;
     default:
         break;
     }

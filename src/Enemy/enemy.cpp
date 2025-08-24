@@ -112,7 +112,7 @@ void Enemy::addVelocityX(float X)
 {
 	m_velocity.x += X;
 }
-Vector2 Enemy::getVelocity() const
+Vector2& Enemy::getVelocity() 
 {
 	return m_velocity;
 }
@@ -130,7 +130,7 @@ void Enemy::reverseDirection()
 	m_velocity.x *= -1;
 }
 
-Rectangle Enemy::getHurtBox() const
+Rectangle& Enemy::getHurtBox() 
 {
 	return m_HurtBox;
 }

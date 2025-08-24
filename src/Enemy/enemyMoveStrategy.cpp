@@ -22,7 +22,7 @@ MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e, const Mario& mario) :
 MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e) :
 	speed(value)
 {
-	e.setVelocityX(speed);	//so it is 20 instead of 20+x...
+	e.setVelocityX(-speed);	//so it is 20 instead of 20+x...
 }
 void MoveStrategyBasic::move(Enemy& e)
 {
@@ -85,7 +85,7 @@ void MoveStrategyKeepDistance::move(Enemy& e)
 		e.addVelocityX(result);
 	}
 
-	cout << e.getVelocity().x << endl;
+	// cout << e.getVelocity().x << endl;
 
 	if (e.getVelocity().x > m_speed) e.setVelocityX(m_speed);
 

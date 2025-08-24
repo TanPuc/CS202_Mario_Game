@@ -4,8 +4,8 @@
 #include <memory>
 #include "raylib.h"
 
-#include "enemyEnum.h"
-#include "enemyAsset.h"
+#include "Enemy/enemyEnum.h"
+#include "Enemy/enemyAsset.h"
 
 using namespace std;
 

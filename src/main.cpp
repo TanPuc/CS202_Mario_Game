@@ -16,7 +16,8 @@
 
 int main(void)
 {
-	SetConfigFlags( FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+	// SetConfigFlags( FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+	SetConfigFlags( FLAG_VSYNC_HINT );	
 	InitWindow(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "Mario");
 	InitAudioDevice();
 	SetTargetFPS(60);

@@ -46,14 +46,14 @@ public:
 	void setVelocityY(float Y);
 	void addVelocityX(float X);
 	void addVelocityY(float Y);
-	Vector2 getVelocity() const;
+	Vector2& getVelocity();
 
 	int getDirectionSelf() const;
 	void reverseDirection();
 
 	void setPosition(Vector2);
 
-	Rectangle getHurtBox() const;
+	Rectangle& getHurtBox() ;
 	void setHurtBox();
 
 	Rectangle getHitBox() const;

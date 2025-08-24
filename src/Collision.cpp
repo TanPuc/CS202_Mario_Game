@@ -175,10 +175,17 @@ void Collision::PlayerVsLevel(Vector2 &position, Rectangle &bbox, Vector2 &veloc
                 Rectangle tileBBox = brick ? brick->getOriginalBBox() : 
                     ( question ? question->getOriginalBBox() : level.getTileInstance(y, x)->bbox );
 
+                auto hidden = dynamic_cast<HiddenBlockInstance*>(level.getTileInstance(y, x).get());
+
                 if (aabb::CheckCollisionStaticRectDynamicRect(bbox, velocity, tileBBox, contact_point, contact_normal, contact_time, dt))
                 {
                     std::array<int, 2> temp = {y, x};
                     z.push_back({temp, contact_time});
+
+                    if ( hidden )
+                    {
+                        hidden->handleActivation();
+                    }
                 }
             }
         }

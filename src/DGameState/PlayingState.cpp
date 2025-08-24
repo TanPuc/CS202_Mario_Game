@@ -6,7 +6,6 @@
 #include "DCore/SoundManager.h"
 #include "DCore/SaveManager.h"
 
-
 PlayingState::PlayingState(GameStateManager *manager, const GameData &initialData) : gsm(manager), currentData(initialData) {}
 
 void PlayingState::enter()
@@ -31,7 +30,6 @@ void PlayingState::enter()
     // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
     // player = std::make_unique<Mario>(START_POS_WORLD_1_1);
 
-    level = std::make_unique<Level_1_4>("./assets/Levels/world_1.4.txt");
 
     player = std::make_unique<Mario>(currentData.playerPosition);
     player->lives = currentData.lives;
@@ -47,6 +45,10 @@ void PlayingState::enter()
     // itemManager.AddItem(std::make_unique<Coin>(Vector2{200, 100}));
     // itemManager.AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
     // itemManager.AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
+
+    // LEVEL
+    levelManager = std::make_unique<LevelManager>();
+    levelManager->LoadLevel(levelNum);
 
     player->lives = gsm->getContext().lives;
     player->coins = 0;
@@ -64,9 +66,9 @@ void PlayingState::enter()
     hudManager->updateWorld(worldNum, levelNum);
     playerAdapter->update();
 
+    enemyManager = new EnemyManager(player.get(), levelManager->getCurrentLevel(), fireBallManager.GetFireBalls());
 
-    enemyManager = new EnemyManager(player.get(), level.get(), fireBallManager.GetFireBalls());
-    Vector2 posEnemy = { 300, 100 };
+    // Vector2 posEnemy = { 300, 100 };
     // enemyManager->spawnEnemyAt(EnemyType::goopa, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
@@ -122,10 +124,14 @@ void PlayingState::update()
             fireBallManager.ShootFireBall(player->GetPosition(), player->GetDirection());
         }
     }
-    player->Update(*level); // Handling player collision and movement
+
+    player->Update(*levelManager->getCurrentLevel());
 
     // Handle Mario's death
-    level->update(*player, itemManager);
+
+    // LEVEL
+    levelManager->Update(*player, itemManager);
+    levelManager->SpawnEnemy( player->GetPosition().x + float(GetScreenWidth() / 2) , *enemyManager); // May access nullptr and cause error 
 
     playerAdapter->update();
     hudManager->updateTime();
@@ -156,8 +162,9 @@ void PlayingState::update()
     //     }
     // }
 
-    fireBallManager.Update(*level);
-    itemManager.UpdateItems(*level, *player); // Update all entities
+    fireBallManager.Update(*levelManager->getCurrentLevel());
+
+    itemManager.UpdateItems(*levelManager->getCurrentLevel(), *player);
 
     //Enemy
     enemyManager->update();
@@ -197,7 +204,7 @@ void PlayingState::draw()
     camera.zoom = 1.0f;
 
     BeginMode2D(camera);
-    level->render();
+    levelManager->Draw();
     player->Draw();
     enemyManager->draw();
 

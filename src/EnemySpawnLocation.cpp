@@ -25,23 +25,6 @@
 // x = 165 y = 12: 2 goomba 
     // Separate them 
 
-// Level 1.3
-// Tiled map are 1 column short 
-// All koopas are red
-// x = 27 y = 4: 1 koopa
-
-// x = 41 y = 3: 1 goomba
-
-// x = 44 y = 3: 1 goomba
-
-// x = 72 y = 7: 1 flyingKoopa
-    // x = 77 y = 5: 1 goomba
-    
-// x = 107 y = 6: 1 koopa
-    // x = 113 y = 12: 1 flying koopa
-
-// x = 131 y = 12: 1 koopa
-
 // Level 1.4
 
 
@@ -63,7 +46,7 @@ std::vector<EnemySpawnLocation> EnemySpawnLocationLevel::getEnemySpawnLocation(f
     return result;
 }
 
-EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLocationLevel(tb)
+EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) 
 {
     float t = TILE_SIZE * SCALE;
     Vector2 goomba_spawn_pos = { 22 * t, 12 * t };
@@ -75,12 +58,12 @@ EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLoc
             goomba_spawn_pos,
             std::vector<EnemySpawnLocation>
             {
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos)
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos)
             }
         )
     );
     
-    Vector2 goomba_spawn_pos_1 = { 40 * t, 12 * t };
+    Vector2 goomba_spawn_pos_1 = { 40.1f * t, 12 * t };
     ETLs.push_back
     (
         EnemyTriggerLocation
@@ -89,13 +72,13 @@ EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLoc
             goomba_spawn_pos_1,
             std::vector<EnemySpawnLocation>
             {
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_1)
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_1)
             }
         )
     );
 
-    Vector2 goomba_spawn_pos_2 = { 48 * t, 12 * t };
-    Vector2 goomba_spawn_pos_3 = { 49 * t, 12 * t };
+    Vector2 goomba_spawn_pos_2 = { 48.1f * t, 12 * t };
+    Vector2 goomba_spawn_pos_3 = { 49.6f * t, 12 * t };
     ETLs.push_back
     (
         EnemyTriggerLocation
@@ -104,8 +87,8 @@ EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLoc
             goomba_spawn_pos_2,
             std::vector<EnemySpawnLocation>
             {
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_2),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_3)
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_2),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_3)
             }
         )
     );
@@ -120,19 +103,19 @@ EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLoc
             goomba_spawn_pos_4,
             std::vector<EnemySpawnLocation>
             {
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_4),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_5)
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_4),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_5)
             }
         )
     );
 
-    Vector2 koopa_spawn_pos = { 103 * t, 12 * t };
+    Vector2 koopa_spawn_pos = { 103 * t, 11 * t };
     Vector2 goomba_spawn_pos_6 = { 105 * t, 12 * t };
     Vector2 goomba_spawn_pos_7 = { 110 * t, 12 * t };
     Vector2 goomba_spawn_pos_8 = { 117 * t, 12 * t };
-    Vector2 goomba_spawn_pos_9 = { 118 * t, 12 * t };
-    Vector2 goomba_spawn_pos_10 = { 119 * t, 12 * t };
-    Vector2 goomba_spawn_pos_11 = { 120 * t, 12 * t };
+    Vector2 goomba_spawn_pos_9 = { 118.5f * t, 12 * t };
+    Vector2 goomba_spawn_pos_10 = { 120.5f * t, 12 * t };
+    Vector2 goomba_spawn_pos_11 = { 122 * t, 12 * t };
     ETLs.push_back
     (
         EnemyTriggerLocation
@@ -141,18 +124,18 @@ EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLoc
             koopa_spawn_pos,
             std::vector<EnemySpawnLocation>
             {
-                EnemySpawnLocation(EnemyType::KOOPA, koopa_spawn_pos),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_6),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_7),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_8),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_9),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_10),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_11)
+                EnemySpawnLocation(EnemyType::koopa, koopa_spawn_pos),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_6),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_7),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_8),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_9),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_10),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_11)
             }
         )
     );
 
-    Vector2 goomba_spawn_pos_12 = { 165 * t, 12 * t };
+    Vector2 goomba_spawn_pos_12 = { 165.1f * t, 12 * t };
     Vector2 goomba_spawn_pos_13 = { 167 * t, 12 * t };
     ETLs.push_back
     (
@@ -162,15 +145,143 @@ EnemySpawnLocationLevel_1_1::EnemySpawnLocationLevel_1_1(int tb) : EnemySpawnLoc
             goomba_spawn_pos_12,
             std::vector<EnemySpawnLocation>
             {
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_12),
-                EnemySpawnLocation(EnemyType::GOOMBA, goomba_spawn_pos_13)
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_12),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_13)
             }
         )
     );
 }
 
-EnemySpawnLocationLevel_1_3::EnemySpawnLocationLevel_1_3(int tb) : EnemySpawnLocationLevel(tb)
+// Level 1.3
+// Tiled map are 1 column short 
+// All koopas are red
+// x = 27 y = 3: 1 koopa
+
+// x = 41 y = 3: 1 goomba
+
+// x = 44 y = 3: 1 goomba
+
+// x = 72 y = 7: 1 flyingKoopa
+    // x = 77 y = 5: 1 goomba
+    
+// x = 107 y = 5: 1 koopa
+    // x = 113 y = 12: 1 flying koopa
+
+// x = 131 y = 11: 1 koopa
+
+EnemySpawnLocationLevel_1_3::EnemySpawnLocationLevel_1_3(int tb)
 {
     float t = TILE_SIZE * SCALE;
 
+    Vector2 koopa_spawn_pos = { 27 * t, 3 * t };
+    ETLs.push_back
+    (
+        EnemyTriggerLocation
+        (
+            tb,
+            koopa_spawn_pos,
+            std::vector<EnemySpawnLocation>
+            {
+                EnemySpawnLocation(EnemyType::koopa, koopa_spawn_pos)
+            }
+        )
+    );
+
+    Vector2 goomba_spawn_pos = { 41 * t, 3 * t };
+    ETLs.push_back
+    (
+        EnemyTriggerLocation
+        (
+            tb,
+            goomba_spawn_pos,
+            std::vector<EnemySpawnLocation>
+            {
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos)
+            }
+        )
+    );
+
+    Vector2 goomba_spawn_pos_1 = { 44 * t, 3 * t };
+    ETLs.push_back
+    (
+        EnemyTriggerLocation
+        (
+            tb,
+            goomba_spawn_pos_1,
+            std::vector<EnemySpawnLocation>
+            {
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_1)
+            }
+        )
+    );
+
+    Vector2 flying_koopa_spawn_pos = { 73 * t, 7 * t };
+    Vector2 goomba_spawn_pos_2 = { 77 * t, 5 * t };
+    ETLs.push_back
+    (
+        EnemyTriggerLocation
+        (
+            tb,
+            flying_koopa_spawn_pos,
+            std::vector<EnemySpawnLocation>
+            {
+                // CHECKING LATER
+                EnemySpawnLocation(EnemyType::cheepcheep, flying_koopa_spawn_pos),
+                EnemySpawnLocation(EnemyType::goopa, goomba_spawn_pos_2)
+            }
+        )
+    );
+
+    Vector2 koopa_spawn_pos_1 = { 107 * t, 5 * t };
+    Vector2 flying_koopa_spawn_pos_1 = { 113 * t, 12 * t };
+    ETLs.push_back
+    (
+        EnemyTriggerLocation
+        (
+            tb,
+            koopa_spawn_pos_1,
+            std::vector<EnemySpawnLocation>
+            {
+                EnemySpawnLocation(EnemyType::koopa, koopa_spawn_pos_1),
+                // CHECKING LATER
+                EnemySpawnLocation(EnemyType::cheepcheep, flying_koopa_spawn_pos_1)
+            }
+        )
+    );
+
+    Vector2 koopa_spawn_pos_2 = { 131 * t, 11 * t };
+    ETLs.push_back
+    (
+        EnemyTriggerLocation
+        (
+            tb,
+            koopa_spawn_pos_2,
+            std::vector<EnemySpawnLocation>
+            {
+                EnemySpawnLocation(EnemyType::koopa, koopa_spawn_pos_2)
+            }
+        )
+    );
+}
+
+// Level 1.4
+// x = 135 y = 8: 1 bowser 
+
+EnemySpawnLocationLevel_1_4::EnemySpawnLocationLevel_1_4(int tb)
+{
+    float t = TILE_SIZE * SCALE;
+
+    Vector2 bowser_spawn_pos = { 135 * t, 8 * t };
+    ETLs.push_back
+    (
+        EnemyTriggerLocation
+        (
+            tb,
+            bowser_spawn_pos,
+            std::vector<EnemySpawnLocation>
+            {
+                EnemySpawnLocation(EnemyType::bowser, bowser_spawn_pos)
+            }
+        )
+    );
 }

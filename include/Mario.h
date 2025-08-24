@@ -139,7 +139,6 @@ public:
         // Left wall
         if (position.x < 0)
         {
-            position.y = 5 * TILE_SIZE * SCALE; // TEMPORARY, REMOVE LATER
             position.x = 0;
             velocity.x = 0;
         }
