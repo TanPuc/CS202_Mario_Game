@@ -19,8 +19,13 @@ class ItemManager
 {
 private:
     std::vector<std::unique_ptr<Item>> items;
+    std::unique_ptr<CoinBlockSprite> coinBlockSprite;
 
 public:
+    ItemManager(){
+        coinBlockSprite = std::make_unique<CoinBlockSprite>();
+    };
+
     void AddItem(std::unique_ptr<Item> item);
     void SpawnMushroom(Vector2 position, Vector2 velocity, DIRECTION direction);
     void SpawnFireFlower(Vector2 position, Vector2 velocity, DIRECTION direction);

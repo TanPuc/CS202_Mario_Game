@@ -34,7 +34,6 @@ public:
 
     void Draw(Entity &entity) override
     {
-        std::cout << "Drawing CoinBlockSprite" << std::endl;
         if (!currentAnimation)
         {
             std::cerr << "Current animation is not set!" << std::endl;

@@ -14,16 +14,17 @@
 class CoinBlock : public Item
 {
 public:
-    CoinBlockSprite coinBlockSprite;
     float timer = 0.0f; // Timer for coin animation
     const float lifeTime = 1.0f;
     Collision collision;
+    std::unique_ptr<CoinBlockSprite> coinBlockSprite;
 
     CoinBlock(Vector2 pos) : Item(pos, {COIN_SIZE, COIN_SIZE}) {}
+    CoinBlock(Vector2 pos, std::unique_ptr<CoinBlockSprite> sprite) : Item(pos, {COIN_SIZE, COIN_SIZE}), coinBlockSprite(std::move(sprite)) {}
 
     void Draw() override
     {
-        coinBlockSprite.Draw(*this);
+        coinBlockSprite->Draw(*this);
     }
 
     void Collect(Mario &mario) override
