@@ -13,6 +13,7 @@ public:
     Animation *currentAnimation;
     STATE prevState;
     int frameSpeed = 12; // 12fps
+    int animationTimer = 0;
 
     CoinBlockSprite()
         : coinBlockAnimation({{298, 95, 16, 16},
@@ -40,7 +41,7 @@ public:
             return;
         }
 
-        static int animationTimer = 0;
+        
         animationTimer++;
 
         if (animationTimer >= frameSpeed)

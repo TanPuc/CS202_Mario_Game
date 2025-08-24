@@ -13,6 +13,7 @@ public:
     Animation *currentAnimation;
     STATE prevState;
     int frameSpeed = 6; // 6fps
+    int animationTimer = 0;
 
     CoinSprite()
         : coinAnimation({{180, 36, 8, 16},
@@ -39,8 +40,6 @@ public:
             std::cerr << "Current animation is not set!" << std::endl;
             return;
         }
-
-        static int animationTimer = 0;
         animationTimer++;
 
         if (animationTimer >= frameSpeed)
