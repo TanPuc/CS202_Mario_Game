@@ -194,9 +194,14 @@ GoalpoleInstance::GoalpoleInstance(Vector2 pos, std::shared_ptr<Tile> goalpole)
 
 void GoalpoleInstance::update(Character &player)
 {
-    if (CheckCollisionRecs(player.GetBounds(), hbox))
+    if (CheckCollisionRecs(player.GetBounds(), hbox) && !player.playWinAnimation)
     {
         state = STATE_ACTIVATED;
+        Vector2 playerPos = player.GetPosition();
+        Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
+        player.position.x = ceil(playerGridCoords.x) * (TILE_SIZE * SCALE);
+        player.rect.x = player.position.x;
+        player.playWinAnimation = true;
         goalFlag.iniVelY();
     }
     goalFlag.Update(state);

@@ -21,6 +21,7 @@ class Character : public Entity
 {
 public:
     std::function<void()> onDeath;
+    std::function<void()> onChangeScene;
 
     std::unique_ptr<CharacterState> currentState;
     std::unique_ptr<CharacterSprite> sprite;
@@ -29,6 +30,7 @@ public:
     CHARACTER character;
     float hurtBuffer; // > 0 means invisibility frame, = 0 means can be damaged
     bool isThrowing;
+    bool onGround = false;
     int lives;
     int coins;
     int throwTimer;
@@ -42,6 +44,13 @@ public:
     float transformTimer;
     int frameIndex;
     void ChangeToTargetForm(CHARACTER_FORM form);
+
+    // Win Animation
+    bool playWinAnimation = false;
+    float timeToCastle = 4.5f;
+    float walkTime = 2.2f;
+    float sentEvent = false;
+    void PlayWinAnimation();
 
     Character(Vector2 position);
     Character(Vector2 position, std::function<void()> onDeathAction);
@@ -69,6 +78,7 @@ public:
     void ResolveCollision(Level &level);
 
     // Helper
+    void CheckOnGround(Level &level);
     DIRECTION GetDirection() const;
     CHARACTER_FORM GetForm() const;
     Vector2 GetPosition() const;

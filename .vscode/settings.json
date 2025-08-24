@@ -82,7 +82,9 @@
         "queue": "cpp",
         "ratio": "cpp",
         "stack": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "__threading_support": "cpp",
+        "complex": "cpp"
     },
     "editor.quickSuggestions": {
         "other": true,

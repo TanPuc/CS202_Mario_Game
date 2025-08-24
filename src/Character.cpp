@@ -3,6 +3,7 @@
 #include "CharacterState/DeadState.h"
 #include "CharacterState/SlidingState.h"
 #include "CharacterState/ThrowingState.h"
+#include "CharacterState/WalkingState.h"
 
 Character::Character(Vector2 position)
     : Entity(position, Vector2({CHARACTER_WIDTH, CHARACTER_HEIGHT})),
@@ -206,14 +207,44 @@ void Character::ChangeToTargetForm(CHARACTER_FORM targetForm)
 void Character::Update(Level &level)
 {
     float dt = GetFrameTime();
-    std::unique_ptr<CharacterState> newState = currentState->Update(*this, *sprite);
-    if (newState != nullptr)
-    {
-        currentState = std::move(newState);
-    }
 
     // Prevent animation from being interrupted
-    if (isThrowing)
+
+    if (playWinAnimation)
+    {
+        if (!onGround)
+        {
+            CheckOnGround(level);
+            sprite->SwitchAnimation(STATE_SLIDING);
+            std::cout << "Is not on ground\n";
+            position.y += FLAG_SPEED * dt;
+            rect.y = position.y;
+        }
+        else
+        {
+            std::cout << "Is on ground\n";
+            if (walkTime > 0)
+            {
+                position.x += 100.0f * dt;
+                rect.x = position.x;
+                sprite->SwitchAnimation(STATE_WALKING);
+            }
+
+            timeToCastle -= dt;
+            walkTime -= dt;
+
+            if (timeToCastle <= 0)
+            {
+                playWinAnimation = true;
+                std::cout << "Character reached the castle." << std::endl;
+                if (onChangeScene != nullptr)
+                    onChangeScene();
+            }
+        }
+
+        return;
+    }
+    else if (isThrowing)
     {
         throwTimer--;
         if (throwTimer <= 0)
@@ -222,7 +253,7 @@ void Character::Update(Level &level)
             // std::cout << "Finished throwing animation\n";
         }
     }
-    if (isTransforming)
+    else if (isTransforming)
     {
         transformTimer -= dt; // float time countdown
 
@@ -253,24 +284,23 @@ void Character::Update(Level &level)
             frameIndex = 0;
             showingTarget = false;
         }
+        return;
     }
 
-    // If transformation animation is on-going, don't update the position
-    // Checking for hurt invincibility
-    if (hurtBuffer > 0.0f)
-        hurtBuffer -= GetFrameTime();
-    else
-        hurtBuffer = 0.0f;
+    HandleInput();
 
-    if (isTransforming)
-        return;
-
-    ApplyGravity(velocity, GRAVITY);
+    std::unique_ptr<CharacterState> newState = currentState->Update(*this, *sprite);
+    if (newState != nullptr)
+    {
+        currentState = std::move(newState);
+    }
 
     switch (currentState->GetType())
     {
     case STATE_DEAD:
     {
+        ApplyGravity(velocity, GRAVITY);
+
         position.y += velocity.y * dt;
         rect.y = position.y;
 
@@ -297,6 +327,8 @@ void Character::Update(Level &level)
     }
     default:
     {
+        ApplyGravity(velocity, GRAVITY);
+
         if (position.x < 0)
         {
             position.x = 0;
@@ -311,6 +343,16 @@ void Character::Update(Level &level)
         rect.y = position.y;
     }
     }
+
+    // If transformation animation is on-going, don't update the position
+    // Checking for hurt invincibility
+    // if (hurtBuffer > 0.0f)
+    //     hurtBuffer -= GetFrameTime();
+    // else
+    //     hurtBuffer = 0.0f;
+
+    // if (isTransforming)
+    //     return;
 }
 
 void Character::ResolveCollision(Level &level)
@@ -344,4 +386,19 @@ void Character::SetPosition(Vector2 newPosition)
 void Character::SetOnDeathAction(std::function<void()> action)
 {
     onDeath = std::move(action);
+}
+
+void Character::PlayWinAnimation()
+{
+    if (!playWinAnimation)
+    {
+        playWinAnimation = true;
+        velocity = {0.0f, 0.0f};
+    }
+}
+
+void Character::CheckOnGround(Level &level)
+{
+    // Check if the character is on the ground
+    onGround = collision.IsCollideWithLevelVertically(position, rect, velocity, level);
 }

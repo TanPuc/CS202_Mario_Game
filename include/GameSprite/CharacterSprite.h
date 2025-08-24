@@ -125,7 +125,6 @@ public:
             frameRec.width = -abs(frameRec.width);
         }
 
-        std::cout << "Sprite Rec y: " << frameRec.y << std::endl;
         DrawTexturePro(spriteSheet, frameRec,
                        {entity.position.x, entity.position.y, entity.rect.width, entity.rect.height},
                        {0, 0}, 0.0f, WHITE);

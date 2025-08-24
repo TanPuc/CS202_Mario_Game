@@ -105,7 +105,6 @@ void PlayingState::update()
     currentData.score = player->score;
     currentData.timeRemaining = hudManager->getTime();
 
-    player->HandleInput();
     player->Update(*level); // Handling player collision and movement
 
     if (player->GetForm() == FIRE)
@@ -126,9 +125,9 @@ void PlayingState::update()
 
     if (IsKeyPressed(KEY_F))
     {
-        // Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
-        // player->Slide(playerGridCoords);
-        player->ChangeForm(SMALL);
+        Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
+        player->Slide(playerGridCoords);
+        // player->ChangeForm(SMALL);
     }
 
     if (player->GetBounds().x > cameraPos.x)
