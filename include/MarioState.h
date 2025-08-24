@@ -54,4 +54,22 @@ public:
     STATE GetType() const override { return STATE_JUMPING; } // Return the current state type
 };
 
+class DuckingState : public MarioState
+{
+public:
+    std::unique_ptr<MarioState> HandleInput(Entity &entity, Sprite &sprite) override;
+    std::unique_ptr<MarioState> Update(Entity &entity, Sprite &sprite) override;
+    void Draw(Entity &entity, Sprite &sprite) override;
+    STATE GetType() const override { return STATE_DUCKING; } // Return the current state type
+};
+
+class DeadState : public MarioState
+{
+public:
+    std::unique_ptr<MarioState> HandleInput(Entity &entity, Sprite &sprite) override;
+    std::unique_ptr<MarioState> Update(Entity &entity, Sprite &sprite) override;
+    void Draw(Entity &entity, Sprite &sprite) override;
+    STATE GetType() const override { return STATE_DEAD; } // Return the current state type
+};
+
 #endif

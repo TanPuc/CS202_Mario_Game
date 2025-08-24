@@ -212,33 +212,10 @@ void GoalpoleInstance::render()
 void FortressInstance::update(Mario &player)
 {
     fortressFlag.Update();
-    void LavaSurfaceInstance::update(Mario & player)
-    {
-        if (CheckCollisionRecs(player.GetBounds(), hbox))
-        {
-            // GAME_STATE = LOSE
-            // PLAYER_STATE = DEAD
-        }
-    }
+}
 
-    void FortressInstance::render()
-    {
-        fortressFlag.Draw();
-        void LavaSurfaceInstance::render()
-        {
-            DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
-            DrawRectangleLinesEx(hbox, 2.0f, RED); // Draw hitbox
-        }
-
-        // void PlatformInstance::update(Mario& player)
-        // {
-        //     float deltaTime = GetFrameTime();
-
-        //     if ( pos.y > bottomPos.y ||  pos.y < topPos.y )
-        //     {
-        //         velocity.y *= -1;
-        //     }
-        //     pos.y += velocity.y * deltaTime;
-        //     bbox.y = pos.y;
-
-        // }
+void FortressInstance::render()
+{
+    fortressFlag.Draw();
+    DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+}

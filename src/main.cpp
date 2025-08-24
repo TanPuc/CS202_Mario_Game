@@ -11,7 +11,6 @@
 // #define MARIO_SKYBLUE (Color){68, 145, 190, 255}
 #define MARIO_SKYBLUE (Color{68, 145, 190, 225})
 // #define MARIO_SKYBLUE (Color){148, 148, 255, 255}
-#define MARIO_SKYBLACK (Color){0, 0, 0, 255}
 
 int main(void)
 {
@@ -26,26 +25,19 @@ int main(void)
 
 	float initialPosX = 0.0f;
 	Vector2 CameraPos = {0, 0};
-	Mario *player = new Mario({initialPosX, 0.0f});
-	Level level("./assets/Levels/world_1.1.txt");
+	// No exit key
+	SetExitKey(KEY_NULL);
 
-	while (!WindowShouldClose())
+	GameStateManager gsm;
+
+	SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
+
+	gsm.changeState(new MenuState(&gsm));
+
+	while (!WindowShouldClose() && !gsm.isExiting())
 	{
-		/// UPDATE GAME
-		player->HandleInput();
-		player->Update(level); // Handling player collision and movement
-		level.update(*player);
-
-		/// RENDER GAME
-		Camera2D camera = {0};
-		Vector2 playerPos = player->GetPosition();
-		if (playerPos.x > CameraPos.x)
-		{
-			CameraPos.x = playerPos.x;
-		}
-		camera.target = (Vector2){float(CameraPos.x + player->rect.width / 2), float(GetScreenHeight() / 2)};
-		camera.offset = (Vector2){float(GetScreenWidth() / 2), float(GetScreenHeight() / 2)};
-		camera.zoom = 1.0f;
+		SoundManager::getInstance().updateMusicStreams();
+		gsm.update();
 
 		BeginDrawing();
 		ClearBackground(MARIO_SKYBLUE);
@@ -62,24 +54,12 @@ int main(void)
 		DrawTexturePro(background, sourceRec, destRec, origin, 0.0f, WHITE);
 
 		gsm.draw();
-
-		ClearBackground(MARIO_SKYBLACK);
-		BeginMode2D(camera);
-
-		level->render();
-		player->Draw();
-
-		EndMode2D();
 		EndDrawing();
 	}
 	SoundManager::getInstance().unload();
 	ResourceManager::GetInstance().UnloadResources();
 
 	CloseAudioDevice();
-	if (player)
-		delete player;
-	if (level)
-		delete level;
 	CloseWindow();
 
 	return 0;

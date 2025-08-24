@@ -13,6 +13,7 @@
 #include "FireBallManager.h"
 #include "DGUI/ImageButton.h"
 #include "DCore/GameData.h"
+#include "GameCamera.h"
 #include "raylib.h"
 #include <vector>
 #include <memory>
@@ -33,7 +34,12 @@ private:
     int levelNum;
     Texture2D marioTexture, heartTexture, coinIcon;
 
+    // Death
+    bool pendingRespawn = false;
+    bool pendingGameOver = false;
+
     Vector2 cameraPos;
+    GameCamera &camera = GameCamera::getInstance();
 
     // PAUSE BUTTON
     std::unique_ptr<ImageButton> pauseButton;

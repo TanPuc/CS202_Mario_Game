@@ -1,10 +1,8 @@
 #include "Level.h"
 #include "Tile.h"
 
-Level_1_1::Level_1_1(const char* filePath)
-{
-    tileMap = 
-    { 
+Level::Level(const char* filePath){
+    tileMap = { 
         {1, std::make_shared<Tile>("./assets/Tiles/Overworld/pipe2.png")},
         {2, std::make_shared<Tile>("./assets/Tiles/Overworld/background.png")},
         {4, std::make_shared<Tile>("./assets/Tiles/Overworld/fortress.png")},
@@ -17,30 +15,22 @@ Level_1_1::Level_1_1(const char* filePath)
         {17, std::make_shared<Tile>("./assets/Tiles/Overworld/brick.png")}
     };
 
+    int temp = 0;
     std::ifstream fin;
     fin.open(filePath);
-    if ( fin.is_open() ) 
-    {
-        int grid_height, grid_width;
-        fin >> grid_height >> grid_width;
-        tileInstancesGrid.resize(grid_height, std::vector<std::shared_ptr<TileInstance>>(grid_width, nullptr));
-        int temp = 0;
-        for (int i = 0; i < grid_height; ++i)
-        {
-            for (int j = 0; j < grid_width; ++j) 
-            {
+    if ( fin.is_open() ){
+        for (int i = 0; i < GRID_HEIGHT; ++i)
+            for (int j = 0; j < GRID_WIDTH; ++j) {
                 fin >> temp;
                 Vector2 pos = Vector2{ j * TILE_SIZE * SCALE, i * TILE_SIZE * SCALE };
                 addTileInstance(pos, temp, i, j);
             }
-        }
+        fin.close();
     }
-    fin.close();
 }
 
-void Level_1_1::addTileInstance(Vector2& pos, int& tileID, int& x, int& y)
-{
-    const int t = 64.0f;
+void Level::addTileInstance(Vector2 pos, int tileID, int x, int y) {
+    float t = TILE_SIZE * SCALE;
     std::shared_ptr<TileInstance> tileInstance = nullptr;
     switch ( tileID ) {
         case 1: {
@@ -76,13 +66,14 @@ void Level_1_1::addTileInstance(Vector2& pos, int& tileID, int& x, int& y)
         case 17: tileInstance = std::make_shared<BrickInstance>(pos, tileMap[tileID]); break;
         default: break;
     }
-    if ( tileInstance ) tileInstancesGrid[x][y] = tileInstance; 
+    if ( tileInstance ) {
+        tileInstancesGrid[x][y] = tileInstance; 
+    }
 }
 
-void Level_1_1::update(Mario& player) 
-{
-    for ( int i = 0; i < getGridHeight(); i++ ) {
-        for ( int j = 0; j < getGridWidth(); j++ ) {
+void Level::update(Mario& player){
+    for ( int i = 0; i < GRID_HEIGHT; i++ ) {
+        for ( int j = 0; j < GRID_WIDTH; j++ ) {
             if ( tileInstancesGrid[i][j] ) {
                 tileInstancesGrid[i][j]->update(player);
                 if ( tileInstancesGrid[i][j]->getState() == STATE_BROKEN ) {
@@ -92,20 +83,19 @@ void Level_1_1::update(Mario& player)
             }
         }
     }
-    entityManager.update(player);
+    entityManager.update();
 }
 
-void Level_1_1::render() 
-{
-    for ( int i = 0; i < getGridHeight(); i++ ) {
-        for ( int j = 0; j < getGridWidth(); j++ ) {
+void Level::render() {
+    for ( int i = 0; i < GRID_HEIGHT; i++ ) {
+        for ( int j = 0; j < GRID_WIDTH; j++ ) {
             if ( tileInstancesGrid[i][j]) {
                 tileInstancesGrid[i][j]->render();
                 DrawRectangleLinesEx(tileInstancesGrid[i][j]->bbox, 2.0f, RED); // Debug: Draw bounding box
             }
         }
     }
-    entityManager.render(); 
+    entityManager.render();
 }
 
 void EntityManager::addBrickPieces(Vector2 position) {
@@ -119,20 +109,7 @@ void EntityManager::addBrickPieces(Vector2 position) {
     brickPieces.push_back(brickPiece4);
 }
 
-void EntityManager::initPlatform() 
-{
-    std::shared_ptr<Tile> temp = std::make_shared<Tile>("./assets/Tiles/Overworld/platform.png");
-    platforms.push_back(std::make_shared<PlatformInstance>(Vector2{54 * TILE_SIZE * SCALE, 5.5f * TILE_SIZE * SCALE}, 
-        Vector2{54 * TILE_SIZE * SCALE, 14 * TILE_SIZE * SCALE - temp->getTexture().height * SCALE}, temp, 0));
-    platforms.push_back(std::make_shared<PlatformInstance>(Vector2{86 * TILE_SIZE * SCALE, 8 * TILE_SIZE * SCALE}, 
-        Vector2{0 * TILE_SIZE * SCALE, 8 * TILE_SIZE * SCALE - temp->getTexture().height * SCALE}, temp, 1));
-    platforms.push_back(std::make_shared<PlatformInstance>(Vector2{94 * TILE_SIZE * SCALE, 9 * TILE_SIZE * SCALE}, 
-        Vector2{0 * TILE_SIZE * SCALE, 9 * TILE_SIZE * SCALE - temp->getTexture().height * SCALE}, temp, 1));
-    platforms.push_back(std::make_shared<PlatformInstance>(Vector2{131 * TILE_SIZE * SCALE, 6 * TILE_SIZE * SCALE},
-        Vector2{0 * TILE_SIZE * SCALE, 6 * TILE_SIZE * SCALE - temp->getTexture().height * SCALE}, temp, 1));
-}
-
-void EntityManager::update(Mario& player) {
+void EntityManager::update() {
     for ( int i = 0; i < brickPieces.size(); i++ ) {
         brickPieces[i]->Update();
         // Check for out-of-screen brick pieces to remove
@@ -143,209 +120,89 @@ void EntityManager::update(Mario& player) {
     for ( const auto& idx : toRemove ) 
         brickPieces.erase(brickPieces.begin() + idx);
     toRemove.clear();
-
-    for ( const auto& platform : platforms ) 
-    {
-        platform->update(player);
-    }
-
 }
 
 void EntityManager::render() {
-    for ( const auto& brickPiece : brickPieces ) 
-    {
+    for ( const auto& brickPiece : brickPieces ) {
         brickPiece->Draw();
     }
-    for ( const auto& platform : platforms ) 
-    {
-        platform->render();
-    }
 }
 
-Level_1_3::Level_1_3(const char* filePath) {
-    tileMap = 
-    {
-        { 2, std::make_shared<Tile>("./assets/Tiles/Overworld/bigfortress.png")},
-        { 3, std::make_shared<Tile>("./assets/Tiles/Overworld/fortress.png")},
-        { 4, std::make_shared<Tile>("./assets/Tiles/Overworld/ground.png")},
-        { 5, std::make_shared<Tile>("./assets/Tiles/Overworld/grass_left.png")},
-        { 6, std::make_shared<Tile>("./assets/Tiles/Overworld/grass_middle.png")},
-        { 7, std::make_shared<Tile>("./assets/Tiles/Overworld/grass_right.png")},
-        { 9, std::make_shared<Tile>("./assets/Tiles/Overworld/hardblock.png")},
-        { 10, std::make_shared<Tile>("./assets/Tiles/Overworld/goalpole.png")},
-        { 11, std::make_shared<Tile>("./assets/Tiles/Overworld/grassbrick.png")},
-        { 12, std::make_shared<Tile>("./assets/Tiles/Overworld/background_3.png")},
-        { 13, std::make_shared<Tile>("./assets/Tiles/Overworld/question.png")}
-    };
+// Level_2::Level_2(const char* filePath) {
+//     tileMap = 
+//     {
+//         { 2, std::make_shared<Tile>("./assets/Tiles/Overworld/bigfortress.png")},
+//         { 3, std::make_shared<Tile>("./assets/Tiles/Overworld/fortress.png")},
+//         { 4, std::make_shared<Tile>("./assets/Tiles/Overworld/ground.png")},
+//         { 5, std::make_shared<Tile>("./assets/Tiles/Overworld/grass_left.png")},
+//         { 6, std::make_shared<Tile>("./assets/Tiles/Overworld/grass_middle.png")},
+//         { 7, std::make_shared<Tile>("./assets/Tiles/Overworld/grass_right.png")},
+//         { 9, std::make_shared<Tile>("./assets/Tiles/Overworld/hardblock.png")},
+//         { 10, std::make_shared<Tile>("./assets/Tiles/Overworld/goalpole.png")},
+//         { 11, std::make_shared<Tile>("./assets/Tiles/Overworld/grassbrick.png")}
+//     };
 
-    int temp = 0;
-    std::ifstream fin;
-    fin.open(filePath);
-    if ( fin.is_open() )
-    {
-        int grid_height, grid_width;
-        fin >> grid_height >> grid_width;
-        tileInstancesGrid.resize(grid_height, std::vector<std::shared_ptr<TileInstance>>(grid_width, nullptr));
-        for (int i = 0; i < grid_height; ++i)
-        {
-            for (int j = 0; j < grid_width; ++j) 
-            {
-                fin >> temp;
-                Vector2 pos = Vector2{ j * TILE_SIZE * SCALE, i * TILE_SIZE * SCALE };
-                addTileInstance(pos, temp, i, j);
-            }
-        }
-        fin.close();
-    }
-    entityManager.initPlatform(); // Initialize platform instances
-}
+//     int temp = 0;
+//     std::ifstream fin;
+//     fin.open(filePath);
+//     if ( fin.is_open() )
+//     {
+//         for (int i = 0; i < GRID_HEIGHT; ++i)
+//         {
+//             for (int j = 0; j < GRID_WIDTH_2; ++j) 
+//             {
+//                 fin >> temp;
+//                 std::cout << temp << std::endl;
+//                 Vector2 pos = Vector2{ j * TILE_SIZE * SCALE, i * TILE_SIZE * SCALE };
+//                 addTileInstance(pos, temp, i, j);
+//             }
+//         }
+//         fin.close();
+//     }
+// }
 
-void Level_1_3::addTileInstance(Vector2& pos, int& tileID, int& x, int& y) 
-{
-    std::shared_ptr<TileInstance> tileInstance = nullptr;
-    switch(tileID) {
-        case 2: tileInstance = std::make_shared<BigFortressInstance>(pos, tileMap[tileID]); break;
-        case 3: tileInstance = std::make_shared<FortressInstance>(pos, tileMap[tileID]); break;
-        case 4: tileInstance = std::make_shared<GroundInstance>(pos, tileMap[tileID]); break;
-        case 5: tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]); break;
-        case 6: tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]); break;
-        case 7: tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]); break;
-        case 9: tileInstance = std::make_shared<HardblockInstance>(pos, tileMap[tileID]); break;
-        case 10: tileInstance = std::make_shared<GoalpoleInstance>(pos, tileMap[tileID]); break;
-        case 11: tileInstance = std::make_shared<GrassBrickInstance>(pos, tileMap[tileID]); break;
-        case 12: tileInstance = std::make_shared<BackgroundInstance>(pos, tileMap[tileID]); break;
-        case 13: tileInstance = std::make_shared<QuestionInstance>(pos, tileMap[tileID]); break;
-        default: break;
-    }
-    tileInstancesGrid[x][y] = tileInstance;
-}
+// void Level_2::addTileInstance(Vector2& pos, int& tileID, int& x, int& y) 
+// {
+//     std::shared_ptr<TileInstance> tileInstance = nullptr;
+//     switch(tileID) {
+//         case 2: tileInstance = std::make_shared<BigFortressInstance>(pos, tileMap[tileID]); break;
+//         case 3: tileInstance = std::make_shared<FortressInstance>(pos, tileMap[tileID]); break;
+//         case 4: tileInstance = std::make_shared<GroundInstance>(pos, tileMap[tileID]); break;
+//         case 5: tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]); break;
+//         case 6: tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]); break;
+//         case 7: tileInstance = std::make_shared<GrassInstance>(pos, tileMap[tileID]); break;
+//         case 9: tileInstance = std::make_shared<HardblockInstance>(pos, tileMap[tileID]); break;
+//         case 10: tileInstance = std::make_shared<GoalpoleInstance>(pos, tileMap[tileID]); break;
+//         case 11: tileInstance = std::make_shared<GrassBrickInstance>(pos, tileMap[tileID]); break;
+//         default: break;
+//     }
+//     tileInstancesGrid[x][y] = tileInstance;
+// }
 
-void Level_1_3::update(Mario& player)
-{
-    for ( int i = 0; i < getGridHeight(); i++ ) 
-    {
-        for ( int j = 0; j < getGridWidth(); j++ )
-        {
-            if ( tileInstancesGrid[i][j] )
-            {
-                tileInstancesGrid[i][j]->update(player);
-            }
-        }
-    }
-    entityManager.update(player);
-}
+// void Level_2::update(Mario& player)
+// {
+//     for ( int i = 0; i < GRID_HEIGHT; i++ ) 
+//     {
+//         for ( int j = 0; j < GRID_WIDTH_2; j++ )
+//         {
+//             if ( tileInstancesGrid[i][j] )
+//             {
+//                 tileInstancesGrid[i][j]->update(player);
+//             }
+//         }
+//     }
+// }
 
-void Level_1_3::render()
-{
-    for ( int i = 0; i < getGridHeight(); i++ )
-    {
-        for ( int j = 0; j < getGridWidth(); j++ )
-        {
-            if ( tileInstancesGrid[i][j] )
-            {
-                tileInstancesGrid[i][j]->render();
-            }
-        }
-    }
-    entityManager.render();
-}
-
-Level_1_4::Level_1_4(const char* filePath) 
-{
-    tileMap = 
-    {
-        { 3, std::make_shared<Tile>("./assets/Tiles/Castle/lava.png")},
-        { 4, std::make_shared<Tile>("./assets/Tiles/Castle/lava_surface.png")},
-        { 5, std::make_shared<Tile>("./assets/Tiles/Castle/axe.png")},
-        { 7, std::make_shared<Tile>("./assets/Tiles/Castle/question.png")},
-        { 8, std::make_shared<Tile>("./assets/Tiles/Castle/used_block.png")},
-        { 9, std::make_shared<Tile>("./assets/Tiles/Castle/brick.png")},
-        { 10, std::make_shared<Tile>("./assets/Tiles/Castle/bridge.png")},
-        { 11, std::make_shared<Tile>("./assets/Tiles/Castle/chain.png")}
-    };
-    
-    // for ( const auto& tile : tileMap )
-    // {
-    //     if ( tile.second == nullptr )
-    //     {
-    //         std::cout << "NULLPTR DETECTED" << std::endl;
-    //     }
-    //     else 
-    //     {
-    //         if ( tile.second->getTexture().id <= 0 )
-    //         {
-    //             std::cout << "INVALID TEXTURE DETECTED" << std::endl;
-    //         }
-    //     }
-    // }
-
-    int temp = 0;
-    std::ifstream fin;
-    fin.open(filePath);
-    if ( fin.is_open() )
-    {
-        int grid_height, grid_width;
-        fin >> grid_height >> grid_width;
-        tileInstancesGrid.resize(grid_height, std::vector<std::shared_ptr<TileInstance>>(grid_width, nullptr));
-        for (int i = 0; i < grid_height; ++i)
-        {
-            for (int j = 0; j < grid_width; ++j) 
-            {
-                fin >> temp;
-                Vector2 pos = Vector2{ j * TILE_SIZE * SCALE, i * TILE_SIZE * SCALE };
-                addTileInstance(pos, temp, i, j);
-            }
-        }
-        fin.close();
-    }
-
-}
- 
-
-void Level_1_4::addTileInstance(Vector2& pos, int& tileID, int& x, int& y)
-{
-    std::shared_ptr<TileInstance> tileInstance = nullptr;
-    switch ( tileID )
-    {
-        case 3: tileInstance = std::make_shared<TileInstance>(pos, tileMap[tileID]); break;
-        case 4: tileInstance = std::make_shared<LavaSurfaceInstance>(pos, tileMap[tileID]); break;
-        case 5: tileInstance = std::make_shared<TileInstance>(pos, tileMap[tileID]); break;
-        case 7: tileInstance = std::make_shared<QuestionInstance>(pos, tileMap[tileID]); break;
-        case 8: tileInstance = std::make_shared<UsedBlockInstance>(pos, tileMap[tileID]); break;
-        case 9: tileInstance = std::make_shared<TileInstance>(pos, tileMap[tileID]); break;
-        case 10: tileInstance = std::make_shared<TileInstance>(pos, tileMap[tileID]); break;
-        case 11: tileInstance = std::make_shared<TileInstance>(pos, tileMap[tileID]); break;
-        default: break;
-    }
-    tileInstancesGrid[x][y] = tileInstance;
-}
-
-void Level_1_4::update(Mario& player) 
-{
-    for ( int i = 0; i < getGridHeight(); i++ ) 
-    {
-        for ( int j = 0; j < getGridWidth(); j++ )
-        {
-            if ( tileInstancesGrid[i][j] )
-            {
-                tileInstancesGrid[i][j]->update(player);
-            }
-        }
-    }
-    entityManager.update(player);
-}
-
-void Level_1_4::render()
-{
-    for ( int i = 0; i < getGridHeight(); i++ )
-    {
-        for ( int j = 0; j < getGridWidth(); j++ )
-        {
-            if ( tileInstancesGrid[i][j] )
-            {
-                tileInstancesGrid[i][j]->render();
-            }
-        }
-    }
-    entityManager.render();
-}
+// void Level_2::render()
+// {
+//     for ( int i = 0; i < GRID_HEIGHT; i++ )
+//     {
+//         for ( int j = 0; j < GRID_WIDTH_2; j++ )
+//         {
+//             if ( tileInstancesGrid[i][j] )
+//             {
+//                 tileInstancesGrid[i][j]->render();
+//             }
+//         }
+//     }
+// }
