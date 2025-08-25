@@ -62,6 +62,7 @@ Character::Character(CHARACTER character, Vector2 position, std::function<void()
 void Character::Die()
 {
     Shrink();
+    isDead = true;
     lives--;
     currentState = std::make_unique<DeadState>();
     // Animation
@@ -167,7 +168,7 @@ void Character::HandleInput()
 
 void Character::Draw()
 {
-    DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);
+    // DrawRectangleLines(rect.x, rect.y, rect.width, rect.height, RED);
     if (isThrowing)
         throwingSprite->Draw(*this);
     else

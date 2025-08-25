@@ -67,8 +67,8 @@ void Enemy::Update(Level &level)
 void Enemy::Draw()
 {
 	m_sprite->draw(*this);
-	DrawRectangleLines(m_HurtBox.x, m_HurtBox.y, m_HurtBox.width, m_HurtBox.height, RED);
-	DrawRectangleLines(m_HitBox.x, m_HitBox.y, m_HitBox.width, m_HitBox.height, GREEN);
+	// DrawRectangleLines(m_HurtBox.x, m_HurtBox.y, m_HurtBox.width, m_HurtBox.height, RED);
+	// DrawRectangleLines(m_HitBox.x, m_HitBox.y, m_HitBox.width, m_HitBox.height, GREEN);
 }
 
 void Enemy::setMoveStrategy(IMoveStrategy *strategy)

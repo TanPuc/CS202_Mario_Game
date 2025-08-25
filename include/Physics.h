@@ -22,8 +22,12 @@ class Level;
 
 inline int active_buffer = 0; // Buffer for jump input
 inline int jump_time = 0;     // Time the jump button is held
-static const float MAX_VELOCITY = 300.0f;
-static const float JUMP_FORCE = 500.0f;
+static float MAX_VELOCITY = 300.0f;
+static float MAX_VELOCITY_MARIO = 300.0f;
+static float MAX_VELOCITY_LUIGI = 200.0f;
+static float JUMP_FORCE = 500.0f;
+static float JUMP_FORCE_MARIO = 400.0f;
+static float JUMP_FORCE_LUIGI = 800.0f;
 void SetJumpBuffer();
 void ResetJumpBuffer();
 bool ConsumeJumpBuffer();

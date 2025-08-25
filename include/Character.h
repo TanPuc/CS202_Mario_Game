@@ -42,6 +42,7 @@ public:
     CHARACTER_FORM targetForm;   // For transformation forward
     bool isTransforming = false;
     bool showingTarget = false;
+    bool isDead = false;
     float transformTimer;
     int frameIndex;
     void ChangeToTargetForm(CHARACTER_FORM form);

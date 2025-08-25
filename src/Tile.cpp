@@ -93,7 +93,7 @@ void BrickInstance::update(Character &player, ItemManager &itemManager, PlayingS
 void BrickInstance::render()
 {
     DrawTexturePro(tile->getTexture(), normal, dest, Vector2{0, 0}, 0.0f, WHITE);
-    DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox
+    // DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox
 }
 
 QuestionInstance::QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question)
@@ -185,7 +185,7 @@ void QuestionInstance::handleActivation(Character &player, ItemManager &itemMana
             }
             else
             {
-                // Spawn coins
+                itemManager.SpawnCoin(Vector2{pos.x + TILE_SIZE * SCALE / 4, pos.y - TILE_SIZE * SCALE}, Vector2{0.0f, -100.0f});
             }
         }
         break;
@@ -202,7 +202,7 @@ void QuestionInstance::update(Character &player, ItemManager &itemManager, Playi
 void QuestionInstance::render()
 {
     DrawTexturePro(tile->getTexture(), normal, dest, Vector2{0, 0}, 0.0f, WHITE);
-    DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox
+    // DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox
 }
 
 BackgroundInstance::BackgroundInstance(Vector2 pos, std::shared_ptr<Tile> background) : TileInstance(pos, background)
@@ -256,7 +256,7 @@ void GoalpoleInstance::update(Character &player, ItemManager &itemManager, Playi
 void GoalpoleInstance::render()
 {
     DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
-    DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox
+    // DrawRectangleLinesEx(hbox, 1.0f, RED); // Draw hitbox
     goalFlag.Draw();
 }
 
@@ -288,7 +288,7 @@ void LavaSurfaceInstance::update(Character &player, ItemManager &itemManager, Pl
 void LavaSurfaceInstance::render()
 {
     DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
-    DrawRectangleLinesEx(hbox, 2.0f, RED); // Draw hitbox
+    // DrawRectangleLinesEx(hbox, 2.0f, RED); // Draw hitbox
 }
 
 void HiddenBlockInstance::render()
@@ -297,7 +297,7 @@ void HiddenBlockInstance::render()
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
     }
-    DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw hitbox
+    // DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw hitbox
 }
 
 void HiddenBlockInstance::handleAnimation()
@@ -365,5 +365,15 @@ void HiddenBlockInstance::update(Character &player, ItemManager &itemManager, Pl
         // itemManager.SpawnCoin();
         spawnCoin = false;
         std::cout << "Coin spawned!" << std::endl;
+    }
+}
+
+void CoinInstance::update(Character &player, ItemManager &itemManager, PlayingState *ps)
+{
+    if (!CoinInitialized)
+    {
+        itemManager.SpawnCoinBlock(pos);
+        std::cout << "Coin spawned!" << std::endl;
+        CoinInitialized = true;
     }
 }

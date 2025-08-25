@@ -72,7 +72,7 @@ public:
     void Draw() 
     {
         sprite->Draw(*this);
-        DrawRectangleLinesEx(rect, 1.0f, RED); // Draw hurt box
+        // DrawRectangleLinesEx(rect, 1.0f, RED); // Draw hurt box
     }
 
     ~FireBarElement()

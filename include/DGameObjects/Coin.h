@@ -15,7 +15,8 @@ public:
     const float lifeTime = 1.0f;
     Collision collision;
 
-    Coin(Vector2 pos, Vector2 vel) : Item(pos, {COIN_SIZE, COIN_SIZE}){
+    Coin(Vector2 pos, Vector2 vel) : Item(pos, {COIN_SIZE, COIN_SIZE})
+    {
         this->velocity = vel;
     }
 
@@ -37,22 +38,24 @@ public:
 
     void Update(Level &level) override
     {
-        float gravity = 900.0f;
+        if (!isActive)
+            return;
+
         float dt = GetFrameTime();
-        ApplyGravity(velocity, gravity);
 
-        ResolveCollision(level);
+        timer += dt;
+        if (timer >= lifeTime)
+        {
+            timer = 0.0f;
+            isActive = false;
+            return;
+        }
 
-        position.x += velocity.x * dt;
         position.y += velocity.y * dt;
-        rect.x = position.x;
         rect.y = position.y;
     }
 
-    void ResolveCollision(Level &level)
-    {
-        collision.MushroomVsLevel(position, rect, velocity, level);
-    };
+    void ResolveCollision(Level &level) {};
 };
 
 #endif // COIN_H

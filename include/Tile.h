@@ -292,7 +292,7 @@ public:
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
-        DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw bounding box
+        // DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw bounding box
     }
     void update(Character &player, ItemManager &itemManager, PlayingState *ps) override
     {
@@ -333,15 +333,7 @@ public:
     void render() override
     {
     }
-    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override
-    {
-        if (!CoinInitialized)
-        {
-            // itemManager.SpawnCoin();
-            std::cout << "Coin spawned!" << std::endl;
-            CoinInitialized = true;
-        }
-    }
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
     bool isCoinInitialized() const
     {
         return CoinInitialized;

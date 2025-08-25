@@ -12,7 +12,7 @@ public:
     Texture2D spriteSheet;
     Animation *currentAnimation;
     STATE prevState;
-    int frameSpeed = 12; // 12fps
+    int frameSpeed = 400; // 400ms per frame
     int animationTimer = 0;
 
     CoinBlockSprite()

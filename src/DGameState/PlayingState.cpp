@@ -96,9 +96,9 @@ void PlayingState::enter()
     }
 
     // TILE
-    for (int i = 0; i < GRID_HEIGHT; i++)
+    for (int i = 0; i < levelManager->getCurrentLevel()->getGridHeight(); i++)
     {
-        for (int j = 0; j < GRID_WIDTH; j++)
+        for (int j = 0; j < levelManager->getCurrentLevel()->getGridWidth(); j++)
         {
             if (levelManager->getCurrentLevel()->tileInstancesGrid[i][j])
             {

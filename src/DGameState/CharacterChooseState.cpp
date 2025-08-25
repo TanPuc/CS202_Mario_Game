@@ -5,6 +5,7 @@
 #include "DGameState/GetReadyState.h"
 #include "DCore/ResourceManager.h"
 #include "DCore/SoundManager.h"
+#include "Physics.h"
 #include <iostream>
 
 CharacterChooseState::CharacterChooseState(GameStateManager *manager) : gsm(manager), guiManager(GUIManager::getInstance()) {}
@@ -54,10 +55,14 @@ void CharacterChooseState::enter()
     if (gsm->getContext().selectedCharacter == "luigi")
     {
         selectedCharacter = CHARACTER::LUIGI;
+        MAX_VELOCITY = MAX_VELOCITY_LUIGI;
+        JUMP_FORCE = JUMP_FORCE_LUIGI;
     }
     else
     {
         selectedCharacter = CHARACTER::MARIO;
+        MAX_VELOCITY = MAX_VELOCITY_MARIO;
+        JUMP_FORCE = JUMP_FORCE_MARIO;
     }
 
     marioHotspot = {533, 150, 127, 220};
