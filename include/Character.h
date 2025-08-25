@@ -8,6 +8,7 @@
 #include "GameSprite/ThrowingSprite.h"
 #include "Entity.h"
 #include "GlobalVariables.h"
+#include <functional>
 #include <raylib.h>
 
 #define HURT_BUFFER_THRESHOLD 1.0f

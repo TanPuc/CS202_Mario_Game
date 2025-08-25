@@ -26,7 +26,16 @@ void PlayingState::enter()
 {
     SoundManager::getInstance().stopMusic();
     SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
-    heartTexture = LoadTexture("assets/marioHead.png");
+    std::string headIcon;
+    if (gsm->getContext().selectedCharacter == "luigi")
+    {
+        headIcon = "assets/luigiHead.png";
+    }
+    else
+    {
+        headIcon = "assets/marioHead.png";
+    }
+    heartTexture = LoadTexture(headIcon.c_str());
     coinIcon = LoadTexture("assets/coinHUD.png");
     marioTexture = LoadTexture("assets/mario.png");
     pauseIconTexture = LoadTexture("assets/pause.png");
@@ -51,8 +60,15 @@ void PlayingState::enter()
     std::cout << "Loading map from: " << mapFilePath << std::endl;
     level = std::make_unique<Level>(mapFilePath.c_str(), this);
 
+    CHARACTER charToCreate = MARIO;
+    if (gsm->getContext().selectedCharacter == "luigi")
+    {
+        charToCreate = LUIGI;
+    }
+    
+
     player = std::make_unique<Character>(
-        MARIO,
+        charToCreate,
         currentData.playerPosition,
         [this]()
         {

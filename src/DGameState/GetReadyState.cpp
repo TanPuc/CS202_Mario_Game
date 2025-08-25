@@ -41,7 +41,16 @@ void GetReadyState::enter()
     }
     dataForNextLevel.lives = gsm->getContext().lives;
 
-    lifeIcon = LoadTexture("assets/marioHead.png");
+    std::string headIconPath;
+    if (gsm->getContext().selectedCharacter == "luigi")
+    {
+        headIconPath = "assets/luigiHead.png";
+    }
+    else
+    {
+        headIconPath = "assets/marioHead.png";
+    }
+    lifeIcon = LoadTexture(headIconPath.c_str());
     coinIcon = LoadTexture("assets/coinHUD.png");
     hudManager = std::make_unique<HUDManager>(lifeIcon, coinIcon);
     // hudManager->syncWithContext(gsm->getContext());

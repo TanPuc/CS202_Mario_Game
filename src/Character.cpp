@@ -24,10 +24,14 @@ Character::Character(Vector2 position, std::function<void()> onDeathAction)
       lives(3),
       coins(0),
       score(0),
-      onDeath(std::move(onDeathAction))
+      onDeath(std::move(onDeathAction)),
+      character(character)
 {
     rect = {position.x, position.y, CHARACTER_WIDTH, CHARACTER_HEIGHT};
-    sprite = std::make_unique<MarioSprite>();
+    if (character == LUIGI)
+        sprite = std::make_unique<LuigiSprite>();
+    else
+        sprite = std::make_unique<MarioSprite>();
     throwingSprite = std::make_unique<ThrowingSprite>();
     currentState = std::make_unique<IdleState>();
 }
