@@ -69,7 +69,7 @@ void EnemyManager::update()
 
 		if (!e->CheckIsDead() && !e->CheckHasNoHurtBox() && CheckCollisionRecs(e->getHurtBox(), m_player->rect))
 		{
-			std::cout << "Enemy collided with Mario" << std::endl;
+			// std::cout << "Enemy collided with Mario" << std::endl;
 			m_player->velocity.y = -500.0f;
 			e->setHitBox({0,0,e->getHitBox().width, e->getHitBox().height});
 		}

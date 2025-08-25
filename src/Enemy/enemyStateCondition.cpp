@@ -59,11 +59,18 @@ bool ConditionFireBall::evaluate(Enemy &e)
     return false;
 }
 
-ConditionStomped::ConditionStomped(const Character &player) : m_player(player) {}
+ConditionStomped::ConditionStomped(Character &player) : m_player(player) {}
 bool ConditionStomped::evaluate(Enemy &e)
 {
+
     if (CheckCollisionRecs(e.getHurtBox(), m_player.GetBounds()))
     {
+        if (!e.CheckIsDead() && !e.CheckHasNoHurtBox() && CheckCollisionRecs(e.getHurtBox(), m_player.rect))
+        {
+            // std::cout << "Enemy collided with Mario" << std::endl;
+            m_player.velocity.y = -200.0f;
+            e.setHitBox({0, 0, e.getHitBox().width, e.getHitBox().height});
+        }
         return true;
     }
     return false;

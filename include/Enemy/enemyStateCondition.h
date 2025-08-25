@@ -51,11 +51,11 @@ private:
 class ConditionStomped : public EnemyStateCondition
 {
 public:
-	ConditionStomped(const Character &player);
+	ConditionStomped(Character &player);
 	bool evaluate(Enemy &e) override;
 
 private:
-	const Character &m_player;
+	Character &m_player;
 };
 class ConditionKicked : public EnemyStateCondition
 {

@@ -108,8 +108,8 @@ void PlayingState::enter()
     }
 
     // Items // For testing
-    itemManager->SpawnCoinBlock(Vector2{200, 100});
-    itemManager->SpawnCoin(Vector2{200, 100}, Vector2{0, -100.0f});
+    // itemManager->SpawnCoinBlock(Vector2{200, 100});
+    // itemManager->SpawnCoin(Vector2{200, 100}, Vector2{0, -100.0f});
 
     // player->lives = gsm->getContext().lives;
     // player->coins = 0;
