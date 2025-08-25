@@ -2,7 +2,7 @@
 
 #include "DCore/GameState.h"
 #include "DGameState/GameStateManager.h"
-#include "Character.h"
+#include "Mario.h"
 #include "Level.h"
 #include "DHUD/HUDManager.h"
 #include "DGameObjects/PlayerAdapter.h"
@@ -13,7 +13,6 @@
 #include "FireBallManager.h"
 #include "DGUI/ImageButton.h"
 #include "DCore/GameData.h"
-#include "GameCamera.h"
 #include "Enemy/enemyManager.h"
 #include "raylib.h"
 #include <vector>
@@ -25,7 +24,7 @@ private:
     GameStateManager *gsm;
     ItemManager itemManager;
     FireBallManager fireBallManager;
-    std::unique_ptr<Character> player;
+    std::unique_ptr<Mario> player;
     std::unique_ptr<Level> level;
     std::unique_ptr<PlayerAdapter> playerAdapter;
     std::unique_ptr<HUDManager> hudManager;
@@ -37,12 +36,7 @@ private:
     int levelNum;
     Texture2D marioTexture, heartTexture, coinIcon;
 
-    // Death
-    bool pendingRespawn = false;
-    bool pendingGameOver = false;
-
     Vector2 cameraPos;
-    GameCamera &camera = GameCamera::getInstance();
 
     // PAUSE BUTTON
     std::unique_ptr<ImageButton> pauseButton;

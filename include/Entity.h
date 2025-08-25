@@ -2,10 +2,8 @@
 #define ENTITY_H
 
 #include <raylib.h>
-#include <iostream>
 #include "GlobalVariables.h"
 #include "Collision.h"
-#include "Physics.h"
 
 // Forward declaration
 class Level;

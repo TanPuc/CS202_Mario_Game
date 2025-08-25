@@ -1,10 +1,8 @@
 #pragma once
 
-#include "GlobalVariables.h"
-
 class GameState
 {
-public:
+    public:
     virtual ~GameState() = default;
 
     virtual void enter() = 0;

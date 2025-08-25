@@ -13,7 +13,7 @@ public:
     Animation *currentAnimation;
     STATE prevState;
     int frameSpeed = 6; // 6fps
-    int animationTimer = 0;
+
     MushroomSprite()
         : mushroomAnimation({{0, 8, 16, 16}}),
           prevState(STATE_IDLE)
@@ -37,6 +37,7 @@ public:
             return;
         }
 
+        static int animationTimer = 0;
         animationTimer++;
 
         if (animationTimer >= frameSpeed)

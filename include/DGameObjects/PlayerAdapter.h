@@ -1,23 +1,22 @@
 #pragma once
 #include "DCore/ObserverSubject.h"
-#include "Character.h"
+#include "Mario.h"
 
 class PlayerAdapter : public Subject
 {
-private:
-    Character *character_target;
+    private: 
+        Mario* mario_target;
 
-    int last_lives;
-    long long last_score;
-    int last_coins;
+        int last_lives;
+        long long last_score;
+        int last_coins;
+    public:
+        PlayerAdapter(Mario* target);
+        ~PlayerAdapter();
 
-public:
-    PlayerAdapter(Character *target);
-    ~PlayerAdapter();
-
-    void init();
-    void update();
-    int getLives() const;
-    int getCoins() const;
-    long long getScore() const;
+        void init();
+        void update();
+        int getLives() const;
+        int getCoins() const;
+        long long getScore() const;
 };

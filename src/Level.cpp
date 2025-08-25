@@ -21,7 +21,6 @@ Level_1_1::Level_1_1(const char *filePath)
             {17, std::make_shared<Tile>("./assets/Tiles/Overworld/brick.png")}
         };
 
-    int temp = 0;
     std::ifstream fin;
     fin.open(filePath);
     if (fin.is_open())
@@ -38,8 +37,9 @@ Level_1_1::Level_1_1(const char *filePath)
                 Vector2 pos = Vector2{j * TILE_SIZE * SCALE, i * TILE_SIZE * SCALE};
                 addTileInstance(pos, temp, i, j);
             }
-        fin.close();
+        }
     }
+    fin.close();
 }
 
 void Level_1_1::addTileInstance(Vector2 &pos, int &tileID, int &x, int &y)
@@ -140,7 +140,7 @@ void Level_1_1::update(Mario &player, ItemManager& itemManager)
             }
         }
     }
-    entityManager.update();
+    entityManager.update(player);
 }
 
 void Level_1_1::render()

@@ -8,7 +8,7 @@ void FireBallManager::Update(Level &level)
 {
     for (auto it = fireballs.begin(); it != fireballs.end();)
     {
-        if (!(*it)->isActive)
+        if ((*it)->isOverLifeTime())
         {
             std::cout << "Fireball expired!" << std::endl;
             it = fireballs.erase(it); // Remove expired fireball

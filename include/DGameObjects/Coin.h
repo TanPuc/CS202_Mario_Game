@@ -1,7 +1,11 @@
 #ifndef COIN_H
 #define COIN_H
 
+#include <raylib.h>
+#include <iostream>
 #include "Item.h"
+#include "Collision.h"
+#include "GlobalVariables.h"
 #include "GameSprite/CoinSprite.h"
 #include "DCore/SoundManager.h"
 
@@ -22,14 +26,14 @@ public:
         coinSprite.Draw(*this);
     }
 
-    void Collect(Character &character) override
+    void Collect(Mario &mario) override
     {
         if (isCollected)
             return;
         isCollected = true;
-        character.coins++;
-        character.score += 100; // Increment score by 100 for collecting a coin
-        std::cout << "Coin collected! Total coins: " << character.coins << std::endl;
+        mario.coins++;
+        mario.score += 100; // Increment score by 100 for collecting a coin
+        std::cout << "Coin collected! Total coins: " << mario.coins << std::endl;
         SoundManager::getInstance().playSound(SoundEffect::COIN);
     }
 

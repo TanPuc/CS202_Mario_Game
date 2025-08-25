@@ -7,7 +7,6 @@ class FireBallSprite : public Sprite
 {
 private:
     Animation fireballAnimation;
-    Animation explosionAnimation;
 
 public:
     Texture2D spriteSheet;
@@ -15,18 +14,15 @@ public:
     STATE prevState;
     int frameSpeed = 6; // 6fps
     int animationTimer = 0;
-
+    
     FireBallSprite()
-        : fireballAnimation({{180, 54, 8, 8},
-                             {180 + 8 + FRAME_PADDING, 54, 8, 8},
-                             {180 + (8 + FRAME_PADDING) * 2, 54, 8, 8},
-                             {180 + (8 + FRAME_PADDING) * 3, 54, 8, 8}}),
-          explosionAnimation({{180, 64, 16, 16},
-                              {180 + 16 + FRAME_PADDING, 64, 16, 16},
-                              {180 + (16 + FRAME_PADDING) * 2, 64, 16, 16}}),
+        : fireballAnimation({{247, 302 + 4, 8, 8},
+                             {247 + 8 + FRAME_PADDING, 302 + 4, 8, 8},
+                             {247 + (8 + FRAME_PADDING) * 2, 302 + 4, 8, 8},
+                             {247 + (8 + FRAME_PADDING) * 3, 302 + 4, 8, 8}}),
           prevState(STATE_IDLE)
     {
-        spriteSheet = LoadTexture("assets/SMB_Items_And_Objects.png");
+        spriteSheet = LoadTexture("assets/SMB3_Mario_Luigi_SpriteSheet.png");
         currentAnimation = &fireballAnimation;
     }
 
@@ -35,20 +31,7 @@ public:
         UnloadTexture(spriteSheet);
     }
 
-    void SwitchAnimation(STATE state_) override
-    {
-        switch (state_)
-        {
-        case STATE_IDLE:
-            currentAnimation = &fireballAnimation;
-            break;
-        case STATE_DEAD:
-            currentAnimation = &explosionAnimation;
-            break;
-        default:
-            break;
-        }
-    }
+    void SwitchAnimation(STATE state_) override {}
 
     void Draw(Entity &entity) override
     {

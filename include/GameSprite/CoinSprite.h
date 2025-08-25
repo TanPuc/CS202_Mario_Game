@@ -13,7 +13,6 @@ public:
     Animation *currentAnimation;
     STATE prevState;
     int frameSpeed = 6; // 6fps
-    int animationTimer = 0;
 
     CoinSprite()
         : coinAnimation({{180, 36, 8, 16},
@@ -41,6 +40,7 @@ public:
             return;
         }
 
+        static int animationTimer = 0;
         animationTimer++;
 
         if (animationTimer >= frameSpeed)

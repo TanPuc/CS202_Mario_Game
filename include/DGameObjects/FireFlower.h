@@ -43,12 +43,13 @@ public:
         collision.MushroomVsLevel(position, rect, velocity, level);
     };
 
-    void Collect(Character &character) override
+    void Collect(Mario &mario) override
     {
-        if (isCollected || character.form != CHARACTER_FORM::BIG)
+        if (isCollected || mario.form != MARIO_FORM::BIG)
             return;
-        // character.ChangeToFire();
-        character.ChangeForm(CHARACTER_FORM::FIRE);
+        mario.ChangeToFire();
+        mario.position.y = position.y - 32.0f;
+        mario.rect.y = mario.position.y;
         isCollected = true;
         // Handle collision with other entities if needed
     }

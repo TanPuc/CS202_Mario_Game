@@ -13,8 +13,7 @@
 #define FIREBALL_THRESHOLD 3  // Number of maximum fireballs
 #define FIREBALL_LIFETIME 120 // Fireball lifetime in frames
 
-#define FIREBALL_SIZE 8 * SCALE
-#define FIREBALL_EXPLOSION_TIME_THRESHOLD 18 // 18 fps
+// #define FIREBALL_SIZE 8 * SCALE
 
 class FireBall : public Entity
 {
@@ -22,8 +21,7 @@ public:
     Rectangle bounceBox = {0, 0, FIREBALL_SIZE / 2, FIREBALL_SIZE / 2}; // Fireball bounding for bouncing
     Rectangle hitBox = {0, 0, FIREBALL_SIZE / 2, FIREBALL_SIZE / 2};    // Fireball hitbox for enemy collision
     Sprite *sprite;
-    int explosionTimer = 0;
-    bool isExploding = false;
+    int timer = 0;
     Collision collision;
 
     FireBall(Vector2 position, DIRECTION direction) : Entity(position, Vector2({FIREBALL_SIZE, FIREBALL_SIZE}))
@@ -47,15 +45,7 @@ public:
 
     void Update(Level &level) override
     {
-        if (isExploding)
-        {
-            explosionTimer++;
-            if (explosionTimer >= FIREBALL_EXPLOSION_TIME_THRESHOLD)
-            {
-                isActive = false; // Deactivate fireball after explosion animation
-            }
-            return; // Skip movement and collision when exploding
-        }
+        timer++;
         float dt = GetFrameTime();
 
         ApplyGravity(velocity, 800.0f);
@@ -72,6 +62,11 @@ public:
         hitBox.y = position.y + rect.height / 2 - hitBox.height / 2;
     }
 
+    bool isOverLifeTime() const
+    {
+        return timer > FIREBALL_LIFETIME;
+    }
+
     void Draw() override
     {
         //     DrawRectangleLines(bounceBox.x, bounceBox.y, bounceBox.width, bounceBox.height, RED); // Draw bounding box for debugging
@@ -82,19 +77,13 @@ public:
 
     void ResolveCollision(Level &level)
     {
-        if (collision.IsCollideWithLevelVertically(position, rect, velocity, level))
-        {
-            velocity.y = -150.f;
-        }
-
-        if (collision.IsCollideWithLevelHorizontally(position, rect, velocity, level))
-        {
-            isExploding = true;
-            sprite->SwitchAnimation(STATE_DEAD);
-        }
-
-        collision.CheckCollision(position, rect, velocity, level);
-        collision.ResolveCollision(position, rect, velocity, level);
+        // if (collision.IsCollideWithLevel(position, rect, velocity, level))
+        // {
+        //     velocity.y = -150.f;
+        // }
+        // collision.CheckCollision(position, rect, velocity, level);
+        // collision.ResolveCollision(position, rect, velocity, level);
+        collision.FireBallVsLevel(position, rect, velocity, level);
     }
 };
 
