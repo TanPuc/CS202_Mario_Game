@@ -56,6 +56,11 @@ void EnemyManager::update() {
 	for (auto e : m_enemies)
 	{
 		e->Update(*m_level);
+		if (CheckCollisionRecs(e->getHitBox(), m_player->rect))
+		{
+			m_player->Die();
+			cout << "gay" << endl;
+		}
 	}
 }
 
@@ -189,7 +194,7 @@ Enemy* EnemyManager::spawnKoopa(Vector2 pos)
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new WalkState(WALKSPEED, GRAVITY))
+		.addState(new WalkOnLedgeState(WALKSPEED, GRAVITY))
 		.addState(new ShellState(GRAVITY))
 		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY, *m_player))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
@@ -276,7 +281,7 @@ Enemy* EnemyManager::spawnParatroopa(Vector2 pos)
 
 	fsm = builder
 		.addState(new HopState(HOPPOWER, WALKSPEED, GRAVITY))
-		.addState(new WalkState(WALKSPEED, GRAVITY))
+		.addState(new WalkOnLedgeState(WALKSPEED, GRAVITY))
 		.addState(new ShellState(GRAVITY))
 		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY, *m_player))
 		.addState(new DeadStateStomp())
@@ -509,10 +514,12 @@ Enemy* EnemyManager::spawnFireBall(Vector2 pos)
 	case 1:
 	{
 		random.x = 2.0f;
-		random.y = TILEFACTOR * 32;
+		random.y = SCALE * 32;
 	}
 	case 2:
+	{
 		break;
+	}
 	default:
 		break;
 	}

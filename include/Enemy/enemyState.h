@@ -41,9 +41,16 @@ public:
 	void update(Enemy& enemy) override;
 	StateType getName() const override;
 private:
-	float			m_speed;
-	float			m_gravity;
+	float	m_speed;
+	float	m_gravity;
 	Mario*	m_mario;
+};
+class WalkOnLedgeState : public WalkState
+{
+public:
+	using WalkState::WalkState;
+	void enter(Enemy& e) override;
+private:
 };
 class SwimState : public EnemyState
 {
