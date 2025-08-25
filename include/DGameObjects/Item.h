@@ -6,8 +6,6 @@
 #include "GlobalVariables.h"
 #include "Collision.h"
 
-class Mario;
-
 class Item : public Entity
 {
 public:

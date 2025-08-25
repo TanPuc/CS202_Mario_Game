@@ -357,8 +357,9 @@ void Character::Update(Level &level)
 
 void Character::ResolveCollision(Level &level)
 {
-    collision.CheckCollision(position, rect, velocity, level);
-    collision.ResolveCollision(position, rect, velocity, level);
+    // collision.CheckCollision(position, rect, velocity, level);
+    // collision.ResolveCollision(position, rect, velocity, level);
+    collision.PlayerVsLevel(position, rect, velocity, level);
 }
 
 DIRECTION Character::GetDirection() const

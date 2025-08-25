@@ -5,6 +5,7 @@
 #include "DGameState/PauseState.h"
 #include "DCore/SoundManager.h"
 #include "DCore/SaveManager.h"
+#include "LevelManager.h"
 #include "ItemManager.h"
 
 PlayingState::PlayingState(GameStateManager *manager, const GameData &initialData) : gsm(manager), currentData(initialData)
@@ -24,8 +25,11 @@ void PlayingState::setGoalpole(std::shared_ptr<GoalpoleInstance> gp)
 
 void PlayingState::enter()
 {
+    enemyAsset::Load();
+
     SoundManager::getInstance().stopMusic();
     SoundManager::getInstance().playMusic(MusicTrack::MAIN_THEME);
+
     heartTexture = LoadTexture("assets/marioHead.png");
     coinIcon = LoadTexture("assets/coinHUD.png");
     marioTexture = LoadTexture("assets/mario.png");
@@ -40,17 +44,18 @@ void PlayingState::enter()
             gsm->pushState(new PauseState(gsm, worldNum, levelNum));
         });
 
-    // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
-    // player = std::make_unique<Mario>(START_POS_WORLD_1_1);
-
+    // Level
+    levelManager = std::make_unique<LevelManager>();
     this->worldNum = currentData.worldNum;
     this->levelNum = currentData.levelNum;
     // level = std::make_unique<Level>("./assets/Levels/world_1.1.txt", this);
-    std::string mapFilePath = "./assets/Levels/world_" + std::to_string(this->worldNum) + "." + std::to_string(this->levelNum) + ".txt";
+    // std::string mapFilePath = "./assets/Levels/world_" + std::to_string(this->worldNum) + "." + std::to_string(this->levelNum) + ".txt";
 
-    std::cout << "Loading map from: " << mapFilePath << std::endl;
-    level = std::make_unique<Level>(mapFilePath.c_str(), this);
+    // std::cout << "Loading map from: " << mapFilePath << std::endl;
+    // level = std::make_unique<Level>(mapFilePath.c_str(), this);
+    levelManager->LoadLevel(this->levelNum, this);
 
+    // Player
     player = std::make_unique<Character>(
         MARIO,
         currentData.playerPosition,
@@ -76,27 +81,21 @@ void PlayingState::enter()
         player->rect.height = CHARACTER_HEIGHT * 2.0f;
     }
 
-    worldNum = currentData.worldNum;
-    levelNum = currentData.levelNum;
-
     // TILE
     for (int i = 0; i < GRID_HEIGHT; i++)
     {
         for (int j = 0; j < GRID_WIDTH; j++)
         {
-            if (level->tileInstancesGrid[i][j])
+            if (levelManager->getCurrentLevel()->tileInstancesGrid[i][j])
             {
-                level->tileInstancesGrid[i][j]->state = currentData.tileStates[i][j];
+                levelManager->getCurrentLevel()->tileInstancesGrid[i][j]->state = currentData.tileStates[i][j];
             }
         }
     }
 
-    // Items
-    // entities.push_back(std::make_unique<Coin>(Vector2{200, 100}));
-    // entities.push_back(std::make_unique<Mushroom>(Vector2{300, 100}));
-    itemManager->AddItem(std::make_unique<Coin>(Vector2{200, 100}));
-    itemManager->AddItem(std::make_unique<Mushroom>(Vector2{300, 100}));
-    itemManager->AddItem(std::make_unique<FireFlower>(Vector2{400, 100}));
+    // Items // For testing
+    itemManager->SpawnCoinBlock(Vector2{200, 100});
+    itemManager->SpawnCoin(Vector2{200, 100}, Vector2{0, -100.0f});
 
     // player->lives = gsm->getContext().lives;
     // player->coins = 0;
@@ -114,6 +113,23 @@ void PlayingState::enter()
     hudManager->resetTime(currentData.timeRemaining);
     hudManager->updateWorld(worldNum, levelNum);
     playerAdapter->update();
+
+    enemyManager = new EnemyManager(player.get(), levelManager->getCurrentLevel(), fireBallManager.GetFireBalls());
+
+    // Vector2 posEnemy = { 300, 100 };
+    // enemyManager->spawnEnemyAt(EnemyType::goopa, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::beezybettle, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::blooper, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::spiny, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::paratroopa, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::hammer, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::piranhaplant, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::hammerbro, posEnemy);
+    // enemyManager->spawnEnemyAt(EnemyType::bowser, posEnemy);
 }
 
 void PlayingState::exit()
@@ -122,17 +138,17 @@ void PlayingState::exit()
     UnloadTexture(heartTexture);
     UnloadTexture(coinIcon);
     UnloadTexture(pauseIconTexture);
+    enemyAsset::Unload();
 }
 
 void PlayingState::updatePlaying()
 {
-    // if we press escape, we want to pause the game
+    // Pausing
     if (IsKeyPressed(KEY_ESCAPE))
     {
         gsm->pushState(new PauseState(gsm, worldNum, levelNum));
         return;
     }
-
     pauseButton->update();
     if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && pauseButton->contains(GetMousePosition()))
     {
@@ -140,26 +156,25 @@ void PlayingState::updatePlaying()
         return;
     }
 
+    // Updating current data
     currentData.playerPosition = player->position;
     currentData.lives = player->lives;
     currentData.coins = player->coins;
     currentData.score = player->score;
     currentData.timeRemaining = hudManager->getTime();
 
-    player->Update(*level); // Handling player collision and movement
+    player->Update(*levelManager->getCurrentLevel()); // Handling player collision and movement
     Vector2 playerPos = player->GetPosition();
 
-    if (player->GetBounds().x > cameraPos.x)
+    if (player->GetBounds().x > cameraPos.x) // Keep camera follow player
     {
         cameraPos.x = player->GetBounds().x;
     }
 
-    if (player->GetForm() == FIRE)
+    if (player->GetForm() == FIRE) // Shoot Fireball
     {
         if ((IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT)) && !player->isThrowing)
         {
-            // player->ShootFireBall();
-            std::cout << "Switched animation into throwing\n";
             player->ShootFireBall();
             Vector2 playerHandPos = player->GetPosition();
             playerHandPos.x += player->GetBounds().width;
@@ -168,39 +183,11 @@ void PlayingState::updatePlaying()
         }
     }
 
-    if (IsKeyPressed(KEY_F))
-    {
-        Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
-        player->Slide(playerGridCoords);
-        // player->ChangeForm(SMALL);
-    }
-
-    if (player->GetBounds().x > cameraPos.x)
-    {
-        cameraPos.x = player->GetBounds().x;
-    }
-
-    level->update(*player, this);
-
-    // for (int i=0; i<GRID_HEIGHT; i++)
+    // if (IsKeyPressed(KEY_F)) // Debug
     // {
-    //     for (int j=0; j<GRID_WIDTH; j++)
-    //     {
-    //         if (auto goalpole= std::dynamic_pointer_cast<GoalpoleInstance>(level->tileInstancesGrid[i][j]))
-    //         {
-    //             if (goalpole->isLevelFinished)
-    //             {
-    //                 // Save checkpoint
-    //                 gsm->getContext().checkpointWorld = worldNum;
-    //                 gsm->getContext().checkpointLevel = levelNum;
-
-    //                 // Transition to GetReadyState
-    //                 saveGameData();
-    //                 gsm->changeState(new GetReadyState(gsm, worldNum, levelNum, GetReadyReason::NEW_GAME));
-    //                 return;
-    //             }
-    //         }
-    //     }
+    //     Vector2 playerGridCoords = {playerPos.x / (TILE_SIZE * SCALE), playerPos.y / (TILE_SIZE * SCALE)};
+    //     player->Slide(playerGridCoords);
+    //     // player->ChangeForm(SMALL);
     // }
 
     if (auto gp_ptr = goalpole.lock())
@@ -246,28 +233,34 @@ void PlayingState::updatePlaying()
         }
     }
 
+    // LEVEL
+    levelManager->Update(*player, *itemManager, this);
+    levelManager->SpawnEnemy(player->GetPosition().x + float(GetScreenWidth() / 2), *enemyManager); // May access nullptr and cause error
+
     playerAdapter->update();
     hudManager->updateTime();
 
-    fireBallManager.Update(*level);
-    itemManager->UpdateItems(*level, *player, this); // Update all entities
-
-    // Check for player horizontal bounding
+    // Check for player horizontal camera bounding
     if (playerPos.x < cameraPos.x - (camera.bounds.width / 2) || playerPos.x + player->GetBounds().width > cameraPos.x + camera.bounds.width)
     {
         player->SetPosition({cameraPos.x - (camera.bounds.width / 2), playerPos.y});
         player->velocity.x = 0; // Stop horizontal movement
     }
 
-    // Handle Mario's death
-    if (playerPos.y >= cameraPos.y + camera.bounds.height && pendingRespawn == false)
-    {
-        player->Die();
-    }
+    fireBallManager.Update(*levelManager->getCurrentLevel());
+
+    itemManager.get()->UpdateItems(*levelManager->getCurrentLevel(), *player, this);
+
+    // Enemy
+    enemyManager->update();
 
     // Check for game over
     // Time and lives
-    if (hudManager->getTime() <= 0)
+    if (playerPos.y >= cameraPos.y + camera.bounds.height && pendingRespawn == false) // Out Of Bound
+    {
+        player->Die();
+    }
+    if (hudManager->getTime() <= 0 && pendingRespawn == false)
     {
         player->Die();
     }
@@ -280,26 +273,6 @@ void PlayingState::updatePlaying()
     if (pendingRespawn)
     {
         gsm->changeState(new GetReadyState(gsm, worldNum, levelNum, GetReadyReason::RESPAWN));
-        return;
-    }
-
-    // Check for game over
-    // Time and lives
-    if (hudManager->getTime() <= 0)
-    {
-        player->Die();
-        gsm->getContext().lives = player->lives;
-
-        // gsm->getContext().scoreBeforeRespawn = player->score;
-
-        if (player->lives <= 0)
-        {
-            gsm->changeState(new GameOverState(gsm));
-        }
-        else
-        {
-            gsm->changeState(new GetReadyState(gsm, worldNum, levelNum, GetReadyReason::RESPAWN));
-        }
         return;
     }
 
@@ -387,8 +360,9 @@ void PlayingState::draw()
     camera.setTarget(cameraPos);
 
     BeginMode2D(camera.camera);
-    level->render();
+    levelManager->Draw();
     player->Draw();
+    enemyManager->draw();
 
     fireBallManager.Draw();
     itemManager->DrawItems();
@@ -416,9 +390,9 @@ void PlayingState::saveGameData()
     {
         for (int j = 0; j < GRID_WIDTH; j++)
         {
-            if (level->tileInstancesGrid[i][j])
+            if (levelManager->getCurrentLevel()->tileInstancesGrid[i][j])
             {
-                currentData.tileStates[i][j] = level->tileInstancesGrid[i][j]->state;
+                currentData.tileStates[i][j] = levelManager->getCurrentLevel()->tileInstancesGrid[i][j]->state;
             }
         }
     }

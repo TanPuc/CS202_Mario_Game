@@ -40,7 +40,6 @@ public:
             std::cerr << "Current animation is not set!" << std::endl;
             return;
         }
-
         animationTimer++;
 
         if (animationTimer >= frameSpeed)

@@ -5,7 +5,7 @@
 #include "GameSprite/CoinSprite.h"
 #include "DCore/SoundManager.h"
 
-#define COIN_SIZE 16
+#define COIN_SIZE 16 * SCALE
 
 class Coin : public Item
 {
@@ -15,7 +15,9 @@ public:
     const float lifeTime = 1.0f;
     Collision collision;
 
-    Coin(Vector2 pos) : Item(pos, {COIN_SIZE * SCALE, COIN_SIZE * SCALE}) {}
+    Coin(Vector2 pos, Vector2 vel) : Item(pos, {COIN_SIZE, COIN_SIZE}){
+        this->velocity = vel;
+    }
 
     void Draw() override
     {
@@ -45,17 +47,11 @@ public:
         position.y += velocity.y * dt;
         rect.x = position.x;
         rect.y = position.y;
-
-        // if (timer >= lifeTime)
-        // {
-        //     isActive = false;
-        // }
     }
 
     void ResolveCollision(Level &level)
     {
-        collision.CheckCollision(position, rect, velocity, level);
-        collision.ResolveCollision(position, rect, velocity, level);
+        collision.MushroomVsLevel(position, rect, velocity, level);
     };
 };
 

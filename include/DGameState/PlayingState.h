@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Enemy/enemyManager.h"
 #include "DCore/GameState.h"
 #include "DGameState/GameStateManager.h"
 #include "Character.h"
-#include "Level.h"
+// #include "Level.h"
 #include "DHUD/HUDManager.h"
 #include "DGameObjects/PlayerAdapter.h"
-#include "DGameObjects/Coin.h"
+#include "DGameObjects/CoinBlock.h"
 #include "DGameObjects/Mushroom.h"
 #include "DGameObjects/FireFlower.h"
 #include "ItemManager.h"
@@ -26,12 +27,12 @@ enum class PlaySubState
     LEVEL_CLEAR_ANIMATION,
     SCORE_TALLY
 };
-class Mario;
-class Level;
+// class Level;
 class PlayerAdapter;
 class HUDManager;
 class ImageButton;
 class ItemManager;
+class LevelManager;
 
 class PlayingState : public GameState
 {
@@ -40,11 +41,14 @@ private:
     std::unique_ptr<ItemManager> itemManager;
     FireBallManager fireBallManager;
     std::unique_ptr<Character> player;
-    std::unique_ptr<Level> level;
+    // std::unique_ptr<Level> level;
     std::unique_ptr<PlayerAdapter> playerAdapter;
     std::unique_ptr<HUDManager> hudManager;
     std::weak_ptr<GoalpoleInstance> goalpole;
     std::vector<FloatingScore> floatingScores;
+    std::unique_ptr<LevelManager> levelManager;
+    EnemyManager* enemyManager;
+
     // std::vector<std::unique_ptr<Entity>> entities; // This counts for items and enemies
 
     int worldNum;

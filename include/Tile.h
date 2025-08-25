@@ -15,14 +15,15 @@
 #include "Collision.h"
 #include "BrickPieces.h"
 #include "GoalFlag.h"
-#include "FortressFlag.h"
 
-#define HITBOX_WIDTH TILE_SIZE *SCALE / 2 // 16px
-#define HITBOX_HEIGHT 6 * SCALE / 2       // 6px
+// To prevent activating 2 blocks simultaneously when Character is in the middle of 2 tiles
+#define HITBOX_WIDTH 1 * SCALE / 2  // 1px
+#define HITBOX_HEIGHT 1 * SCALE / 2 // 1px
 
 // Forward declaration
 class Character;
 class PlayingState;
+class ItemManager;
 
 float Q_rsqrt(float number);
 bool compare(const std::pair<std::array<int, 2>, float> &a, const std::pair<std::array<int, 2>, float> &b);
@@ -33,10 +34,6 @@ private:
     Texture2D texture;
 
 public:
-    // Tile()
-    // {
-    //     texture = LoadTexture("./assets/Tiles/Overworld.png");
-    // }
     Tile(const char *filePath)
     {
         texture = LoadTexture(filePath);
@@ -90,15 +87,20 @@ public:
     TileState getState() const { return state; }
 
     TileInstance(Vector2 pos, std::shared_ptr<Tile> tile);
-    virtual void update(Character &player, PlayingState *ps) = 0;
-    virtual void render() = 0;
+    virtual void update(Character &player, ItemManager &itemManager, PlayingState *ps) {}
+    virtual void render()
+    {
+        if (tile)
+        {
+            DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+        }
+    }
 };
 
 class DummyInstance : public TileInstance
 {
 public:
     DummyInstance(Vector2 pos) : TileInstance(pos, nullptr) {}
-    void update(Character &player, PlayingState *ps) override {}
     void render() override {}
 };
 
@@ -107,7 +109,6 @@ class GroundInstance : public TileInstance
 public:
     GroundInstance(Vector2 pos, std::shared_ptr<Tile> ground)
         : TileInstance(pos, ground) {}
-    void update(Character &player, PlayingState *ps) override {}
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
@@ -122,14 +123,20 @@ private:
 
     Q_B_A q_b_a;
     Rectangle hbox;
+    Rectangle originalBBox;
 
     void handleAnimation();
     void handleBreaking(Character &player);
 
 public:
     BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick);
-    void update(Character &player, PlayingState *ps) override;
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
     void render() override;
+
+    Rectangle &getOriginalBBox()
+    {
+        return originalBBox;
+    }
 };
 
 class QuestionInstance : public TileInstance
@@ -139,26 +146,42 @@ private:
     const int frameSpeed = 12;
     const int frameSpeed2 = 36;
 
-    Rectangle hbox;
+    bool hasFlower = false;
+    bool hasMushroom = false;
+
     Q_B_A q_b_a;
+    Rectangle hbox;
+    Rectangle originalBBox;
 
     Rectangle normal = {0, 0, 16, 16};
     Rectangle dest;
 
     void handleAnimation();
-    void handleActivation(Character &player, PlayingState *ps);
+    void handleActivation(Character &player, ItemManager &itemManager, PlayingState *ps);
 
 public:
     QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question);
-    void update(Character &player, PlayingState *ps) override;
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
     void render() override;
+
+    void setHasFlower()
+    {
+        hasFlower = true;
+    }
+    void setHasMushroom()
+    {
+        hasMushroom = true;
+    }
+    Rectangle &getOriginalBBox()
+    {
+        return originalBBox;
+    }
 };
 
 class BackgroundInstance : public TileInstance
 {
 public:
     BackgroundInstance(Vector2 pos, std::shared_ptr<Tile> background);
-    void update(Character &player, PlayingState *ps) override {}
     void render() override;
 };
 
@@ -167,7 +190,6 @@ class PipeInstance1 : public TileInstance
 public:
     PipeInstance1(Vector2 pos, std::shared_ptr<Tile> pipe)
         : TileInstance(pos, pipe) {}
-    void update(Character &player, PlayingState *ps) override {}
     void render() override;
 };
 class PipeInstance2 : public TileInstance
@@ -175,7 +197,6 @@ class PipeInstance2 : public TileInstance
 public:
     PipeInstance2(Vector2 pos, std::shared_ptr<Tile> pipe)
         : TileInstance(pos, pipe) {}
-    void update(Character &player, PlayingState *ps) override {}
     void render() override;
 };
 class PipeInstance3 : public TileInstance
@@ -183,7 +204,6 @@ class PipeInstance3 : public TileInstance
 public:
     PipeInstance3(Vector2 pos, std::shared_ptr<Tile> pipe)
         : TileInstance(pos, pipe) {}
-    void update(Character &player, PlayingState *ps) override {}
     void render() override;
 };
 
@@ -191,7 +211,6 @@ class HardblockInstance : public TileInstance
 {
 public:
     HardblockInstance(Vector2 pos, std::shared_ptr<Tile> hardblock);
-    void update(Character &player, PlayingState *ps) override;
     void render() override;
 };
 
@@ -204,7 +223,7 @@ private:
 public:
     bool isLevelFinished = false; // To indicate if the level is finished
     GoalpoleInstance(Vector2 pos, std::shared_ptr<Tile> goalpole);
-    void update(Character &player, PlayingState *ps) override;
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
     void render() override;
 };
 
@@ -212,16 +231,13 @@ class FortressInstance : public TileInstance
 {
 private:
     Rectangle hbox;
-    FortressFlag fortressFlag;
 
 public:
     FortressInstance(Vector2 pos, std::shared_ptr<Tile> fortress)
-        : TileInstance(pos, fortress), fortressFlag({pos.x + fortress->getTexture().width * SCALE / 2 - TILE_SIZE * SCALE / 2, pos.y + 16.0f})
+        : TileInstance(pos, fortress)
     {
         bbox = Rectangle{0, 0, 0, 0};
     }
-    void update(Character &player, PlayingState *ps) override;
-    void render() override;
 };
 
 class BigFortressInstance : public TileInstance
@@ -232,7 +248,6 @@ public:
     {
         bbox = Rectangle{0, 0, 0, 0};
     }
-    void update(Character &player, PlayingState *ps) override {}
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
@@ -244,7 +259,6 @@ class GrassInstance : public TileInstance
 public:
     GrassInstance(Vector2 pos, std::shared_ptr<Tile> grass)
         : TileInstance(pos, grass) {}
-    void update(Character &player, PlayingState *ps) override {}
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
@@ -255,12 +269,112 @@ class GrassBrickInstance : public TileInstance
 {
 public:
     GrassBrickInstance(Vector2 pos, std::shared_ptr<Tile> grass)
-        : TileInstance(pos, grass) {}
-    void update(Character &player, PlayingState *ps) override {}
+        : TileInstance(pos, grass)
+    {
+        bbox = Rectangle{0, 0, 0, 0};
+    }
     void render() override
     {
         DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
     }
 };
+
+class PlatformInstance : public TileInstance
+{
+public:
+    std::shared_ptr<Vector2> topPos = nullptr;
+    std::shared_ptr<Vector2> bottomPos = nullptr;
+    std::shared_ptr<Vector2> leftPos = nullptr;
+    std::shared_ptr<Vector2> rightPos = nullptr;
+    // Vector2 velocity = {0.0f, 100.0f};
+
+    PlatformInstance(Vector2 pos_1, Vector2 pos_2, std::shared_ptr<Tile> platform, int direction);
+    void render() override
+    {
+        DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+        DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw bounding box
+    }
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override
+    {
+    }
+};
+
+class LavaSurfaceInstance : public TileInstance
+{
+public:
+    Rectangle hbox;
+    LavaSurfaceInstance(Vector2 pos, std::shared_ptr<Tile> lavaSurface)
+        : TileInstance(pos, lavaSurface), hbox({pos.x, pos.y + 0.25f * TILE_SIZE * SCALE, TILE_SIZE * SCALE, 0.75f * TILE_SIZE * SCALE})
+    {
+        bbox = Rectangle{0, 0, 0, 0};
+    }
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
+    void render() override;
+};
+
+class UsedBlockInstance : public TileInstance
+{
+public:
+    UsedBlockInstance(Vector2 pos, std::shared_ptr<Tile> usedBlock)
+        : TileInstance(pos, usedBlock) {}
+};
+
+// THIS INSTANCE IS MEANT TO INITIALIZE COINS
+// IT WILL BE REMOVED AFTER
+class CoinInstance : public TileInstance
+{
+public:
+    bool CoinInitialized = false;
+    CoinInstance(Vector2 pos)
+        : TileInstance(pos, nullptr)
+    {
+        bbox = Rectangle{0, 0, 0, 0};
+    }
+    void render() override
+    {
+    }
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override
+    {
+        if (!CoinInitialized)
+        {
+            // itemManager.SpawnCoin();
+            std::cout << "Coin spawned!" << std::endl;
+            CoinInitialized = true;
+        }
+    }
+    bool isCoinInitialized() const
+    {
+        return CoinInitialized;
+    }
+};
+
+class HiddenBlockInstance : public TileInstance
+{
+public:
+    float original_bbox_y;
+    Q_B_A q_b_a;
+    bool spawnCoin = false;
+
+    HiddenBlockInstance(Vector2 pos, std::shared_ptr<Tile> hiddenBlock)
+        : TileInstance(pos, hiddenBlock), q_b_a(pos.y)
+    {
+        original_bbox_y = bbox.y;
+    }
+
+    void handleAnimation();
+    void handleHiddenBBox(Character &player);
+    // void handleActivation(Character &player, ItemManager &itemManager);
+    void handleActivation();
+
+    void render() override;
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
+};
+
+// class AxeInstance : public TileInstance
+// {
+// public:
+//     Rectangle hitbox;
+
+// }
 
 #endif // TILE_H

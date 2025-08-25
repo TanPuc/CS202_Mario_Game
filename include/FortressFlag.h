@@ -12,7 +12,8 @@ private:
     Texture2D texture;
 
 public:
-    FortressFlag(Vector2 position) : Entity(position, {32, 32}), destPos({position.x, position.y - 76.0f})
+    FortressFlag() {}
+    FortressFlag(Vector2 position) : Entity(position, {32, 32}), destPos({position.x, position.y - 1.1875f * TILE_SIZE * SCALE })
     {
         texture = LoadTexture("./assets/Tiles/Overworld/fortressflag.png");
     }
