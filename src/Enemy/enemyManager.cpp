@@ -11,6 +11,10 @@
 #include "Enemy/enemyEnum.h"
 
 #include "FireBallManager.h"
+#include "Character.h"
+
+#include "algorithm"
+using namespace std;
 
 const float WALKSPEED = 50;
 const float SHELLSPEED = 200;
@@ -18,8 +22,7 @@ const float RANDOMSPEED = 80;
 const float RANDOMBOUNDARY = 150;
 const float DISTANCESPEED = 500;
 const float CHASESPEED = 300;
-// const float SWIMSPEED = 20;
-const float SWIMSPEED = 0;
+const float SWIMSPEED = 20;
 const float FREQUENCY = 5;
 const float MAGNITUDE = 20;
 const float PIRANHAMAGNITUDE = 100;
@@ -38,8 +41,8 @@ const float FIREBALLCOOLDOWNTIMER = 3;
 const float JUMPCOOLDOWNTIMER = 2;
 const float SPINYCOOLDOWNTIMER = 2;
 
-EnemyManager::EnemyManager(Character* Character, Level* level, const vector<shared_ptr<FireBall>>& fireballs) :
-	m_player(Character), m_level(level), m_fireballs(fireballs) {}
+EnemyManager::EnemyManager(Character* mario, Level* level, const vector<shared_ptr<FireBall>>& fireballs) :
+	m_player(mario), m_level(level), m_fireballs(fireballs) {}
 void EnemyManager::update() {
 	for (auto e : m_toSpawn)
 	{
@@ -57,7 +60,26 @@ void EnemyManager::update() {
 	for (auto e : m_enemies)
 	{
 		e->Update(*m_level);
+		if (!e->CheckIsDead() && CheckCollisionRecs(e->getHitBox(), m_player->rect))
+		{
+			cout << "gay";
+			m_player->Die();
+		}
+
+		if (!e->CheckIsDead() && !e->CheckHasNoHurtBox() && CheckCollisionRecs(e->getHurtBox(), m_player->rect))
+		{
+			m_player->velocity.y = -200;
+		}
 	}
+}
+
+void EnemyManager::addShell(Enemy* e)
+{
+	m_shells.push_back(e);
+}
+void EnemyManager::removeShell(Enemy* e)
+{
+	m_shells.erase(remove(m_shells.begin(), m_shells.end(), e), m_shells.end());
 }
 
 void EnemyManager::draw()
@@ -171,6 +193,7 @@ Enemy* EnemyManager::spawnGooba(Vector2 pos)
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Walk, new ConditionStomped(*m_player), StateType::DeadStomp)
 		.addTransition(StateType::Walk, new ConditionFireBall(m_fireballs), StateType::DeadElse)
+		.addTransition(StateType::Walk, new ConditionShell(m_shells), StateType::DeadElse)
 		.setInitialState(StateType::Walk)
 		.build();
 
@@ -190,14 +213,15 @@ Enemy* EnemyManager::spawnKoopa(Vector2 pos)
 	FSMBuilder			builder;
 
 	fsm = builder
-		.addState(new WalkState(WALKSPEED, GRAVITY))
+		.addState(new WalkOnLedgeState(WALKSPEED, GRAVITY))
 		.addState(new ShellState(GRAVITY))
-		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY, *m_player))
+		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY, *m_player, this))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Walk, new ConditionStomped(*m_player), StateType::Shell)
 		.addTransition(StateType::Shell, new ConditionKicked(*m_player), StateType::ShellSlide)
 		.addTransition(StateType::ShellSlide, new ConditionStomped(*m_player), StateType::Shell)
 		.addTransition(StateType::Walk, new ConditionFireBall(m_fireballs), StateType::DeadElse)
+		.addTransition(StateType::Walk, new ConditionShell(m_shells), StateType::DeadElse)
 		.setInitialState(StateType::Walk)
 		.build();
 
@@ -224,6 +248,7 @@ Enemy* EnemyManager::spawnSpiny(Vector2 pos)
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Fall, new ConditionGrounded(*m_level), StateType::Walk)
 		.addTransition(StateType::Walk, new ConditionFireBall(m_fireballs), StateType::DeadElse)
+		.addTransition(StateType::Walk, new ConditionShell(m_shells), StateType::DeadElse)
 		.setInitialState(StateType::Fall)
 		.build();
 
@@ -237,6 +262,7 @@ Enemy* EnemyManager::spawnSpiny(Vector2 pos)
 	Vector2 size = { 16,16 };
 
 	Enemy* emmy = new Enemy(EnemyType::spiny, fsm, sprite, size, pos);
+	emmy->SwitchNoHurtBox();
 	return emmy;
 }
 
@@ -277,9 +303,9 @@ Enemy* EnemyManager::spawnParatroopa(Vector2 pos)
 
 	fsm = builder
 		.addState(new HopState(HOPPOWER, WALKSPEED, GRAVITY))
-		.addState(new WalkState(WALKSPEED, GRAVITY))
+		.addState(new WalkOnLedgeState(WALKSPEED, GRAVITY))
 		.addState(new ShellState(GRAVITY))
-		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY, *m_player))
+		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY, *m_player, this))
 		.addState(new DeadStateStomp())
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Hop, new ConditionStomped(*m_player), StateType::Walk)
@@ -287,7 +313,9 @@ Enemy* EnemyManager::spawnParatroopa(Vector2 pos)
 		.addTransition(StateType::Shell, new ConditionKicked(*m_player), StateType::ShellSlide)
 		.addTransition(StateType::ShellSlide, new ConditionStomped(*m_player), StateType::Shell)
 		.addTransition(StateType::Hop, new ConditionFireBall(m_fireballs), StateType::DeadElse)
+		.addTransition(StateType::Walk, new ConditionShell(m_shells), StateType::DeadElse)
 		.addTransition(StateType::Walk, new ConditionFireBall(m_fireballs), StateType::DeadElse)
+		.addTransition(StateType::Shell, new ConditionShell(m_shells), StateType::DeadElse)
 		.addTransition(StateType::Shell, new ConditionFireBall(m_fireballs), StateType::DeadElse)
 		.addTransition(StateType::ShellSlide, new ConditionFireBall(m_fireballs), StateType::DeadElse)
 		.setInitialState(StateType::Hop)
@@ -314,12 +342,14 @@ Enemy* EnemyManager::spawnBeezyBettle(Vector2 pos)
 	fsm = builder
 		.addState(new WalkState(WALKSPEED, GRAVITY))
 		.addState(new ShellState(GRAVITY))
-		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY, *m_player))
+		.addState(new ShellSlidingState(SHELLSPEED, GRAVITY, *m_player, this))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Walk, new ConditionStomped(*m_player), StateType::Shell)
 		.addTransition(StateType::Shell, new ConditionKicked(*m_player), StateType::ShellSlide)
 		.addTransition(StateType::ShellSlide, new ConditionStomped(*m_player), StateType::Shell)
 		.addTransition(StateType::Walk, new ConditionFireBall(m_fireballs), StateType::DeadElse)
+		.addTransition(StateType::Walk, new ConditionShell(m_shells), StateType::DeadElse)
+		.addTransition(StateType::Shell, new ConditionShell(m_shells), StateType::DeadElse)
 		.setInitialState(StateType::Walk)
 		.build();
 
@@ -392,12 +422,14 @@ Enemy* EnemyManager::spawnHammerBro(Vector2 pos)
 
 	fsm = builder
 		.addState(new PatrolState(RANDOMBOUNDARY, WALKSPEED, HOPPOWER, JUMPCOOLDOWNTIMER))
-		.addState(new AttackState(this, new AttackStrat(this, EnemyType::hammer)))
+		.addState(new AttackState(this, new AttackStrat(this, EnemyType::hammer, 3)))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Patrol, new ConditionTimer(HAMMERCOOLDOWNTIMER), StateType::Attack)
 		.addTransition(StateType::Attack, new ConditionTimer(ATTACKTIMER), StateType::Patrol)
 		.addTransition(StateType::Patrol, new ConditionFireBall(m_fireballs), StateType::DeadElse)
+		.addTransition(StateType::Patrol, new ConditionShell(m_shells), StateType::DeadElse)
 		.addTransition(StateType::Attack, new ConditionFireBall(m_fireballs), StateType::DeadElse)
+		.addTransition(StateType::Attack, new ConditionShell(m_shells), StateType::DeadElse)
 		.setInitialState(StateType::Attack)
 		.build();
 
@@ -436,6 +468,7 @@ Enemy* EnemyManager::spawnHammer(Vector2 pos)
 
 	Enemy* hemmer = new Enemy(EnemyType::hammer, fsm, sprite, size, pos);
 	hemmer->setVelocityY(-HOPPOWER);
+	hemmer->SwitchNoHurtBox();
 	return hemmer;
 }
 Enemy* EnemyManager::spawnPiranhaPlant(Vector2 pos)
@@ -459,6 +492,7 @@ Enemy* EnemyManager::spawnPiranhaPlant(Vector2 pos)
 	Vector2 size = { 16,24 };
 
 	Enemy* hemmer = new Enemy(EnemyType::piranhaplant, fsm, sprite, size, pos);
+	hemmer->SwitchNoHitBox();
 	return hemmer;
 }
 
@@ -510,10 +544,12 @@ Enemy* EnemyManager::spawnFireBall(Vector2 pos)
 	case 1:
 	{
 		random.x = 2.0f;
-		random.y = TILEFACTOR * 32;
+		random.y = SCALE * 32;
 	}
 	case 2:
+	{
 		break;
+	}
 	default:
 		break;
 	}
@@ -535,5 +571,6 @@ Enemy* EnemyManager::spawnFireBall(Vector2 pos)
 	Vector2 size = { 24,8 };
 
 	Enemy* hemmer = new Enemy(EnemyType::fireball, fsm, sprite, size, pos);
+	hemmer->SwitchNoHurtBox();
 	return hemmer;
 }

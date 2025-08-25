@@ -41,9 +41,16 @@ public:
 	void update(Enemy& enemy) override;
 	StateType getName() const override;
 private:
-	float			m_speed;
-	float			m_gravity;
+	float	m_speed;
+	float	m_gravity;
 	Character*	m_mario;
+};
+class WalkOnLedgeState : public WalkState
+{
+public:
+	using WalkState::WalkState;
+	void enter(Enemy& e) override;
+private:
 };
 class SwimState : public EnemyState
 {
@@ -160,11 +167,12 @@ public:
 	StateType getName() const override;
 private:
 	float m_gravity;
+	
 };
 class ShellSlidingState : public EnemyState
 {
 public:
-	ShellSlidingState(float speed, float gravity, const Character& );
+	ShellSlidingState(float speed, float gravity, const Character&, EnemyManager* manager);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
@@ -172,6 +180,7 @@ public:
 private:
 	float m_speed, m_gravity;
 	const Character& m_player;
+	EnemyManager* m_manager;
 };
 
 class ChaseState : public EnemyState

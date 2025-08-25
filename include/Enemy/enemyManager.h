@@ -4,8 +4,8 @@
 #include <memory>
 #include "raylib.h"
 
-#include "Enemy/enemyEnum.h"
-#include "Enemy/enemyAsset.h"
+#include "enemyEnum.h"
+#include "enemyAsset.h"
 
 using namespace std;
 
@@ -20,6 +20,8 @@ class EnemyManager
 public:
 	EnemyManager(Character* player, Level* level, const vector<shared_ptr<FireBall>>& fireballs);
 	void spawnEnemyAt(EnemyType type, Vector2 position);
+	void addShell(Enemy* e);
+	void removeShell(Enemy* e);
 	void update();
 	void draw();
 private:

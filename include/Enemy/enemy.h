@@ -18,26 +18,26 @@ class CollisionMap;
 
 class SpriteEnemy;
 
-//context
+// context
 class Enemy : public Entity
 {
 public:
-	Enemy(EnemyType type, FiniteStateMachine* fsm, SpriteEnemy* sprite, Vector2 size, Vector2 positon);
+	Enemy(EnemyType type, FiniteStateMachine *fsm, SpriteEnemy *sprite, Vector2 size, Vector2 positon);
 	~Enemy();
 
 	bool isActive() const;
 	void UnActivate();
 
-	void setMoveStrategy(IMoveStrategy*);
-	void setCollisionMap(CollisionMap*);
-	//void setAttackStrategy(IAttackStrategy*);
-	//void setCollisionPlayerStrategy(ICollisionPlayerStrategy*);
-	//void setState(EnemyState*);
+	void setMoveStrategy(IMoveStrategy *);
+	void setCollisionMap(CollisionMap *);
+	// void setAttackStrategy(IAttackStrategy*);
+	// void setCollisionPlayerStrategy(ICollisionPlayerStrategy*);
+	// void setState(EnemyState*);
 
 	void setSprite(StateType);
 
 	void handleInput(int input);
-	void Update(Level& level) override;
+	void Update(Level &level) override;
 	void Draw() override;
 
 	void destroy();
@@ -46,51 +46,61 @@ public:
 	void setVelocityY(float Y);
 	void addVelocityX(float X);
 	void addVelocityY(float Y);
-	Vector2& getVelocity();
+	Vector2 &getVelocity();
 
 	int getDirectionSelf() const;
 	void reverseDirection();
 
 	void setPosition(Vector2);
 
-	Rectangle& getHurtBox();
-	void setHurtBox();
+	Rectangle &getHurtBox();
+	void setHurtBox(Rectangle rec);
 
-	Rectangle& getHitBox();
-	void setHitBox();
+	Rectangle &getHitBox();
+	void setHitBox(Rectangle rec);
+
+	Rectangle &getSpriteBox();
+	void setSpriteBox(Rectangle rec);
 
 	void setIsCollidedMap();
 	bool getIsCollidedMap();
 
+	void SwitchNoHurtBox();
+	bool CheckHasNoHurtBox();
+	void SwitchNoHitBox();
+	bool CheckHasNoHitBox();
+	void isDead();
+	bool CheckIsDead();
+
 private:
-	EnemyType					m_Type					;
-	bool						m_isActive				= true;
+	EnemyType m_Type;
+	bool m_isActive = true;
+	bool m_hasNoHurtBox = false;
+	bool m_hasNoHitBox = false;
+	bool m_isDead = false;
 
-	Vector2						m_velocity				= { 0,0 };
-	int							m_initialDirection		= 1;
+	Vector2 m_velocity = {0, 0};
+	int m_initialDirection = 1;
 
-	Rectangle					m_HitBox				= {};  //bound is ratio
-	Rectangle					m_HurtBox				= {};
+	Rectangle m_HitBox = {}; // bound is ratio
+	Rectangle m_HurtBox = {};
+	Rectangle m_SpriteBox = {};
 
-	FiniteStateMachine*			m_FSM					= nullptr;
-	
-	IMoveStrategy*				m_MoveStrategy			= nullptr;
-	CollisionMap*				m_CollideMap			= nullptr;
+	FiniteStateMachine *m_FSM = nullptr;
 
-	SpriteEnemy*				m_sprite				= nullptr;
+	IMoveStrategy *m_MoveStrategy = nullptr;
+	CollisionMap *m_CollideMap = nullptr;
 
-	bool						m_isCollidedMap			= false;
+	SpriteEnemy *m_sprite = nullptr;
 
+	bool m_isCollidedMap = false;
 
-	//IAttackStrategy*			m_AttackStrategy		= nullptr;
-	//ICollisionMapStrategy*	m_CollideMapStrategy	= nullptr;
-	//Vector2					m_position				= { 0,0 };
-	//EnemyState*				m_State					= nullptr;
-	//ICollisionPlayerStrategy*	m_CollidePlayerStrategy = nullptr;
+	// IAttackStrategy*			m_AttackStrategy		= nullptr;
+	// ICollisionMapStrategy*	m_CollideMapStrategy	= nullptr;
+	// Vector2					m_position				= { 0,0 };
+	// EnemyState*				m_State					= nullptr;
+	// ICollisionPlayerStrategy*	m_CollidePlayerStrategy = nullptr;
 };
-
-
-
 
 /*
 class Monster : public Enemy

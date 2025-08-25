@@ -7,8 +7,8 @@
 using namespace std;
 
 SpriteEnemy::SpriteEnemy() = default;
-SpriteEnemy::SpriteEnemy(Character* Character) :
-    m_Character(Character) {}
+SpriteEnemy::SpriteEnemy(Character* mario) :
+    m_mario(mario) {}
 SpriteEnemy::~SpriteEnemy() = default;
 
 
@@ -19,22 +19,22 @@ void SpriteEnemy::draw(Enemy& e)
     Rectangle src = sprite.m_FrameRect;
     src.x = sprite.m_offset + src.width * m_CurrentFrame;
 
-    if (!m_Character) src.width *= e.getDirectionSelf() ;
+    if (!m_mario) src.width *= e.getDirectionSelf() ;
     else
     {
-        if (e.GetPosition().x + e.getHurtBox().width / 2 <= m_Character->position.x + m_Character->rect.width / 2)
+        if (e.GetPosition().x + e.getSpriteBox().width / 2 <= m_mario->position.x + m_mario->rect.width / 2)
         {
             src.width *= -1;
         }
     }
 
-    Rectangle dest = e.getHurtBox();
+    Rectangle dest = e.getSpriteBox();
     dest.width *= m_OffSet.width;
     dest.height *= m_OffSet.height;
-    dest.y += m_OffSet.y * TILEFACTOR;
-    dest.x += m_OffSet.x * TILEFACTOR;
-    dest.width -= m_OffSet.x * TILEFACTOR;
-    dest.height -= m_OffSet.y * TILEFACTOR;
+    dest.y += m_OffSet.y * SCALE;
+    dest.x += m_OffSet.x * SCALE;
+    dest.width -= m_OffSet.x * SCALE;
+    dest.height -= m_OffSet.y * SCALE;
 
     DrawTexturePro(sprite.m_Texture, src, dest, { 0,0 }, 0, WHITE);
 }

@@ -20,7 +20,7 @@ int main(void)
 	SetTargetFPS(60);
 
 	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
-	// ResourceManager::GetInstance().LoadBackgroundTexture("assets/menu_background.png");
+	ResourceManager::GetInstance().LoadBackgroundTexture("assets/menu_background.png");
 	SoundManager::getInstance().load();
 
 	float initialPosX = 0.0f;
@@ -37,7 +37,7 @@ int main(void)
 		SoundManager::getInstance().updateMusicStreams();
 		gsm.update();
 
-		// ClearBackground(SKYBLUE);
+		ClearBackground(SKYBLUE);
 		Texture2D background = ResourceManager::GetInstance().GetBackgroundTexture();
 		float bgAspectRatio = (float)background.width / (float)background.height;
 		float bgScreenWidth = (float)GetScreenWidth() + 15;

@@ -22,7 +22,7 @@ class MoveStrategyBasic : public IMoveStrategy
 {
 public:
 	MoveStrategyBasic(int,Enemy&);
-	MoveStrategyBasic(int, Enemy&, const Character& Character);
+	MoveStrategyBasic(int, Enemy&, const Character& mario);
 	void move(Enemy& e) override;
 
 private:

@@ -4,38 +4,34 @@
 
 #include "raylib.h"
 
-ConditionTimer::ConditionTimer(float timer) :
-	threshold(timer) {}
-bool ConditionTimer::evaluate(Enemy& e)
+ConditionTimer::ConditionTimer(float timer) : threshold(timer) {}
+bool ConditionTimer::evaluate(Enemy &e)
 {
-	timer += GetFrameTime();
+    timer += GetFrameTime();
 
-	if (timer >= threshold)
-	{
-		timer = 0;
-		return true;
-	}
-	return false;
+    if (timer >= threshold)
+    {
+        timer = 0;
+        return true;
+    }
+    return false;
 }
 
-ConditionShell::ConditionShell(const vector<Enemy*>& shells) :
-	m_shells(shells) {}
-bool ConditionShell::evaluate(Enemy& e)
+ConditionShell::ConditionShell(const vector<Enemy *> &shells) : m_shells(shells) {}
+bool ConditionShell::evaluate(Enemy &e)
 {
-	for (auto& s : m_shells)
-	{
-        if (s == &e) continue;
+    for (auto &s : m_shells)
+    {
+        if (s == &e)
+            continue;
         return (CheckCollisionRecs(s->getHitBox(), e.getHurtBox()));
-	}
-	return false;
+    }
+    return false;
 }
 
-
-ConditionFireBall::ConditionFireBall(const vector<shared_ptr<FireBall>>& balls) :
-	m_fireballs(balls) {}
-ConditionFireBall::ConditionFireBall(const vector<shared_ptr<FireBall>>& balls, int amount) :
-    m_fireballs(balls) , m_amount(amount) {}
-bool ConditionFireBall::evaluate(Enemy& e)
+ConditionFireBall::ConditionFireBall(const vector<shared_ptr<FireBall>> &balls) : m_fireballs(balls) {}
+ConditionFireBall::ConditionFireBall(const vector<shared_ptr<FireBall>> &balls, int amount) : m_fireballs(balls), m_amount(amount) {}
+bool ConditionFireBall::evaluate(Enemy &e)
 {
     if (isImmune)
     {
@@ -48,7 +44,7 @@ bool ConditionFireBall::evaluate(Enemy& e)
     }
     else
     {
-        for (auto& s : m_fireballs)
+        for (auto &s : m_fireballs)
         {
             if (CheckCollisionRecs(e.getHurtBox(), s->GetBounds()))
             {
@@ -59,24 +55,22 @@ bool ConditionFireBall::evaluate(Enemy& e)
             }
         }
     }
-  
-	return false;
+
+    return false;
 }
 
-ConditionStomped::ConditionStomped(const Character& player) :
-	m_player(player) {}
-bool ConditionStomped::evaluate(Enemy& e)
+ConditionStomped::ConditionStomped(const Character &player) : m_player(player) {}
+bool ConditionStomped::evaluate(Enemy &e)
 {
     if (CheckCollisionRecs(e.getHurtBox(), m_player.GetBounds()))
     {
         return true;
     }
-	return false;
+    return false;
 }
 
-ConditionKicked::ConditionKicked(const Character& Character):
-    m_player(Character) {}
-bool ConditionKicked::evaluate(Enemy& e)
+ConditionKicked::ConditionKicked(const Character &mario) : m_player(mario) {}
+bool ConditionKicked::evaluate(Enemy &e)
 {
     if (CheckCollisionRecs(e.getHitBox(), m_player.GetBounds()))
     {
@@ -85,9 +79,8 @@ bool ConditionKicked::evaluate(Enemy& e)
     return false;
 }
 
-ConditionGrounded::ConditionGrounded(Level& level) :
-	m_level(level) {}
-bool ConditionGrounded::evaluate(Enemy& e)
+ConditionGrounded::ConditionGrounded(Level &level) : m_level(level) {}
+bool ConditionGrounded::evaluate(Enemy &e)
 {
     vector<pair<array<int, 2>, float>> unresolvedtile;
     Vector2 cp, cn;
@@ -99,12 +92,17 @@ bool ConditionGrounded::evaluate(Enemy& e)
     int maxY = std::floor(std::max(e.position.y + e.getHurtBox().height, nextPos.y + e.getHurtBox().height) / (TILE_SIZE * SCALE));
     float t;
 
-    for (int y = minY; y <= maxY; y++) {
-        for (int x = minX; x <= maxX; x++) {
-            if (x < 0 || y < 0 || x >= m_level.getGridWidth()|| y >= m_level.getGridHeight()) continue;
-            if (m_level.getTileInstance(y, x)) {
+    for (int y = minY; y <= maxY; y++)
+    {
+        for (int x = minX; x <= maxX; x++)
+        {
+            if (x < 0 || y < 0 || x >= m_level.getGridWidth() || y >= m_level.getGridHeight())
+                continue;
+            if (m_level.getTileInstance(y, x))
+            {
                 if (aabb::CheckCollisionStaticRectDynamicRect(e.getHurtBox(), e.getVelocity(),
-                    m_level.getTileInstance(y, x)->bbox, cp, cn, t, et)) {
+                                                              m_level.getTileInstance(y, x)->bbox, cp, cn, t, et))
+                {
                     return true;
                 }
             }
@@ -113,4 +111,3 @@ bool ConditionGrounded::evaluate(Enemy& e)
 
     return false;
 }
-
