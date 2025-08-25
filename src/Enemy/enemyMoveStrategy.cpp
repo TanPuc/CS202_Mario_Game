@@ -8,10 +8,10 @@
 
 using namespace std;
 
-MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e, const Character& Character) :
+MoveStrategyBasic::MoveStrategyBasic(int value, Enemy& e, const Character& mario) :
 	speed(value)
 {
-	if (e.GetPosition().x + e.getHurtBox().width/2 >= Character.GetPosition().x + Character.rect.width/2)
+	if (e.GetPosition().x + e.getHurtBox().width/2 >= mario.GetPosition().x + mario.rect.width/2)
 	{
 		e.setVelocityX(-speed);
 	}
@@ -84,8 +84,6 @@ void MoveStrategyKeepDistance::move(Enemy& e)
 		}
 		e.addVelocityX(result);
 	}
-
-	// cout << e.getVelocity().x << endl;
 
 	if (e.getVelocity().x > m_speed) e.setVelocityX(m_speed);
 

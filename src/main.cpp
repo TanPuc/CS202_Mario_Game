@@ -37,7 +37,7 @@ int main(void)
 		SoundManager::getInstance().updateMusicStreams();
 		gsm.update();
 
-		// ClearBackground(SKYBLUE);
+		ClearBackground(SKYBLUE);
 		Texture2D background = ResourceManager::GetInstance().GetBackgroundTexture();
 		float bgAspectRatio = (float)background.width / (float)background.height;
 		float bgScreenWidth = (float)GetScreenWidth() + 15;

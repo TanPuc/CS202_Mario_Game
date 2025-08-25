@@ -1,7 +1,5 @@
 #pragma once
 
-const float TILEFACTOR = 2;
-
 enum StateType
 {
 	Nothing = 0,

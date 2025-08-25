@@ -40,5 +40,5 @@ private:
 	float										m_AnimationTimer	= 0;
 	int											m_CurrentFrame		= 0;
 	Rectangle									m_OffSet			= { 0,0,1,1 };
-	Character*										m_Character				= nullptr;
+	Character*										m_mario				= nullptr;
 };
