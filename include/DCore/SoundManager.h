@@ -10,6 +10,10 @@ enum class SoundEffect
     COIN,
     FIRE_BALL,
     POWERUP,
+    BUMP,
+    BRICK_SMASH,
+    KICK,
+    FLAGPOLE,
     LEVEL_START,
     PLAYER_DOWN,
     GAME_OVER
@@ -53,6 +57,11 @@ public:
         sfx[SoundEffect::COIN] = LoadSound("assets/smb_coin.wav");
         sfx[SoundEffect::LEVEL_START] = LoadSound("assets/smb_stage_clear.wav");
         sfx[SoundEffect::PLAYER_DOWN] = LoadSound("assets/smb_mariodie.wav");
+        sfx[SoundEffect::POWERUP] = LoadSound("assets/smb_powerup.wav");
+        sfx[SoundEffect::BUMP] = LoadSound("assets/smb_bump.wav");
+        sfx[SoundEffect::KICK] = LoadSound("assets/smb_kick.wav");
+        sfx[SoundEffect::BRICK_SMASH] = LoadSound("assets/smb_breakblock.wav");
+        sfx[SoundEffect::FLAGPOLE] = LoadSound("assets/smb_flagpole.wav");
         sfx[SoundEffect::FIRE_BALL] = LoadSound("assets/smb_fireball.wav");
         sfx[SoundEffect::GAME_OVER] = LoadSound("assets/smb_game_over.wav");
         musicTracks[MusicTrack::MAIN_THEME] = LoadMusicStream("assets/Ground_Theme.mp3");

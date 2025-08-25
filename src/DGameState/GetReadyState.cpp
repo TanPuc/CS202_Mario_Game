@@ -27,6 +27,7 @@ void GetReadyState::enter()
             dataForNextLevel.levelNum = this->targetLevel;
             dataForNextLevel.score = gsm->getContext().scoreBeforeRespawn;
             dataForNextLevel.coins = 0;
+            dataForNextLevel.playerForm = SMALL; // Reset to small form on respawn
         }
     } 
     else // NEW_GAME
@@ -87,6 +88,8 @@ void GetReadyState::update()
                 
                 dataToLoad.score = 0; 
                 dataToLoad.coins = 0; 
+
+                // dataToLoad.playerForm = SMALL;
             }
         } 
         else 

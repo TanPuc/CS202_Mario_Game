@@ -17,6 +17,7 @@ class ICollisionMapStrategy;
 class CollisionMap;
 
 class SpriteEnemy;
+class PlayingState;
 
 //context
 class Enemy : public Entity
@@ -62,6 +63,7 @@ public:
 	void setIsCollidedMap();
 	bool getIsCollidedMap();
 
+	void onDefeated();
 private:
 	EnemyType					m_Type					;
 	bool						m_isActive				= true;
@@ -80,6 +82,8 @@ private:
 	SpriteEnemy*				m_sprite				= nullptr;
 
 	bool						m_isCollidedMap			= false;
+public:
+	PlayingState*				m_playingStateRef			= nullptr;
 
 
 	//IAttackStrategy*			m_AttackStrategy		= nullptr;

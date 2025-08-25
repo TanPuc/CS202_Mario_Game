@@ -3,6 +3,7 @@
 #include "BrickPieces.h"
 #include "DGameState/PlayingState.h"
 #include "ItemManager.h"
+#include "DCore/SoundManager.h"
 
 float Q_rsqrt(float number)
 {
@@ -58,11 +59,13 @@ void BrickInstance::handleBreaking(Character &player)
             if (player.GetForm() == BIG || player.GetForm() == FIRE || player.GetForm() == SUPER)
             {
                 state = STATE_BROKEN;
+                SoundManager::getInstance().playSound(SoundEffect::BRICK_SMASH);
             }
             else
             {
                 state = STATE_INTERACTED;
                 q_b_a.iniVelY();
+                SoundManager::getInstance().playSound(SoundEffect::BUMP);
             }
         }
         break;
@@ -249,6 +252,7 @@ void GoalpoleInstance::update(Character &player, ItemManager &itemManager, Playi
         player.rect.x = player.position.x;
         player.playWinAnimation = true;
         goalFlag.iniVelY();
+        SoundManager::getInstance().playSound(SoundEffect::FLAGPOLE);
     }
     goalFlag.Update(state);
 }

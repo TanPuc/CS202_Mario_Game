@@ -30,9 +30,24 @@ C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DHUD\ScoreDisplay.cpp;C:\Us
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DHUD\TimeDisplay.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\TimeDisplay.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DHUD\WorldDisplay.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\WorldDisplay.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\DSound\SoundManager 2.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\SoundManager 2.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemy.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemy.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyAsset.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyAsset.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyAttackStrategy.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyAttackStrategy.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyCollisionMap.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyCollisionMap.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyCollisionPlayer.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyCollisionPlayer.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyFSM.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyFSM.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyFSMBuilder.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyFSMBuilder.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyManager.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyManager.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyMoveStrategy.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyMoveStrategy.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemySprite.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemySprite.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyState.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyState.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Enemy\enemyStateCondition.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\enemyStateCondition.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\EnemySpawnLocation.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\EnemySpawnLocation.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\FireBallManager.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\FireBallManager.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\FireBar.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\FireBar.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\ItemManager.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\ItemManager.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Level.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Level.obj
+C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\LevelManager.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\LevelManager.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Physics.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Physics.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\Tile.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\Tile.obj
 C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\src\main.cpp;C:\Users\DUYEN\Documents\GitHub\CS202_Mario_Game\Mario.dir\Debug\main.obj

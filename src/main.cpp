@@ -13,14 +13,14 @@
 
 int main(void)
 {
-	SetConfigFlags( FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
-	// SetConfigFlags(FLAG_VSYNC_HINT);
+	//SetConfigFlags( FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+	SetConfigFlags(FLAG_VSYNC_HINT);
 	InitWindow(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "Mario");
 	InitAudioDevice();
 	SetTargetFPS(60);
 
 	ResourceManager::GetInstance().LoadGameFont("assets/Super Mario Bros. 2.ttf");
-	// ResourceManager::GetInstance().LoadBackgroundTexture("assets/menu_background.png");
+	ResourceManager::GetInstance().LoadBackgroundTexture("assets/menu_background.png");
 	SoundManager::getInstance().load();
 
 	float initialPosX = 0.0f;

@@ -96,9 +96,11 @@ void PlayingState::enter()
     }
 
     // TILE
-    for (int i = 0; i < GRID_HEIGHT; i++)
+    int grid_height = levelManager->getCurrentLevel()->getGridHeight();
+    int grid_width = levelManager->getCurrentLevel()->getGridWidth();
+    for (int i = 0; i < grid_height; i++)
     {
-        for (int j = 0; j < GRID_WIDTH; j++)
+        for (int j = 0; j < grid_width; j++)
         {
             if (levelManager->getCurrentLevel()->tileInstancesGrid[i][j])
             {
@@ -128,7 +130,7 @@ void PlayingState::enter()
     hudManager->updateWorld(worldNum, levelNum);
     playerAdapter->update();
 
-    enemyManager = new EnemyManager(player.get(), levelManager->getCurrentLevel(), fireBallManager.GetFireBalls());
+    enemyManager = new EnemyManager(player.get(), levelManager->getCurrentLevel(), this, fireBallManager.GetFireBalls());
 
     // Vector2 posEnemy = { 300, 100 };
     // enemyManager->spawnEnemyAt(EnemyType::goopa, posEnemy);
@@ -203,6 +205,16 @@ void PlayingState::updatePlaying()
     //     player->Slide(playerGridCoords);
     //     // player->ChangeForm(SMALL);
     // }
+
+    if (comboTimer > 0.0f) 
+    {
+        comboTimer -= GetFrameTime();
+        if (comboTimer <= 0.0f)
+        {
+            comboScore = 100;
+            std::cout << "Combo Reset!" << std::endl;
+        }
+    }
 
     if (auto gp_ptr = goalpole.lock())
     {
@@ -412,4 +424,17 @@ void PlayingState::saveGameData()
     }
 
     SaveManager::saveGame(currentData, "savegame.dat");
+}
+
+void PlayingState::reportEnemyKill(Vector2 position)
+{
+    player->score += comboScore;
+    addFloatingScore(position, std::to_string(comboScore));
+
+    if (comboScore < 8000) {
+        comboScore *= 2; 
+    } else {
+        player->lives++;
+    }
+    comboTimer = 0.5f; 
 }

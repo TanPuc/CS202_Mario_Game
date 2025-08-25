@@ -1,6 +1,7 @@
 #include "Enemy/enemyStateCondition.h"
 #include "Level.h"
 #include "Tile.h"
+#include "DCore/SoundManager.h"
 
 #include "raylib.h"
 
@@ -55,7 +56,10 @@ bool ConditionFireBall::evaluate(Enemy& e)
                 isImmune = true;
                 m_counter++;
                 if (m_counter >= m_amount)
+                {
+                    e.onDefeated();
                     return true;
+                }
             }
         }
     }
@@ -69,6 +73,7 @@ bool ConditionStomped::evaluate(Enemy& e)
 {
     if (CheckCollisionRecs(e.getHurtBox(), m_player.GetBounds()))
     {
+        e.onDefeated();
         return true;
     }
 	return false;
@@ -80,6 +85,7 @@ bool ConditionKicked::evaluate(Enemy& e)
 {
     if (CheckCollisionRecs(e.getHitBox(), m_player.GetBounds()))
     {
+        SoundManager::getInstance().playSound(SoundEffect::KICK);
         return true;
     }
     return false;

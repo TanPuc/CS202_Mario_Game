@@ -13,17 +13,18 @@ class Character;
 class Enemy;
 class Level;
 class FireBall;
+class PlayingState;
 
 
 class EnemyManager
 {
 public:
-	EnemyManager(Character* player, Level* level, const vector<shared_ptr<FireBall>>& fireballs);
+	EnemyManager(Character* player, Level* level, PlayingState* ps, const vector<shared_ptr<FireBall>>& fireballs);
 	void spawnEnemyAt(EnemyType type, Vector2 position);
 	void update();
 	void draw();
 private:
-
+	PlayingState* m_playingState;
 	Level* m_level;
 	Character* m_player;
 	const vector<shared_ptr<FireBall>>& m_fireballs;

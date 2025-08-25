@@ -72,6 +72,9 @@ private:
     float scoreTallyTimer = 0.0f;
     int timeToConvert = 0;
 
+    float comboTimer = 0.0f;
+    int comboScore = 100;
+
 public:
     PlayingState(GameStateManager *manager, const GameData &initialData);
     void enter() override;
@@ -84,4 +87,5 @@ public:
     void updatePlaying();
     void updateLevelClearAnimation();
     void updateScoreTally();
+    void reportEnemyKill(Vector2 position);
 };

@@ -11,6 +11,7 @@
 #include "Enemy/enemyEnum.h"
 
 #include "FireBallManager.h"
+#include "DGameState/PlayingState.h"
 
 const float WALKSPEED = 50;
 const float SHELLSPEED = 200;
@@ -38,8 +39,8 @@ const float FIREBALLCOOLDOWNTIMER = 3;
 const float JUMPCOOLDOWNTIMER = 2;
 const float SPINYCOOLDOWNTIMER = 2;
 
-EnemyManager::EnemyManager(Character* Character, Level* level, const vector<shared_ptr<FireBall>>& fireballs) :
-	m_player(Character), m_level(level), m_fireballs(fireballs) {}
+EnemyManager::EnemyManager(Character* Character, Level* level, PlayingState* ps, const vector<shared_ptr<FireBall>>& fireballs) :
+	m_player(Character), m_level(level), m_playingState(ps), m_fireballs(fireballs) {}
 void EnemyManager::update() {
 	for (auto e : m_toSpawn)
 	{
@@ -51,8 +52,15 @@ void EnemyManager::update() {
 		return !e->isActive();
 	};
 
-	m_enemies.erase(remove_if(m_enemies.begin(), m_enemies.end(), isNotActive), m_enemies.end());
-
+	// m_enemies.erase(remove_if(m_enemies.begin(), m_enemies.end(), isNotActive), m_enemies.end());
+	m_enemies.erase(std::remove_if(m_enemies.begin(), m_enemies.end(), 
+        [this](Enemy* e) {
+            if (!e->isActive()) {
+                delete e;
+                return true;
+            }
+            return false;
+        }), m_enemies.end());
 
 	for (auto e : m_enemies)
 	{
@@ -156,8 +164,11 @@ void EnemyManager::spawnEnemyAt(EnemyType type, Vector2 position)
 	}
 
 	//e->setPosition(position);
-
-	m_toSpawn.push_back(e);
+	if (e)
+	{
+		e->m_playingStateRef = this->m_playingState;
+		m_toSpawn.push_back(e);
+	}
 }
 
 Enemy* EnemyManager::spawnGooba(Vector2 pos)

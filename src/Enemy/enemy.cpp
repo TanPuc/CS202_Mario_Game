@@ -10,6 +10,7 @@
 #include "Enemy/enemyFSM.h"
 #include "Enemy/enemySprite.h"
 #include "Enemy/enemyEnum.h"
+#include "DGameState/PlayingState.h"
 
 Enemy::Enemy(EnemyType type, FiniteStateMachine* state, SpriteEnemy* sprite, Vector2 size, Vector2 positon):
 	Entity(positon, size),
@@ -174,6 +175,13 @@ void Enemy::setPosition(Vector2 pos)
 	position = pos;
 }
 
+void Enemy::onDefeated()
+{
+	if (m_playingStateRef)
+	{
+		m_playingStateRef->reportEnemyKill(this->GetPosition());
+	}
+}
 //Vector2 Enemy::getPositon() const
 //{
 //	return position;
