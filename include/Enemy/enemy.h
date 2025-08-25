@@ -54,23 +54,33 @@ public:
 	void setPosition(Vector2);
 
 	Rectangle getHurtBox() const;
-	void setHurtBox();
+	void setHurtBox(Rectangle rec);
 
 	Rectangle getHitBox() const;
-	void setHitBox();		
+	void setHitBox(Rectangle rec);	
+
+	Rectangle getSpriteBox() const;
+	void setSpriteBox( Rectangle rec);
 
 	void setIsCollidedMap();
 	bool getIsCollidedMap();
 
+	void hasNoHurtBox();
+	bool CheckHasNoHurtBox();
+	void isDead();
+	bool CheckIsDead();
 private:
 	EnemyType					m_Type					;
 	bool						m_isActive				= true;
+	bool						m_hasNoHurtBox			= false;
+	bool						m_isDead				= false;
 
 	Vector2						m_velocity				= { 0,0 };
 	int							m_initialDirection		= 1;
 
 	Rectangle					m_HitBox				= {};  //bound is ratio
 	Rectangle					m_HurtBox				= {};
+	Rectangle					m_SpriteBox				= {};
 
 	FiniteStateMachine*			m_FSM					= nullptr;
 	

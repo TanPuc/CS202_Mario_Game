@@ -16,8 +16,9 @@ Enemy::Enemy(EnemyType type, FiniteStateMachine* state, SpriteEnemy* sprite, Vec
 	m_Type(type), m_FSM(state), m_sprite(sprite)
 {
 	m_FSM->runInitialState(*this);
-	setHurtBox();
-	setHitBox();
+	setHurtBox(rect);
+	setHitBox({rect.x,rect.y, m_HurtBox.width,m_HurtBox.height});
+	setSpriteBox( {position.x,position.y,rect.width, rect.height});
 }
 Enemy::~Enemy()
 {
@@ -40,12 +41,13 @@ void Enemy::handleInput(int Input)
 
 void Enemy::Update(Level& level)
 {
+	// move -> FSM -> collide -> position -> sprite
+
 	if (m_MoveStrategy) m_MoveStrategy->move(*this);
 
 	if (m_FSM) m_FSM->update(*this);
 
 	if (m_CollideMap) m_CollideMap->update(*this, level);
-
 
 	position = Vector2Add(position, Vector2Scale(Vector2{ m_velocity.x ,m_velocity.y }, GetFrameTime()));
 
@@ -54,9 +56,9 @@ void Enemy::Update(Level& level)
 	rect.x = position.x; //most stupid fck i have ever seen
 	rect.y = position.y;
 
-	setHurtBox();
-	setHitBox();
-
+	setHurtBox(rect);
+	setHitBox({ rect.x,rect.y, m_HurtBox.width,m_HurtBox.height });
+	setSpriteBox({position.x,position.y, m_SpriteBox.width/SCALE, m_SpriteBox.height/SCALE});
 }
 
 void Enemy::Draw()
@@ -132,26 +134,50 @@ void Enemy::reverseDirection()
 
 Rectangle Enemy::getHurtBox() const
 {
-	return m_HurtBox;
+		return m_HurtBox;
 }
-void Enemy::setHurtBox()
+void Enemy::setHurtBox(Rectangle recta)
 {
-	m_HurtBox.x = position.x;
-	m_HurtBox.y = position.y;
-	m_HurtBox.width = rect.width * SCALE;
-	m_HurtBox.height = rect.height * SCALE;
+	//m_HurtBox.x = rect.x;
+	//m_HurtBox.y = rect.y;
+	//m_HurtBox.width = rect.width * SCALE;
+	//m_HurtBox.height = rect.height * SCALE;
+
+	m_HurtBox.x = recta.x;
+	m_HurtBox.y = recta.y;
+	m_HurtBox.width = recta.width * SCALE;
+	m_HurtBox.height = recta.height * SCALE;
 }
 
-Rectangle Enemy::getHitBox() const {
+Rectangle Enemy::getHitBox() const 
+{
 	return m_HitBox;
 }
-void Enemy::setHitBox()
+void Enemy::setHitBox(Rectangle rectan)
 {
+	//float offset = 5;
+	//m_HitBox.x = rect.x - offset;
+	//m_HitBox.y = rect.y + offset;
+	//m_HitBox.width = m_HurtBox.width + 2 * offset;
+	//m_HitBox.height = m_HurtBox.height - offset;
+
 	float offset = 5;
-	m_HitBox.x = position.x - offset;
-	m_HitBox.y = position.y + offset;
-	m_HitBox.width = m_HurtBox.width + 2 * offset;
-	m_HitBox.height = m_HurtBox.height - offset;
+	m_HitBox.x = rectan.x - offset;
+	m_HitBox.y = rectan.y + offset;
+	m_HitBox.width = rectan.width + 2 * offset;
+	m_HitBox.height = rectan.height - offset;
+}
+
+Rectangle Enemy::getSpriteBox() const
+{
+	return m_SpriteBox;
+}
+void Enemy::setSpriteBox( Rectangle rectan)
+{
+	m_SpriteBox.x = rectan.x;
+	m_SpriteBox.y = rectan.y;
+	m_SpriteBox.width = rectan.width * SCALE;
+	m_SpriteBox.height = rectan.height * SCALE;
 }
 
 void Enemy::setIsCollidedMap()
@@ -173,6 +199,23 @@ void Enemy::setPosition(Vector2 pos)
 	position = pos;
 }
 
+void Enemy::hasNoHurtBox()
+{
+	m_hasNoHurtBox = true;
+}
+bool Enemy::CheckHasNoHurtBox()
+{
+	return m_hasNoHurtBox;
+}
+
+void Enemy::isDead()
+{
+	m_isDead = true;
+}
+bool Enemy::CheckIsDead()
+{
+	return m_isDead;
+}
 //Vector2 Enemy::getPositon() const
 //{
 //	return position;

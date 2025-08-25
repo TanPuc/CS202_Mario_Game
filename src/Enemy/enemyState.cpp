@@ -209,6 +209,7 @@ void ShellState::enter(Enemy& e)
 
 	e.rect.width = 16;
 	e.rect.height = 16;
+	e.setSpriteBox({e.GetPosition().x,e.GetPosition().y,16,16});
 
 	e.setSprite(getName());
 }
@@ -291,7 +292,10 @@ StateType PatrolState::getName() const
 
 void DeadStateStomp::enter(Enemy& e)
 {
+	e.isDead();
 	e.setMoveStrategy(new MoveStrategyBasic(0,e));
+
+	e.rect = { 0,0,0,0 };
 
 	e.setSprite(getName());
 }
@@ -313,9 +317,12 @@ DeadStateElse::DeadStateElse(float gravity):
 	m_gravity(gravity) {}
 void DeadStateElse::enter(Enemy& e)
 {
+	e.isDead();
 	e.setVelocityX(0);
 	e.setVelocityY(-100);
 	e.setMoveStrategy(new MoveStrategyFall(m_gravity));
+
+	e.rect = {0,0,0,0};
 
 	e.setCollisionMap(nullptr);
 

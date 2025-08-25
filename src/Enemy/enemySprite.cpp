@@ -22,13 +22,13 @@ void SpriteEnemy::draw(Enemy& e)
     if (!m_mario) src.width *= e.getDirectionSelf() ;
     else
     {
-        if (e.GetPosition().x + e.getHurtBox().width / 2 <= m_mario->position.x + m_mario->rect.width / 2)
+        if (e.GetPosition().x + e.getSpriteBox().width / 2 <= m_mario->position.x + m_mario->rect.width / 2)
         {
             src.width *= -1;
         }
     }
 
-    Rectangle dest = e.getHurtBox();
+    Rectangle dest = e.getSpriteBox();
     dest.width *= m_OffSet.width;
     dest.height *= m_OffSet.height;
     dest.y += m_OffSet.y * SCALE;

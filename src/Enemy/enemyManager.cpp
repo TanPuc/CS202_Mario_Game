@@ -11,6 +11,7 @@
 #include "Enemy/enemyEnum.h"
 
 #include "FireBallManager.h"
+#include "Mario.h"
 
 const float WALKSPEED = 50;
 const float SHELLSPEED = 200;
@@ -56,10 +57,14 @@ void EnemyManager::update() {
 	for (auto e : m_enemies)
 	{
 		e->Update(*m_level);
-		if (CheckCollisionRecs(e->getHitBox(), m_player->rect))
+		if (!e->CheckIsDead() && CheckCollisionRecs(e->getHitBox(), m_player->rect))
 		{
 			m_player->Die();
-			cout << "gay" << endl;
+		}
+
+		if (!e->CheckIsDead() && !e->CheckHasNoHurtBox() && CheckCollisionRecs(e->getHurtBox(), m_player->rect))
+		{
+			m_player->velocity.y = -200;
 		}
 	}
 }
@@ -241,6 +246,7 @@ Enemy* EnemyManager::spawnSpiny(Vector2 pos)
 	Vector2 size = { 16,16 };
 
 	Enemy* emmy = new Enemy(EnemyType::spiny, fsm, sprite, size, pos);
+	emmy->hasNoHurtBox();
 	return emmy;
 }
 
@@ -396,7 +402,7 @@ Enemy* EnemyManager::spawnHammerBro(Vector2 pos)
 
 	fsm = builder
 		.addState(new PatrolState(RANDOMBOUNDARY, WALKSPEED, HOPPOWER, JUMPCOOLDOWNTIMER))
-		.addState(new AttackState(this, new AttackStrat(this, EnemyType::hammer)))
+		.addState(new AttackState(this, new AttackStrat(this, EnemyType::hammer, 3)))
 		.addState(new DeadStateElse(GRAVITYPREMIUM))
 		.addTransition(StateType::Patrol, new ConditionTimer(HAMMERCOOLDOWNTIMER), StateType::Attack)
 		.addTransition(StateType::Attack, new ConditionTimer(ATTACKTIMER), StateType::Patrol)
@@ -440,6 +446,7 @@ Enemy* EnemyManager::spawnHammer(Vector2 pos)
 
 	Enemy* hemmer = new Enemy(EnemyType::hammer, fsm, sprite, size, pos);
 	hemmer->setVelocityY(-HOPPOWER);
+	hemmer->hasNoHurtBox();
 	return hemmer;
 }
 Enemy* EnemyManager::spawnPiranhaPlant(Vector2 pos)
@@ -463,6 +470,7 @@ Enemy* EnemyManager::spawnPiranhaPlant(Vector2 pos)
 	Vector2 size = { 16,24 };
 
 	Enemy* hemmer = new Enemy(EnemyType::piranhaplant, fsm, sprite, size, pos);
+	hemmer->hasNoHurtBox();
 	return hemmer;
 }
 
@@ -541,5 +549,6 @@ Enemy* EnemyManager::spawnFireBall(Vector2 pos)
 	Vector2 size = { 24,8 };
 
 	Enemy* hemmer = new Enemy(EnemyType::fireball, fsm, sprite, size, pos);
+	hemmer->hasNoHurtBox();
 	return hemmer;
 }

@@ -31,7 +31,7 @@ void PlayingState::enter()
     // player = std::make_unique<Mario>(Vector2{float(GetScreenWidth() / 2 - 16), 0.0f});
     // player = std::make_unique<Mario>(START_POS_WORLD_1_1);
 
-    level = std::make_unique<Level_1_4>("./assets/Levels/world_1.4.txt");
+    level = std::make_unique<Level_1_1>("./assets/Levels/world_1.1.txt");
 
     player = std::make_unique<Mario>(currentData.playerPosition);
     player->lives = currentData.lives;
@@ -66,19 +66,19 @@ void PlayingState::enter()
 
 
     enemyManager = new EnemyManager(player.get(), level.get(), fireBallManager.GetFireBalls());
-    Vector2 posEnemy = { 300, 150 };
+    Vector2 posEnemy = { 400, 100 };
     //enemyManager->spawnEnemyAt(EnemyType::goopa, posEnemy);
-    enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
+    //enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::beezybettle, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::blooper, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::spiny, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
+    enemyManager->spawnEnemyAt(EnemyType::lakitu, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::paratroopa, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::hammer, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::piranhaplant, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::hammerbro, posEnemy);
+    enemyManager->spawnEnemyAt(EnemyType::hammerbro, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::bowser, posEnemy);
 
 }

@@ -19,7 +19,7 @@ private:
 	ICollisionMapStrategy* m_Rectangle = nullptr;
 
 public:
-	CollisionMap(ICollisionMapStrategy* X, ICollisionMapStrategy* Y);
+	CollisionMap(ICollisionMapStrategy* direction, ICollisionMapStrategy* rectangle);
 	~CollisionMap();
 
 	static bool compare2(const std::pair<Vector2, float>& a, const std::pair<Vector2, float>& b) {
