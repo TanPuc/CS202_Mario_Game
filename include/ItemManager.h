@@ -6,26 +6,33 @@
 #include "DGameObjects/Item.h"
 #include "DGameObjects/Mushroom.h"
 #include "DGameObjects/FireFlower.h"
-#include "DGameState/PlayingState.h"
-#include "DCore/SoundManager.h"
+#include "DGameObjects/CoinBlock.h"
+#include "DGameObjects/Coin.h"
 #include "Physics.h"
-#include "Level.h"
+// #include "Level.h"
 #include "Character.h"
 
-class Item;
-class Mario;
-class PlayingState;
+// Forward declaration
 class Level;
+class PlayingState;
 
 class ItemManager
 {
 private:
     std::vector<std::unique_ptr<Item>> items;
-
+    // std::unique_ptr<CoinBlockSprite> coinBlockSprite;
+    std::shared_ptr<CoinBlockSprite> coinBlockSprite;
 public:
+    ItemManager()
+    {
+        coinBlockSprite = std::make_shared<CoinBlockSprite>();
+    };
+
     void AddItem(std::unique_ptr<Item> item);
     void SpawnMushroom(Vector2 position, Vector2 velocity, DIRECTION direction);
     void SpawnFireFlower(Vector2 position, Vector2 velocity, DIRECTION direction);
+    void SpawnCoinBlock(Vector2 position);
+    void SpawnCoin(Vector2 position, Vector2 velocity);
     void UpdateItems(Level &level, Character &character, PlayingState *ps);
     void DrawItems();
 };

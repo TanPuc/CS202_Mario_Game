@@ -16,7 +16,7 @@ private:
     Texture2D texture;
 
 public:
-    GoalFlag(Vector2 position) : Entity(position, {32, 32}), destPos(Vector2{position.x, position.y + 9 * 16.0f})
+    GoalFlag(Vector2 position) : Entity(position, {32, 32}), destPos(Vector2{position.x, position.y + 7.6875f * TILE_SIZE * SCALE})
     {
         texture = LoadTexture("./assets/Tiles/Overworld/goalflag.png");
     }

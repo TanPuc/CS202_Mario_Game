@@ -63,7 +63,19 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "array": "cpp",
-        "numeric": "cpp"
+        "cstdarg": "cpp",
+        "cwctype": "cpp",
+        "deque": "cpp",
+        "set": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "string_view": "cpp",
+        "numbers": "cpp",
+        "span": "cpp",
+        "text_encoding": "cpp",
+        "cinttypes": "cpp",
+        "variant": "cpp"
     },
     "editor.quickSuggestions": {
         "other": true,
@@ -72,6 +84,6 @@
     },
     "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.intelliSenseEngine": "default",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "C_Cpp.default.compilerPath": "C:/MinGW/bin/g++.exe"
 }

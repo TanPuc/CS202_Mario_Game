@@ -2,6 +2,7 @@
 #include "Character.h"
 #include "BrickPieces.h"
 #include "DGameState/PlayingState.h"
+#include "ItemManager.h"
 
 float Q_rsqrt(float number)
 {
@@ -37,6 +38,7 @@ void BrickInstance::handleAnimation()
             state = STATE_NORMAL;
         }
         dest.y = pos.y;
+        bbox.y = pos.y;
     }
     break;
     default:
@@ -53,11 +55,15 @@ void BrickInstance::handleBreaking(Character &player)
         {
         case STATE_NORMAL:
         {
-            // If player.state == STATE_SUPER
-            // state = STATE_BROKEN;
-            // else
-            state = STATE_INTERACTED;
-            q_b_a.iniVelY();
+            if (player.GetForm() == BIG || player.GetForm() == FIRE || player.GetForm() == SUPER)
+            {
+                state = STATE_BROKEN;
+            }
+            else
+            {
+                state = STATE_INTERACTED;
+                q_b_a.iniVelY();
+            }
         }
         break;
         default:
@@ -67,9 +73,18 @@ void BrickInstance::handleBreaking(Character &player)
 }
 
 BrickInstance::BrickInstance(Vector2 pos, std::shared_ptr<Tile> brick)
-    : TileInstance(pos, brick), hbox(Rectangle{pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2), pos.y + (TILE_SIZE * SCALE), HITBOX_WIDTH, HITBOX_HEIGHT}), dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
+    : TileInstance(pos, brick),
+      hbox(Rectangle{
+          pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2),
+          pos.y + (TILE_SIZE * SCALE),
+          HITBOX_WIDTH,
+          HITBOX_HEIGHT}),
+      dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y))
+{
+    originalBBox = bbox;
+}
 
-void BrickInstance::update(Character &player, PlayingState *ps)
+void BrickInstance::update(Character &player, ItemManager &itemManager, PlayingState *ps)
 {
     handleBreaking(player);
     handleAnimation();
@@ -82,7 +97,16 @@ void BrickInstance::render()
 }
 
 QuestionInstance::QuestionInstance(Vector2 pos, std::shared_ptr<Tile> question)
-    : TileInstance(pos, question), hbox(Rectangle{pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2), pos.y + (TILE_SIZE * SCALE), HITBOX_WIDTH, HITBOX_HEIGHT}), dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y)) {}
+    : TileInstance(pos, question),
+      hbox(Rectangle{
+          pos.x + (TILE_SIZE * SCALE / 2) - (HITBOX_WIDTH / 2),
+          pos.y + (TILE_SIZE * SCALE),
+          HITBOX_WIDTH,
+          HITBOX_HEIGHT}),
+      dest{pos.x, pos.y, TILE_SIZE * SCALE, TILE_SIZE * SCALE}, q_b_a(Q_B_A(pos.y))
+{
+    originalBBox = bbox;
+}
 
 void QuestionInstance::handleAnimation()
 {
@@ -119,6 +143,7 @@ void QuestionInstance::handleAnimation()
             state = STATE_ACTIVATED;
         }
         dest.y = pos.y;
+        bbox.y = pos.y;
     }
     break;
     case STATE_ACTIVATED:
@@ -131,22 +156,14 @@ void QuestionInstance::handleAnimation()
     }
 }
 
-void QuestionInstance::handleActivation(Character &player, PlayingState *ps)
+void QuestionInstance::handleActivation(Character &player, ItemManager &itemManager, PlayingState *ps)
 {
     Rectangle playerBBox = player.rect;
     if (CheckCollisionRecs(playerBBox, hbox))
     {
-        // switch (state)
-        // {
-        // case STATE_NORMAL:
-        // {
-        //     state = STATE_INTERACTED;
-        //     q_b_a.iniVelY();
-        //     player.score += 100;
-        // }
-        // break;
-        // }
-        if (state == STATE_NORMAL)
+        switch (state)
+        {
+        case STATE_NORMAL:
         {
             state = STATE_INTERACTED;
             q_b_a.iniVelY();
@@ -157,13 +174,28 @@ void QuestionInstance::handleActivation(Character &player, PlayingState *ps)
             {
                 ps->addFloatingScore(this->pos, "100");
             }
+
+            if (hasMushroom)
+            {
+                itemManager.SpawnMushroom(Vector2{pos.x, pos.y - TILE_SIZE * SCALE}, Vector2{60.0f, 0.0f}, RIGHT);
+            }
+            else if (hasFlower)
+            {
+                itemManager.SpawnFireFlower(Vector2{pos.x, pos.y - TILE_SIZE * SCALE}, Vector2{0.0f, 0.0f}, RIGHT);
+            }
+            else
+            {
+                // Spawn coins
+            }
+        }
+        break;
         }
     }
 }
 
-void QuestionInstance::update(Character &player, PlayingState *ps)
+void QuestionInstance::update(Character &player, ItemManager &itemManager, PlayingState *ps)
 {
-    handleActivation(player, ps);
+    handleActivation(player, itemManager, ps);
     handleAnimation();
 }
 
@@ -190,23 +222,18 @@ void PipeInstance3::render() { DrawTextureEx(tile->getTexture(), pos, 0.0f, SCAL
 HardblockInstance::HardblockInstance(Vector2 pos, std::shared_ptr<Tile> hardblock)
     : TileInstance(pos, hardblock) {}
 
-void HardblockInstance::update(Character &player, PlayingState *ps)
-{
-    // handleCollision(player);
-}
-
 void HardblockInstance::render()
 {
     DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
 }
 
 GoalpoleInstance::GoalpoleInstance(Vector2 pos, std::shared_ptr<Tile> goalpole)
-    : TileInstance(pos, goalpole), hbox(Rectangle{pos.x, pos.y, 64, 11 * TILE_SIZE * SCALE}), goalFlag({pos.x - 32.0f, pos.y + 68.0f})
+    : TileInstance(pos, goalpole), hbox(Rectangle{pos.x, pos.y, TILE_SIZE * SCALE, 11 * TILE_SIZE * SCALE}), goalFlag({pos.x - TILE_SIZE * SCALE / 2, pos.y + 1.0625f * TILE_SIZE * SCALE})
 {
     bbox = Rectangle{0, 0, 0, 0};
 }
 
-void GoalpoleInstance::update(Character &player, PlayingState *ps)
+void GoalpoleInstance::update(Character &player, ItemManager &itemManager, PlayingState *ps)
 {
     if (state == STATE_ACTIVATED && goalFlag.IsFinishedSliding())
     {
@@ -233,13 +260,110 @@ void GoalpoleInstance::render()
     goalFlag.Draw();
 }
 
-void FortressInstance::update(Character &player, PlayingState *ps)
+PlatformInstance::PlatformInstance(Vector2 pos_1, Vector2 pos_2, std::shared_ptr<Tile> platform, int direction) : TileInstance(pos_1, platform)
 {
-    fortressFlag.Update();
+    if (direction == 0) // Up and down
+    {
+        topPos = std::make_shared<Vector2>(pos_1);
+        bottomPos = std::make_shared<Vector2>(pos_2);
+        bbox = Rectangle{topPos->x, topPos->y, platform->getTexture().width * SCALE, platform->getTexture().height * SCALE};
+    }
+    else if (direction == 1) // Left and right
+    {
+        leftPos = std::make_shared<Vector2>(pos_1);
+        rightPos = std::make_shared<Vector2>(pos_2);
+        bbox = Rectangle{leftPos->x, leftPos->y, platform->getTexture().width * SCALE, platform->getTexture().height * SCALE};
+    }
 }
 
-void FortressInstance::render()
+void LavaSurfaceInstance::update(Character &player, ItemManager &itemManager, PlayingState *ps)
 {
-    fortressFlag.Draw();
+    if (CheckCollisionRecs(player.GetBounds(), hbox))
+    {
+        // GAME_STATE = LOSE
+        // PLAYER_STATE = DEAD
+    }
+}
+
+void LavaSurfaceInstance::render()
+{
     DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+    DrawRectangleLinesEx(hbox, 2.0f, RED); // Draw hitbox
+}
+
+void HiddenBlockInstance::render()
+{
+    if (state == STATE_ACTIVATED || state == STATE_INTERACTED)
+    {
+        DrawTextureEx(tile->getTexture(), pos, 0.0f, SCALE, WHITE);
+    }
+    DrawRectangleLinesEx(bbox, 2.0f, RED); // Draw hitbox
+}
+
+void HiddenBlockInstance::handleAnimation()
+{
+    switch (state)
+    {
+    case STATE_INTERACTED:
+    {
+        if (!q_b_a.is_update(pos.y))
+        {
+            state = STATE_ACTIVATED;
+        }
+    }
+    break;
+    default:
+        break;
+    }
+}
+
+void HiddenBlockInstance::handleActivation()
+{
+    switch (state)
+    {
+    case STATE_NORMAL:
+    {
+        state = STATE_INTERACTED;
+        q_b_a.iniVelY();
+        spawnCoin = true;
+    }
+    break;
+    default:
+        break;
+    }
+}
+
+void HiddenBlockInstance::handleHiddenBBox(Character &player)
+{
+    switch (state)
+    {
+    case STATE_NORMAL:
+    {
+        // Only show the bbox when the player is below the block
+        if (player.GetPosition().y > original_bbox_y + bbox.height)
+        {
+            bbox.y = original_bbox_y;
+        }
+        else
+        {
+            bbox.y = 0;
+        }
+    };
+    default:
+        break;
+    }
+}
+
+void HiddenBlockInstance::update(Character &player, ItemManager &itemManager, PlayingState *ps)
+{
+    // handleActivation(player, itemManager);
+    handleHiddenBBox(player);
+    handleAnimation();
+
+    if (spawnCoin)
+    {
+        // itemManager.SpawnCoin();
+        spawnCoin = false;
+        std::cout << "Coin spawned!" << std::endl;
+    }
 }

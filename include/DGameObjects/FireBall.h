@@ -93,8 +93,7 @@ public:
             sprite->SwitchAnimation(STATE_DEAD);
         }
 
-        collision.CheckCollision(position, rect, velocity, level);
-        collision.ResolveCollision(position, rect, velocity, level);
+        collision.FireBallVsLevel(position, rect, velocity, level);
     }
 };
 

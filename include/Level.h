@@ -5,6 +5,7 @@
 #include <memory>
 #include <map>
 #include <raylib.h>
+#include "FireBar.h"
 #include "GlobalVariables.h"
 
 // Forward declaration
@@ -12,65 +13,99 @@ class PlayingState;
 class BrickPiece;
 class Tile;
 class TileInstance;
+class PlatformInstance;
 class Character;
-
-// pipe2: 1
-// background: 2
-// fortress: 4
-// goalpole: 7
-// ground: 8
-// hardblock: 9
-// pipe1: 10
-// pipe3: 12
-// question: 13
-// brick: 17
+class ItemManager;
+class FortressFlag;
 
 class EntityManager
 {
 public:
+    std::shared_ptr<FortressFlag> fortressFlag;
+    std::vector<std::shared_ptr<PlatformInstance>> platforms;
     std::vector<std::shared_ptr<BrickPiece>> brickPieces;
+    std::vector<std::shared_ptr<FireBar>> fireBars;
     std::vector<int> toRemove;
 
     void addBrickPieces(Vector2 position);
-    void update();
+    void addFireBar(Vector2 position, float initial_angle);
+    void initFortressFlag(Vector2 position, float fortressWidth);
+    void initPlatform();
+    void update(Character &player);
     void render();
+    // Need a separate render function for proper displaying
+    void renderFortressFlag();
 };
+
+typedef std::vector<std::vector<std::shared_ptr<TileInstance>>> TileInstancesGrid;
 
 class Level
 {
 public:
-    // Flyweight pattern
     std::map<int, std::shared_ptr<Tile>> tileMap;
-    std::shared_ptr<TileInstance> tileInstancesGrid[GRID_HEIGHT][GRID_WIDTH] = {nullptr}; // Fast access to tile instances
-
-    // Managing broken brick pieces
+    TileInstancesGrid tileInstancesGrid;
     EntityManager entityManager;
 
-    Level(const char *filePath, PlayingState *ps);
-    void addTileInstance(Vector2 pos, int tileID, int x, int y, PlayingState *ps);
-    void update(Character &player, PlayingState *ps);
-    void render();
+    std::shared_ptr<TileInstance> getTileInstance(int x, int y)
+    {
+        if (x < 0 || x >= tileInstancesGrid.size() || y < 0 || y >= tileInstancesGrid[0].size())
+            return nullptr;
+        return tileInstancesGrid[x][y];
+    }
+    int getGridHeight() const { return tileInstancesGrid.size(); }
+    int getGridWidth() const { return tileInstancesGrid[0].size(); }
+
+    virtual void update(Character &player, ItemManager &itemManager, PlayingState *ps) = 0;
+    virtual void render() = 0;
+
+    virtual ~Level() = default;
 };
 
-// 2: bigfortress
-// 3: fortress
-// 4: ground
-// 5: grassleft
-// 6: grassmiddle
-// 7: grassright
-// 9: hardblock
-// 10: goalpole
-// 11: grassbrick
+class Level_1_1 : public Level
+{
+public:
+    Level_1_1(const char *filePath, PlayingState *ps);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y, PlayingState *ps);
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
+    void render() override;
+};
 
-// class Level_2 {
-// public:
-//     std::map<int, std::shared_ptr<Tile>> tileMap;
-//     std::shared_ptr<TileInstance> tileInstancesGrid[GRID_HEIGHT][GRID_WIDTH_2] = { nullptr }; // Fast access to tile instances
+class Level_1_3 : public Level
+{
+public:
+    Level_1_3(const char *filePath, PlayingState *ps);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y, PlayingState *ps);
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
+    void render() override;
+};
 
-//     Level_2(const char* filePath);
-//     void addTileInstance(Vector2& pos, int& tileID, int& x, int& y);
-//     void update(Character& player);
-//     void render();
-// };
+class Level_1_4 : public Level
+{
+public:
+    Level_1_4(const char *filePath, PlayingState *ps);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y, PlayingState *ps);
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
+    void render() override;
+};
 
+class LevelFactory
+{
+public:
+    std::shared_ptr<Level> level;
+    void createLevel(const std::string &id, const char *filePath)
+    {
+        // if ( id == "1.1" )
+        // {
+        //     level = std::make_shared<Level_1_1>(filePath);
+        // }
+        // else if ( id == "1.3" )
+        // {
+        //     level = std::make_shared<Level_1_3>(filePath);
+        // }
+        // else if ( id == "1.4" )
+        // {
+        //     level = std::make_shared<Level_1_4>(filePath);
+        // }
+    }
+};
 #endif // LEVEL_H

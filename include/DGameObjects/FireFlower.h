@@ -40,8 +40,8 @@ public:
 
     void ResolveCollision(Level &level)
     {
-        collision.CheckCollision(position, rect, velocity, level);
-        collision.ResolveCollision(position, rect, velocity, level);
+        // Similar to Mushroom
+        collision.MushroomVsLevel(position, rect, velocity, level);
     };
 
     void Collect(Character &character) override

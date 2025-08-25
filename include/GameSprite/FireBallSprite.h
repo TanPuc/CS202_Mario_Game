@@ -15,7 +15,7 @@ public:
     STATE prevState;
     int frameSpeed = 6; // 6fps
     int animationTimer = 0;
-
+    
     FireBallSprite()
         : fireballAnimation({{180, 54, 8, 8},
                              {180 + 8 + FRAME_PADDING, 54, 8, 8},
