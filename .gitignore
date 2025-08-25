@@ -37,6 +37,8 @@
 /bin/
 /_deps/
 
+
+
 # CMake files
 CMakeFiles/
 CMakeCache.txt
@@ -55,6 +57,7 @@ lib/
 *.suo
 *.vcxproj*
 *.idea/
+.vs/
 
 # OS files
 .DS_Store
@@ -64,3 +67,8 @@ Thumbs.db
 .ninja_deps
 .ninja_log
 build.ninja
+
+# VSCode folder
+.vscode/settings.json
+/.vscode
+.vs/

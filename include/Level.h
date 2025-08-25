@@ -2,85 +2,110 @@
 #define LEVEL_H
 
 #include <vector>
+#include <memory>
+#include <map>
 #include <raylib.h>
-#include <fstream>
-#include <sstream>
+#include "FireBar.h"
+#include "GlobalVariables.h"
 
-#define TILE_SIZE 32.0f // Size of each tile in pixels
+// Forward declaration
+class PlayingState;
+class BrickPiece;
+class Tile;
+class TileInstance;
+class PlatformInstance;
+class Character;
+class ItemManager;
+class FortressFlag;
+
+class EntityManager
+{
+public:
+    std::shared_ptr<FortressFlag> fortressFlag;
+    std::vector<std::shared_ptr<PlatformInstance>> platforms;
+    std::vector<std::shared_ptr<BrickPiece>> brickPieces;
+    std::vector<std::shared_ptr<FireBar>> fireBars;
+    std::vector<int> toRemove;
+
+    void addBrickPieces(Vector2 position);
+    void addFireBar(Vector2 position, float initial_angle);
+    void initFortressFlag(Vector2 position, float fortressWidth);
+    void initPlatform();
+    void update(Character &player);
+    void render();
+    // Need a separate render function for proper displaying
+    void renderFortressFlag();
+};
+
+typedef std::vector<std::vector<std::shared_ptr<TileInstance>>> TileInstancesGrid;
 
 class Level
 {
 public:
-    std::vector<std::vector<int>> tiles;
-    Texture2D tileset;
+    std::map<int, std::shared_ptr<Tile>> tileMap;
+    TileInstancesGrid tileInstancesGrid;
+    EntityManager entityManager;
 
-    Level()
+    std::shared_ptr<TileInstance> getTileInstance(int x, int y)
     {
-        tileset = LoadTexture("assets/brick.png");
+        if (x < 0 || x >= tileInstancesGrid.size() || y < 0 || y >= tileInstancesGrid[0].size())
+            return nullptr;
+        return tileInstancesGrid[x][y];
     }
+    int getGridHeight() const { return tileInstancesGrid.size(); }
+    int getGridWidth() const { return tileInstancesGrid[0].size(); }
 
-    ~Level()
-    {
-        UnloadTexture(tileset);
-    }
+    virtual void update(Character &player, ItemManager &itemManager, PlayingState *ps) = 0;
+    virtual void render() = 0;
 
-    bool LoadFromFile(const std::string &mapFile)
-    {
-        std::ifstream file(mapFile);
-        if (!file.is_open())
-            return false;
-
-        tiles.clear();
-        std::string line;
-        while (std::getline(file, line))
-        {
-            std::istringstream ss(line);
-            int tile;
-            std::vector<int> row;
-            while (ss >> tile)
-                row.push_back(tile);
-            tiles.push_back(row);
-        }
-        return true;
-    }
-    void Draw(Camera2D &camera) const
-    {
-        for (int y = 0; y < (int)tiles.size(); y++)
-        {
-            for (int x = 0; x < (int)tiles[y].size(); x++)
-            {
-                if (tiles[y][x] > 0)
-                {
-                    // Rectangle src = {0, 0, TILE_SIZE, TILE_SIZE};
-                    // Rectangle dest = {(float)x * TILE_SIZE, (float)y * TILE_SIZE, TILE_SIZE, TILE_SIZE};
-                    // DrawTexturePro(tileset, src, dest, {0, 0}, 0.0f, WHITE);
-                    DrawTextureEx(tileset, (Vector2){(float)x * TILE_SIZE, (float)y * TILE_SIZE}, 0.0f, 2.0f, WHITE); // Draw the tile
-                }
-            }
-        }
-    }
-    bool CheckCollision(Rectangle hitbox) const
-    {
-        // Check overlap with solid tiles
-        int minX = hitbox.x / TILE_SIZE;
-        int maxX = (hitbox.x + hitbox.width) / TILE_SIZE;
-        int minY = hitbox.y / TILE_SIZE;
-        int maxY = (hitbox.y + hitbox.height) / TILE_SIZE;
-
-        for (int y = minY; y <= maxY; y++)
-        {
-            for (int x = minX; x <= maxX; x++)
-            {
-                if (y >= 0 && y < (int)tiles.size() &&
-                    x >= 0 && x < (int)tiles[y].size() &&
-                    tiles[y][x] > 0)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    virtual ~Level() = default;
 };
 
+class Level_1_1 : public Level
+{
+public:
+    Level_1_1(const char *filePath, PlayingState *ps);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y, PlayingState *ps);
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
+    void render() override;
+};
+
+class Level_1_3 : public Level
+{
+public:
+    Level_1_3(const char *filePath, PlayingState *ps);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y, PlayingState *ps);
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
+    void render() override;
+};
+
+class Level_1_4 : public Level
+{
+public:
+    Level_1_4(const char *filePath, PlayingState *ps);
+    void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y, PlayingState *ps);
+    void update(Character &player, ItemManager &itemManager, PlayingState *ps) override;
+    void render() override;
+};
+
+class LevelFactory
+{
+public:
+    std::shared_ptr<Level> level;
+    void createLevel(const std::string &id, const char *filePath)
+    {
+        // if ( id == "1.1" )
+        // {
+        //     level = std::make_shared<Level_1_1>(filePath);
+        // }
+        // else if ( id == "1.3" )
+        // {
+        //     level = std::make_shared<Level_1_3>(filePath);
+        // }
+        // else if ( id == "1.4" )
+        // {
+        //     level = std::make_shared<Level_1_4>(filePath);
+        // }
+    }
+};
 #endif // LEVEL_H
