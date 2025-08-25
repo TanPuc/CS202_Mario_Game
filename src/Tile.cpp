@@ -278,8 +278,9 @@ PlatformInstance::PlatformInstance(Vector2 pos_1, Vector2 pos_2, std::shared_ptr
 
 void LavaSurfaceInstance::update(Character &player, ItemManager &itemManager, PlayingState *ps)
 {
-    if (CheckCollisionRecs(player.GetBounds(), hbox))
+    if (CheckCollisionRecs(player.GetBounds(), hbox) && !player.isDead)
     {
+        player.Die();
         // GAME_STATE = LOSE
         // PLAYER_STATE = DEAD
     }
