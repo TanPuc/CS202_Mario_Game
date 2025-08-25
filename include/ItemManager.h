@@ -19,11 +19,12 @@ class ItemManager
 {
 private:
     std::vector<std::unique_ptr<Item>> items;
-    std::unique_ptr<CoinBlockSprite> coinBlockSprite;
-
+    // std::unique_ptr<CoinBlockSprite> coinBlockSprite;
+    std::shared_ptr<CoinBlockSprite> coinBlockSprite;
 public:
-    ItemManager(){
-        coinBlockSprite = std::make_unique<CoinBlockSprite>();
+    ItemManager()
+    {
+        coinBlockSprite = std::make_shared<CoinBlockSprite>();
     };
 
     void AddItem(std::unique_ptr<Item> item);

@@ -16,6 +16,7 @@ class Tile;
 class TileInstance;
 class Mario;
 class ItemManager;
+class BridgeInstance;
 
 class EntityManager
 {
@@ -24,8 +25,10 @@ public:
     std::vector<std::shared_ptr<PlatformInstance>> platforms;
     std::vector<std::shared_ptr<BrickPiece>> brickPieces;
     std::vector<std::shared_ptr<FireBar>> fireBars;
+    std::vector<std::shared_ptr<BridgeInstance>> bridges;
     std::vector<int> toRemove;
 
+    void addBridge(Vector2 position, std::shared_ptr<Tile> bridge);
     void addBrickPieces(Vector2 position);
     void addFireBar(Vector2 position, float initial_angle);
     void initFortressFlag(Vector2 position, float fortressWidth);
@@ -83,27 +86,6 @@ public:
     void addTileInstance(Vector2 &pos, int &tileID, int &x, int &y);
     void update(Mario &player, ItemManager& itemManager) override;
     void render() override;
-};
-
-class LevelFactory
-{
-public:
-    std::shared_ptr<Level> level;
-    void createLevel(const std::string &id, const char *filePath)
-    {
-        // if ( id == "1.1" )
-        // {
-        //     level = std::make_shared<Level_1_1>(filePath);
-        // }
-        // else if ( id == "1.3" )
-        // {
-        //     level = std::make_shared<Level_1_3>(filePath);
-        // }
-        // else if ( id == "1.4" )
-        // {
-        //     level = std::make_shared<Level_1_4>(filePath);
-        // }
-    }
 };
 
 // Level 1.1

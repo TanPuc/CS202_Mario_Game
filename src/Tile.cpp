@@ -238,6 +238,17 @@ void LavaSurfaceInstance::render()
     DrawRectangleLinesEx(hbox, 2.0f, RED); // Draw hitbox
 }
 
+void CoinInstance::update(Mario &player, ItemManager& itemManager) 
+{
+    if (!CoinInitialized)
+    {
+        // itemManager.SpawnCoin();
+        itemManager.SpawnCoinBlock(pos);
+        std::cout << "Coin spawned!" << std::endl;
+        CoinInitialized = true;
+    }
+}
+
 void HiddenBlockInstance::render()
 {
     if ( state == STATE_ACTIVATED || state == STATE_INTERACTED)

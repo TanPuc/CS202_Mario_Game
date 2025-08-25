@@ -26,7 +26,7 @@ struct GameData
         coins = 0;
         score = 0;
         timeRemaining = 400;
-        playerPosition = { 3000, 141 }; // INITIALIZE POSITION 
+        playerPosition = { 0, 0 }; // INITIALIZE POSITION 
         worldNum = 1;
         levelNum = 1;
     }

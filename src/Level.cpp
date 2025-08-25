@@ -299,22 +299,8 @@ Level_1_4::Level_1_4(const char *filePath)
             {8, std::make_shared<Tile>("./assets/Tiles/Castle/used_block.png")},
             {9, std::make_shared<Tile>("./assets/Tiles/Castle/brick.png")},
             {10, std::make_shared<Tile>("./assets/Tiles/Castle/bridge.png")},
-            {11, std::make_shared<Tile>("./assets/Tiles/Castle/chain.png")}};
-
-    // for ( const auto& tile : tileMap )
-    // {
-    //     if ( tile.second == nullptr )
-    //     {
-    //         std::cout << "NULLPTR DETECTED" << std::endl;
-    //     }
-    //     else
-    //     {
-    //         if ( tile.second->getTexture().id <= 0 )
-    //         {
-    //             std::cout << "INVALID TEXTURE DETECTED" << std::endl;
-    //         }
-    //     }
-    // }
+            {11, std::make_shared<Tile>("./assets/Tiles/Castle/chain.png")}
+        };
 
     int temp = 0;
     std::ifstream fin;
@@ -379,6 +365,7 @@ void Level_1_4::addTileInstance(Vector2 &pos, int &tileID, int &x, int &y)
     }
     tileInstancesGrid[x][y] = tileInstance;
 }
+
 
 void Level_1_4::update(Mario &player, ItemManager& itemManager)
 {
@@ -461,11 +448,6 @@ void EntityManager::update(Mario &player)
     for (const auto &idx : toRemove)
         brickPieces.erase(brickPieces.begin() + idx);
     toRemove.clear();
-
-    // for (const auto &platform : platforms)
-    // {
-    //     platform->update(player);
-    // }
 
     for ( auto& fireBar : fireBars )
     {

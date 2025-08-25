@@ -12,7 +12,8 @@ public:
     Texture2D spriteSheet;
     Animation *currentAnimation;
     STATE prevState;
-    int frameSpeed = 12; // 12fps
+    // int frameSpeed = 12; // 12fps
+    int frameSpeed = 400;
     int animationTimer = 0;
 
     CoinBlockSprite()
@@ -34,6 +35,7 @@ public:
 
     void Draw(Entity &entity) override
     {
+        // std::cout << "Drawing CoinBlockSprite" << std::endl;
         if (!currentAnimation)
         {
             std::cerr << "Current animation is not set!" << std::endl;

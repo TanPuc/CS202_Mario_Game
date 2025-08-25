@@ -338,15 +338,7 @@ public:
     {
 
     }
-    void update(Mario &player, ItemManager& itemManager) override
-    {
-        if (!CoinInitialized)
-        {
-            // itemManager.SpawnCoin();
-            std::cout << "Coin spawned!" << std::endl;
-            CoinInitialized = true;
-        }
-    }
+    void update(Mario &player, ItemManager& itemManager) override;
     bool isCoinInitialized() const
     {
         return CoinInitialized;
@@ -368,18 +360,10 @@ public:
 
     void handleAnimation();
     void handleHiddenBBox(Mario& player);
-    // void handleActivation(Mario &player, ItemManager &itemManager);
     void handleActivation();
 
     void render() override;
     void update(Mario &player, ItemManager& itemManager) override;
 };
-
-// class AxeInstance : public TileInstance
-// {
-// public:     
-//     Rectangle hitbox;
-
-// }
 
 #endif // TILE_H
