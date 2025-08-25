@@ -65,14 +65,17 @@ public:
 	void setIsCollidedMap();
 	bool getIsCollidedMap();
 
-	void hasNoHurtBox();
+	void SwitchNoHurtBox();
 	bool CheckHasNoHurtBox();
+	void SwitchNoHitBox();
+	bool CheckHasNoHitBox();
 	void isDead();
 	bool CheckIsDead();
 private:
 	EnemyType					m_Type					;
 	bool						m_isActive				= true;
 	bool						m_hasNoHurtBox			= false;
+	bool						m_hasNoHitBox			= false;
 	bool						m_isDead				= false;
 
 	Vector2						m_velocity				= { 0,0 };

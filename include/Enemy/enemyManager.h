@@ -20,6 +20,8 @@ class EnemyManager
 public:
 	EnemyManager(Mario* player, Level* level, const vector<shared_ptr<FireBall>>& fireballs);
 	void spawnEnemyAt(EnemyType type, Vector2 position);
+	void addShell(Enemy* e);
+	void removeShell(Enemy* e);
 	void update();
 	void draw();
 private:

@@ -167,11 +167,12 @@ public:
 	StateType getName() const override;
 private:
 	float m_gravity;
+	
 };
 class ShellSlidingState : public EnemyState
 {
 public:
-	ShellSlidingState(float speed, float gravity, const Mario& );
+	ShellSlidingState(float speed, float gravity, const Mario&, EnemyManager* manager);
 	void enter(Enemy& e) override;
 	void exit(Enemy& enemy) override;
 	void update(Enemy& enemy) override;
@@ -179,6 +180,7 @@ public:
 private:
 	float m_speed, m_gravity;
 	const Mario& m_player;
+	EnemyManager* m_manager;
 };
 
 class ChaseState : public EnemyState

@@ -85,8 +85,6 @@ void MoveStrategyKeepDistance::move(Enemy& e)
 		e.addVelocityX(result);
 	}
 
-	cout << e.getVelocity().x << endl;
-
 	if (e.getVelocity().x > m_speed) e.setVelocityX(m_speed);
 
 

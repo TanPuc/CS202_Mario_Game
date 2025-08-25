@@ -68,7 +68,7 @@ void PlayingState::enter()
     enemyManager = new EnemyManager(player.get(), level.get(), fireBallManager.GetFireBalls());
     Vector2 posEnemy = { 400, 100 };
     //enemyManager->spawnEnemyAt(EnemyType::goopa, posEnemy);
-    //enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
+    enemyManager->spawnEnemyAt(EnemyType::koopa, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::cheepcheep, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::beezybettle, posEnemy);
     //enemyManager->spawnEnemyAt(EnemyType::blooper, posEnemy);

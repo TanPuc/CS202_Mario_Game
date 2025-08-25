@@ -88,7 +88,7 @@ void CollisionMap::ResolveCollisionMap(Enemy& e, const Level& level)
             if (m_Rectangle)
             {
                 m_Rectangle->collide(e, level.tileInstancesGrid[tileID.first[0]][tileID.first[1]]->bbox);
-                cout << tileID.first[0] << "  " << tileID.first[1] << endl;
+                
             }
         }
     }
@@ -138,7 +138,6 @@ void CollisionStrategyXReverseLedge::collide(Enemy& e, Rectangle tile)
     if (e.getVelocity().x >= 0)
     {
         VertexPosition = Vector2{ e.getHurtBox().x + e.getHurtBox().width - 5,e.getHurtBox().y + e.getHurtBox().height };
-        //cout << VertexPosition.x << endl;
         Directon.x = -5;
     }
     else

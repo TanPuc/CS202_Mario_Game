@@ -199,13 +199,22 @@ void Enemy::setPosition(Vector2 pos)
 	position = pos;
 }
 
-void Enemy::hasNoHurtBox()
+void Enemy::SwitchNoHurtBox()
 {
-	m_hasNoHurtBox = true;
+	m_hasNoHurtBox = !m_hasNoHurtBox;
 }
 bool Enemy::CheckHasNoHurtBox()
 {
 	return m_hasNoHurtBox;
+}
+
+void Enemy::SwitchNoHitBox()
+{
+	m_hasNoHitBox = !m_hasNoHitBox;
+}
+bool Enemy::CheckHasNoHitBox()
+{
+	return m_hasNoHitBox;
 }
 
 void Enemy::isDead()

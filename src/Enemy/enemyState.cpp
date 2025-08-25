@@ -6,8 +6,10 @@
 #include "Enemy/enemyCollisionMap.h"
 #include "Enemy/enemyEnum.h"
 #include "Enemy/enemySprite.h"
+#include "Enemy/enemyManager.h"
 
 #include "Mario.h"
+
 WalkState::WalkState(int speed, float gravity):
 	m_speed(speed), m_gravity(gravity) , m_mario(nullptr){
 }
@@ -199,7 +201,7 @@ StateType HopState::getName() const
 }
 
 ShellState::ShellState(float gravity):
-	m_gravity(gravity) {}
+	m_gravity(gravity)  {}
 void ShellState::enter(Enemy& e)
 {
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
@@ -220,10 +222,13 @@ StateType ShellState::getName() const
 	return StateType::Shell;
 }
 
-ShellSlidingState::ShellSlidingState(float speed, float gravity, const Mario& mario) :
-	m_speed(speed), m_gravity(gravity), m_player(mario) {}
+ShellSlidingState::ShellSlidingState(float speed, float gravity, const Mario& mario, EnemyManager* manager) :
+	m_speed(speed), m_gravity(gravity), m_player(mario), m_manager(manager) {}
 void ShellSlidingState::enter(Enemy& e)
 {
+	m_manager->addShell(&e);
+	e.SwitchNoHitBox();
+
 	MoveStrategyCombined* compoMove = new MoveStrategyCombined();
 	compoMove->addStrategy(new MoveStrategyBasic(-m_speed, e, m_player));
 	compoMove->addStrategy(new MoveStrategyFall(m_gravity));
@@ -233,7 +238,10 @@ void ShellSlidingState::enter(Enemy& e)
 
 	e.setSprite(getName());
 }
-void ShellSlidingState::exit(Enemy& e) {}
+void ShellSlidingState::exit(Enemy& e) {
+	m_manager->removeShell(&e);
+	e.SwitchNoHitBox();
+}
 void ShellSlidingState::update(Enemy& e) {}
 StateType ShellSlidingState::getName() const
 {
