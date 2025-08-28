@@ -161,7 +161,7 @@ void Level_1_1::render()
             if (tileInstancesGrid[i][j])
             {
                 tileInstancesGrid[i][j]->render();
-                // DrawRectangleLinesEx(tileInstancesGrid[i][j]->bbox, 2.0f, RED); // Debug: Draw bounding box
+                // ÂRectangleLinesEx(tileInstancesGrid[i][j]->bbox, 2.0f, RED); // Debug: Draw bounding box
             }
         }
     }
@@ -295,7 +295,7 @@ void Level_1_3::render()
             if (tileInstancesGrid[i][j])
             {
                 tileInstancesGrid[i][j]->render();
-                DrawRectangleLinesEx(tileInstancesGrid[i][j]->bbox, 2.0f, RED); // Draw bounding box
+                // DrawRectangleLinesEx(tileInstancesGrid[i][j]->bbox, 2.0f, RED); // Draw bounding box
             }
         }
     }
