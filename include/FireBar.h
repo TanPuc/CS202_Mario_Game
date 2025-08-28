@@ -10,7 +10,7 @@
 #include "Entity.h"
 #include "GlobalVariables.h"
 #include "GameSprite/FireBallSprite.h"
-#include "Character.h"
+#include "Mario.h"
 
 
 // Forward declaration
@@ -39,7 +39,7 @@ public:
         
     }
 
-    void update(Character& player)
+    void update(Mario& player)
     {
     // Rotate 10 degree every 8 frames 
     timer++;
@@ -103,7 +103,7 @@ public:
         }
     }
 
-    void Update(Character& player)
+    void Update(Mario& player)
     {
         for (auto& element : elements)
         {
