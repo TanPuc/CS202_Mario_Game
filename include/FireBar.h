@@ -10,7 +10,7 @@
 #include "Entity.h"
 #include "GlobalVariables.h"
 #include "GameSprite/FireBallSprite.h"
-#include "Mario.h"
+#include "Character.h"
 
 
 // Forward declaration
@@ -39,7 +39,7 @@ public:
         
     }
 
-    void update(Mario& player)
+    void update(Character& player)
     {
     // Rotate 10 degree every 8 frames 
     timer++;
@@ -72,7 +72,7 @@ public:
     void Draw() 
     {
         sprite->Draw(*this);
-        DrawRectangleLinesEx(rect, 1.0f, RED); // Draw hurt box
+        // DrawRectangleLinesEx(rect, 1.0f, RED); // Draw hurt box
     }
 
     ~FireBarElement()
@@ -103,7 +103,7 @@ public:
         }
     }
 
-    void Update(Mario& player)
+    void Update(Character& player)
     {
         for (auto& element : elements)
         {
